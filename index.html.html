@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX — Corpus Builder</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Syne+Mono&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0A0A12;--ink2:#13131E;--ink3:#1C1C2E;
+  --paper:#F4F1EA;--paper2:#EDE9DF;--paper3:#E5E0D2;
+  --accent:#C8502A;--accent2:#E8733A;
+  --green:#1A6B3C;--green2:#25A05A;
+  --blue:#1A3A6B;--blue2:#2A5AA0;
+  --purple:#5B21B6;--purple2:#7C3AED;
+  --txt:#1A1A2E;--soft:#4A4A6A;--muted:#8A8AAA;
+  --ln:rgba(0,0,0,.08);--ln2:rgba(0,0,0,.14);
+  --shadow:0 2px 12px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04);
+  --shadow-lg:0 8px 40px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.08);
+}
+body{background:var(--paper);color:var(--txt);font-family:'Lora',Georgia,serif;line-height:1.7;min-height:100vh}
+/* HEADER */
+.site-header{background:var(--ink);color:var(--paper);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--accent);position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:.75rem}
+.brand-mark{width:36px;height:36px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Syne Mono',monospace;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.brand-text{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--paper)}
+.brand-sub{font-family:'Syne Mono',monospace;font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,241,234,.3);display:block;margin-top:.04rem}
+.header-status{font-family:'Syne Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,241,234,.38);display:flex;align-items:center;gap:.4rem}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#25A05A;animation:pulse-dot 2s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+/* MAIN TABS */
+.main-tabs{display:flex;background:var(--ink2);border-bottom:2px solid rgba(255,255,255,.05);padding:0 1.5rem;gap:.2rem}
+.main-tab-btn{padding:.72rem 1.1rem;background:transparent;border:none;font-family:'Syne',sans-serif;font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;color:rgba(244,241,234,.32);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;align-items:center;gap:.4rem}
+.main-tab-btn:hover{color:rgba(244,241,234,.6)}
+.main-tab-btn.active{color:var(--paper);border-bottom-color:var(--accent)}
+.main-tab-btn.media.active{border-bottom-color:var(--purple2);color:#C4B5FD}
+/* LAYOUT */
+.app-layout{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 108px)}
+/* LEFT */
+.left-panel{background:var(--ink2);border-right:1px solid rgba(255,255,255,.05);padding:1.2rem;display:flex;flex-direction:column;gap:1rem;overflow-y:auto;height:calc(100vh - 108px);position:sticky;top:108px}
+.tab-page{display:none;flex-direction:column;gap:1rem}
+.tab-page.active{display:flex}
+.panel-section{background:var(--ink3);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden}
+.ps-title{font-family:'Syne',sans-serif;font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:rgba(244,241,234,.28);padding:.62rem 1rem;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:.45rem}
+.ps-body{padding:.85rem 1rem}
+/* Mode toggle */
+.mode-toggle{display:flex;gap:.32rem;margin-bottom:.85rem}
+.mode-btn{flex:1;padding:.42rem .3rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:6px;color:rgba(244,241,234,.38);font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:center}
+.mode-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+/* Drop zone */
+.drop-zone{border:2px dashed rgba(255,255,255,.1);border-radius:8px;padding:1.2rem .9rem;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.02)}
+.drop-zone:hover,.drop-zone.over{border-color:rgba(200,80,42,.45);background:rgba(200,80,42,.05)}
+.drop-zone.media-dz:hover,.drop-zone.media-dz.over{border-color:rgba(124,58,237,.45);background:rgba(124,58,237,.05)}
+.dz-icon{font-size:1.4rem;display:block;margin-bottom:.3rem}
+.dz-label{font-family:'Syne',sans-serif;font-size:.66rem;font-weight:700;letter-spacing:.05em;color:rgba(244,241,234,.62);margin-bottom:.14rem}
+.dz-sub{font-size:.56rem;color:rgba(244,241,234,.26)}
+input[type=file]{display:none}
+/* Doc items */
+.doc-list{display:flex;flex-direction:column;gap:.32rem;margin-top:.65rem}
+.doc-item,.media-item{display:flex;align-items:flex-start;gap:.5rem;padding:.48rem .65rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:7px;margin-bottom:.35rem}
+.di-icon{font-size:.85rem;flex-shrink:0;margin-top:.1rem}
+.di-info,.mi-info{flex:1;min-width:0}
+.di-name,.mi-title{font-family:'Syne',sans-serif;font-size:.62rem;font-weight:700;color:rgba(244,241,234,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.di-meta,.mi-meta{font-family:'Syne Mono',monospace;font-size:.5rem;color:rgba(244,241,234,.26);margin-top:.06rem}
+.di-status{font-family:'Syne Mono',monospace;font-size:.48rem;padding:.1rem .36rem;border-radius:100px;flex-shrink:0}
+.di-status.ready{background:rgba(37,160,90,.14);color:#25A05A}
+.di-remove{background:none;border:none;color:rgba(244,241,234,.16);cursor:pointer;font-size:.68rem;padding:.1rem;transition:color .15s;flex-shrink:0}
+.di-remove:hover{color:#E05555}
+/* Media thumb */
+.mi-thumb{width:42px;height:28px;border-radius:4px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:1rem;color:rgba(255,255,255,.28);flex-shrink:0;overflow:hidden}
+.mi-thumb img{width:100%;height:100%;object-fit:cover}
+.mi-badge{display:inline-flex;align-items:center;gap:.2rem;font-family:'Syne Mono',monospace;font-size:.46rem;padding:.1rem .38rem;border-radius:100px;margin-right:.22rem}
+.mi-badge.yt{background:rgba(255,0,0,.12);color:#FF5555}
+.mi-badge.audio{background:rgba(124,58,237,.14);color:#A78BFA}
+.mi-badge.ok{background:rgba(37,160,90,.12);color:#25A05A}
+.mi-badge.proc{background:rgba(255,176,32,.1);color:#FFB020}
+.mi-badge.err{background:rgba(224,84,84,.12);color:#E05555}
+.mi-badge.manual{background:rgba(255,176,32,.1);color:#FFB020}
+/* Transcript snippet */
+.transcript-snip{font-family:'Syne Mono',monospace;font-size:.52rem;color:rgba(244,241,234,.3);line-height:1.6;margin-top:.35rem;max-height:52px;overflow:hidden;white-space:pre-wrap}
+/* Text input */
+.text-input{width:100%;padding:.72rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:rgba(244,241,234,.85);font-family:'Lora',serif;font-size:.73rem;line-height:1.6;resize:vertical;min-height:110px;outline:none;transition:border-color .2s}
+.text-input:focus{border-color:rgba(200,80,42,.38)}
+.text-input.purple:focus{border-color:rgba(124,58,237,.38)}
+.text-input::placeholder{color:rgba(244,241,234,.17)}
+/* Fields */
+.field{margin-bottom:.72rem}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-family:'Syne',sans-serif;font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:rgba(244,241,234,.3);margin-bottom:.3rem}
+.field select,.field input[type=text]{width:100%;padding:.52rem .68rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:rgba(244,241,234,.85);font-family:'Syne',sans-serif;font-size:.7rem;outline:none;transition:border-color .2s}
+.field select:focus,.field input[type=text]:focus{border-color:rgba(200,80,42,.38)}
+.field select.purple:focus,.field input.purple:focus{border-color:rgba(124,58,237,.38)}
+.field select option{background:#1C1C2E}
+/* Gen mode tabs */
+.gen-mode-tabs{display:flex;gap:.28rem;margin-bottom:.72rem}
+.gmt-btn{flex:1;padding:.36rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;color:rgba(244,241,234,.35);font-family:'Syne',sans-serif;font-size:.54rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.gmt-btn.active{background:rgba(26,107,60,.2);border-color:rgba(37,160,90,.26);color:#25A05A}
+.gmt-btn.active.enrich{background:rgba(26,58,107,.2);border-color:rgba(42,90,160,.26);color:#4D9EFF}
+/* URL row */
+.url-row{display:flex;gap:.45rem;margin-bottom:.65rem}
+.url-input{flex:1;padding:.55rem .7rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(244,241,234,.85);font-family:'Syne Mono',monospace;font-size:.66rem;outline:none;transition:border-color .2s}
+.url-input:focus{border-color:rgba(124,58,237,.38)}
+.url-input::placeholder{color:rgba(244,241,234,.18)}
+.url-add-btn{padding:.55rem .8rem;background:var(--purple2);border:none;border-radius:7px;color:#fff;font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.url-add-btn:hover{background:#8B5CF6}
+/* Or separator */
+.or-sep{display:flex;align-items:center;gap:.65rem;font-family:'Syne',sans-serif;font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,241,234,.18);margin:.65rem 0}
+.or-sep::before,.or-sep::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+/* CTA buttons */
+.cta-btn{width:100%;padding:.78rem;margin-top:.32rem;color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.42rem;transition:all .2s}
+.cta-btn.accent{background:var(--accent)}.cta-btn.accent:hover:not(:disabled){background:var(--accent2);transform:translateY(-1px)}
+.cta-btn.purple{background:var(--purple2)}.cta-btn.purple:hover:not(:disabled){background:#8B5CF6;transform:translateY(-1px)}
+.cta-btn.green{background:var(--green)}.cta-btn.green:hover:not(:disabled){background:var(--green2)}
+.cta-btn.blue{background:var(--blue2)}.cta-btn.blue:hover:not(:disabled){background:#3B70C0}
+.cta-btn:disabled{opacity:.36;cursor:not-allowed;transform:none!important}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn-spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,.26);border-top:2px solid #fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.cta-btn.loading .btn-spinner{display:block}
+.cta-btn.loading .btn-txt{display:none}
+.hint-txt{font-family:'Syne Mono',monospace;font-size:.55rem;color:rgba(244,241,234,.22);line-height:1.7;margin-bottom:.55rem}
+/* RIGHT PANEL */
+.right-panel{background:var(--paper);display:flex;flex-direction:column;overflow:hidden}
+.rp-topbar{display:flex;align-items:center;justify-content:space-between;padding:.88rem 1.4rem;background:var(--paper2);border-bottom:1px solid var(--ln2);flex-shrink:0;flex-wrap:wrap;gap:.45rem}
+.rp-title{font-family:'Syne',sans-serif;font-size:.67rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.rp-actions{display:flex;gap:.38rem;align-items:center;flex-wrap:wrap}
+.rp-count{font-family:'Syne Mono',monospace;font-size:.58rem;background:var(--ink);color:var(--paper);padding:.18rem .48rem;border-radius:100px}
+.btn-ghost-sm{padding:.36rem .72rem;background:transparent;border:1px solid var(--ln2);border-radius:6px;color:var(--soft);font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.btn-ghost-sm:hover{border-color:var(--ink);color:var(--txt)}
+.btn-danger-sm{padding:.36rem .72rem;background:transparent;border:1px solid rgba(200,80,42,.2);border-radius:6px;color:var(--accent);font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.btn-danger-sm:hover{background:rgba(200,80,42,.06)}
+.rp-content{flex:1;overflow-y:auto;padding:1.4rem}
+/* Empty & progress */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:60vh;gap:.85rem;opacity:.48}
+.es-icon{font-size:2.6rem}.es-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--soft)}
+.es-sub{font-size:.76rem;color:var(--muted);max-width:340px;line-height:1.7}
+.progress-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:60vh;gap:1rem}
+.progress-ring{position:relative;width:66px;height:66px}
+.progress-ring svg{transform:rotate(-90deg)}
+.progress-ring circle{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .48s ease}
+.pr-bg{stroke:var(--paper3)}.pr-fill{stroke:var(--accent)}.pr-fill.pm{stroke:var(--purple2)}
+.pr-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne Mono',monospace;font-size:.8rem;font-weight:700;color:var(--txt)}
+.prog-step{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;color:var(--txt)}
+.prog-sub{font-size:.68rem;color:var(--muted)}
+.prog-log{background:var(--paper3);border-radius:8px;padding:.72rem 1.1rem;width:100%;max-width:390px;font-family:'Syne Mono',monospace;font-size:.62rem;color:var(--soft);line-height:2;text-align:left}
+.prog-log div{opacity:.42;transition:opacity .3s}
+.prog-log div.a{opacity:1;color:var(--accent)}
+.prog-log div.a.pm{color:var(--purple2)}
+.prog-log div.d{opacity:.62;color:var(--green)}
+/* Lesson cards */
+.lesson-card{background:#fff;border:1px solid var(--ln2);border-radius:12px;margin-bottom:.85rem;overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .2s}
+.lesson-card:hover{box-shadow:var(--shadow-lg)}
+.lc-header{display:flex;align-items:flex-start;gap:.72rem;padding:.85rem 1.1rem;cursor:pointer;border-bottom:1px solid transparent;transition:background .15s;user-select:none}
+.lc-header:hover{background:rgba(0,0,0,.018)}
+.lc-header.open{border-bottom-color:var(--ln)}
+.lc-num{width:25px;height:25px;border-radius:50%;flex-shrink:0;background:var(--ink);color:var(--paper);font-family:'Syne Mono',monospace;font-size:.64rem;display:flex;align-items:center;justify-content:center;margin-top:.1rem}
+.lc-num.pm{background:var(--purple2)}
+.lc-meta{flex:1;min-width:0}
+.lc-name{font-family:'Syne',sans-serif;font-size:.86rem;font-weight:800;color:var(--txt);line-height:1.3;margin-bottom:.26rem}
+.lc-tags{display:flex;gap:.28rem;flex-wrap:wrap}
+.lc-tag{font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.14rem .42rem;border-radius:100px}
+.tag-level{background:rgba(10,10,18,.08);color:var(--soft)}
+.tag-track{background:rgba(26,107,60,.1);color:var(--green)}
+.tag-quiz{background:rgba(26,58,107,.1);color:var(--blue2)}
+.tag-new{background:rgba(200,80,42,.1);color:var(--accent)}
+.tag-enrich{background:rgba(26,58,107,.1);color:var(--blue2)}
+.tag-media{background:rgba(91,33,182,.1);color:var(--purple2)}
+.tag-sum{background:rgba(91,33,182,.07);color:var(--purple)}
+.lc-toggle{color:var(--muted);font-size:.6rem;margin-top:.24rem;transition:transform .2s;flex-shrink:0}
+.lc-header.open .lc-toggle{transform:rotate(180deg)}
+.lc-body{padding:1.1rem;display:none}
+.lc-body.visible{display:block}
+.lcb-sec{margin-bottom:1rem}
+.lcb-sec:last-child{margin-bottom:0}
+.lcb-sec-title{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.55rem;padding-bottom:.32rem;border-bottom:1px solid var(--ln)}
+/* Blocks */
+.block-item{padding:.52rem .72rem;border-radius:6px;margin-bottom:.32rem;border-left:3px solid}
+.block-hook{background:#FFF8F0;border-color:var(--accent2)}
+.block-content{background:#F8F8FF;border-color:var(--blue2)}
+.block-example{background:#F0F8F0;border-color:var(--green2)}
+.block-tip{background:#FFFFF0;border-color:#D4A800}
+.block-trap{background:#FFF0F0;border-color:#E04444}
+.block-real{background:#F0F4FF;border-color:var(--blue)}
+.block-stats{background:#F5F0FF;border-color:#8B5CF6}
+.block-info{background:#F0FFFA;border-color:var(--green2)}
+.block-label{font-family:'Syne Mono',monospace;font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem;display:block}
+.block-text{color:var(--txt);line-height:1.5;font-size:.7rem}
+/* Summary panel */
+.summary-panel{background:linear-gradient(135deg,rgba(91,33,182,.06),rgba(124,58,237,.03));border:1px solid rgba(91,33,182,.14);border-radius:10px;padding:.95rem 1.05rem;margin-bottom:.85rem}
+.sp-title{font-family:'Syne',sans-serif;font-size:.54rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--purple2);margin-bottom:.55rem}
+.sp-body{font-size:.76rem;color:var(--soft);line-height:1.75}
+.sp-kp{display:flex;flex-direction:column;gap:.28rem;margin-top:.55rem}
+.sp-kp-item{display:flex;align-items:flex-start;gap:.45rem;font-size:.7rem;color:var(--txt)}
+.sp-kp-dot{width:5px;height:5px;border-radius:50%;background:var(--purple2);flex-shrink:0;margin-top:.46rem}
+.media-src-badge{display:inline-flex;align-items:center;gap:.3rem;font-family:'Syne Mono',monospace;font-size:.52rem;background:rgba(91,33,182,.07);border:1px solid rgba(91,33,182,.14);color:var(--purple2);padding:.18rem .55rem;border-radius:100px;margin-bottom:.55rem}
+/* Quiz */
+.quiz-card{background:var(--paper2);border-radius:8px;padding:.78rem .92rem;margin-bottom:.42rem;border:1px solid var(--ln)}
+.quiz-q{font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;color:var(--txt);margin-bottom:.52rem;line-height:1.5}
+.quiz-opts{display:flex;flex-direction:column;gap:.26rem}
+.quiz-opt{padding:.36rem .62rem;border-radius:5px;font-size:.68rem;color:var(--soft);background:#fff;border:1px solid var(--ln);display:flex;align-items:center;gap:.42rem}
+.quiz-opt.correct{background:rgba(26,107,60,.08);border-color:rgba(26,107,60,.2);color:var(--green);font-weight:600}
+.quiz-expl{font-size:.63rem;color:var(--muted);margin-top:.42rem;font-style:italic;line-height:1.5}
+/* Enrich diff */
+.enrich-diff{background:var(--paper3);border-radius:8px;padding:.78rem .92rem;border:1px solid var(--ln)}
+.enrich-label{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue2);margin-bottom:.42rem}
+.diff-add{color:var(--green);font-size:.7rem;line-height:1.6;padding:.16rem 0}
+.diff-add::before{content:'+ ';font-family:'Syne Mono',monospace;font-weight:700}
+/* JSON */
+.json-preview{background:var(--ink);color:#C8E6C9;font-family:'Syne Mono',monospace;font-size:.6rem;line-height:1.68;padding:1.05rem;border-radius:10px;white-space:pre;overflow-x:auto;max-height:240px;overflow-y:auto;border:1px solid rgba(255,255,255,.07)}
+.jk{color:#80CBC4}.js{color:#A5D6A7}.jn{color:#FFD54F}
+/* Card actions */
+.lc-actions{display:flex;gap:.32rem;padding:.62rem 1.1rem;background:var(--paper2);border-top:1px solid var(--ln);flex-wrap:wrap}
+.la-btn{padding:.3rem .62rem;border-radius:5px;font-family:'Syne',sans-serif;font-size:.54rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;transition:all .15s;border:1px solid}
+.la-rm{background:transparent;border-color:rgba(200,80,42,.2);color:var(--accent)}.la-rm:hover{background:rgba(200,80,42,.07)}
+.la-dup{background:transparent;border-color:var(--ln2);color:var(--soft)}.la-dup:hover{border-color:var(--ink);color:var(--txt)}
+.la-ed{background:transparent;border-color:rgba(26,58,107,.2);color:var(--blue2)}.la-ed:hover{background:rgba(26,58,107,.06)}
+/* Toast */
+.toast{position:fixed;bottom:1.2rem;right:1.2rem;background:var(--ink);color:var(--paper);border-left:3px solid var(--green2);padding:.72rem 1.05rem;border-radius:8px;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;box-shadow:var(--shadow-lg);z-index:200;transform:translateY(14px);opacity:0;transition:all .26s;pointer-events:none;max-width:270px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err{border-left-color:#E05555}
+.toast.pm{border-left-color:var(--purple2)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.11);border-radius:2px}
+@media(max-width:840px){.app-layout{grid-template-columns:1fr}.left-panel{position:static;height:auto}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <div class="brand-mark">AX</div>
+    <div>
+      <div class="brand-text">APEX Corpus Builder</div>
+      <span class="brand-sub">Générateur de leçons par IA · v2</span>
+    </div>
+  </div>
+  <div class="header-status"><div class="status-dot"></div>Claude Sonnet · Prêt</div>
+</header>
+
+<nav class="main-tabs">
+  <button class="main-tab-btn active" id="tabDocBtn" onclick="switchMainTab('doc')">📄 Documents &amp; Texte</button>
+  <button class="main-tab-btn media" id="tabMediaBtn" onclick="switchMainTab('media')">🎬 Vidéos &amp; Audio</button>
+</nav>
+
+<div class="app-layout">
+
+  <div class="left-panel">
+
+    <!-- ═══ DOCUMENTS TAB ═══ -->
+    <div class="tab-page active" id="pageDoc">
+
+      <div class="panel-section">
+        <div class="ps-title">📄 Source du corpus</div>
+        <div class="ps-body">
+          <div class="mode-toggle">
+            <button class="mode-btn active" id="modePDF" onclick="setInputMode('pdf')">PDF</button>
+            <button class="mode-btn" id="modeText" onclick="setInputMode('text')">Texte</button>
+            <button class="mode-btn" id="modeBoth" onclick="setInputMode('both')">Les deux</button>
+          </div>
+          <div id="pdfSection">
+            <div class="drop-zone" id="dropZone">
+              <span class="dz-icon">📂</span>
+              <div class="dz-label">Glisser des PDFs ici</div>
+              <div class="dz-sub">clic pour sélectionner · max 10 Mo</div>
+            </div>
+            <input type="file" id="fileInput" accept=".pdf" multiple>
+            <div class="doc-list" id="docList"></div>
+          </div>
+          <div id="textSection" style="display:none">
+            <textarea class="text-input" id="textInput" placeholder="Colle ici un texte brut — extrait de livre, note de recherche, article financier…"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="ps-title">⚙️ Configuration</div>
+        <div class="ps-body">
+          <div class="gen-mode-tabs">
+            <button class="gmt-btn active" id="gmtNew" onclick="setGenMode('new')">✨ Nouvelles</button>
+            <button class="gmt-btn enrich" id="gmtEnrich" onclick="setGenMode('enrich')">✏️ Enrichir</button>
+          </div>
+          <div class="field"><label>Niveau cible</label>
+            <select id="cfgLevel">
+              <option value="Débutant">🌱 Débutant</option>
+              <option value="Intermédiaire" selected>📈 Intermédiaire</option>
+              <option value="Avancé">⚡ Avancé</option>
+              <option value="Expert">🏛️ Expert</option>
+            </select>
+          </div>
+          <div class="field"><label>Nom du track</label><input type="text" id="cfgTrack" placeholder="ex: Analyse Fondamentale"></div>
+          <div class="field"><label>Focus thématique <span style="opacity:.4">(opt.)</span></label><input type="text" id="cfgTheme" placeholder="ex: obligations, DCF, options…"></div>
+          <div class="field" id="countField"><label>Nombre de leçons</label>
+            <select id="cfgCount">
+              <option value="1">1 leçon</option><option value="2">2 leçons</option>
+              <option value="3" selected>3 leçons</option><option value="5">5 leçons</option>
+            </select>
+          </div>
+          <div class="field" id="enrichField" style="display:none">
+            <label>JSON des leçons à enrichir</label>
+            <textarea class="text-input" id="cfgExistingJSON" style="min-height:85px;font-family:'Syne Mono',monospace;font-size:.58rem" placeholder='[{"id":"d1","n":"Titre",...}]'></textarea>
+          </div>
+          <button class="cta-btn accent" id="generateBtn" onclick="startGeneration()">
+            <div class="btn-spinner"></div><span class="btn-txt">✨ Générer les leçons</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="ps-title">📦 Export JSON</div>
+        <div class="ps-body">
+          <div class="hint-txt">Importable dans APEX Invest via l'onglet 🧠 Corpus.</div>
+          <button class="cta-btn green" id="exportBtn" onclick="exportJSON()" disabled><span class="btn-txt">⬇ Télécharger le JSON</span></button>
+          <button class="cta-btn blue" style="margin-top:.32rem" id="copyBtn" onclick="copyJSON()" disabled><span class="btn-txt">📋 Copier le JSON</span></button>
+        </div>
+      </div>
+
+    </div><!-- /pageDoc -->
+
+    <!-- ═══ MÉDIAS TAB ═══ -->
+    <div class="tab-page" id="pageMedia">
+
+      <div class="panel-section">
+        <div class="ps-title">▶ Vidéos YouTube</div>
+        <div class="ps-body">
+          <div class="hint-txt">Colle une URL YouTube — les sous-titres sont extraits automatiquement et envoyés à Claude pour générer les leçons.</div>
+          <div class="url-row">
+            <input type="text" class="url-input" id="ytUrlInput" placeholder="https://youtube.com/watch?v=…">
+            <button class="url-add-btn" onclick="addYouTubeUrl()">+ Ajouter</button>
+          </div>
+          <div id="ytList"></div>
+        </div>
+      </div>
+
+      <div class="or-sep">ou</div>
+
+      <div class="panel-section">
+        <div class="ps-title">🎙 Fichiers Audio</div>
+        <div class="ps-body">
+          <div class="drop-zone media-dz" id="audioDropZone">
+            <span class="dz-icon">🎵</span>
+            <div class="dz-label">Glisser des fichiers audio ici</div>
+            <div class="dz-sub">MP3, WAV, M4A, OGG · max 25 Mo</div>
+          </div>
+          <input type="file" id="audioFileInput" accept=".mp3,.wav,.m4a,.ogg,audio/*" multiple>
+          <div id="audioList" style="margin-top:.55rem"></div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="ps-title">📝 Contexte complémentaire</div>
+        <div class="ps-body">
+          <textarea class="text-input purple" id="mediaContext" placeholder="Contexte ou consignes supplémentaires…&#10;ex: Focus sur les explications concernant la valeur intrinsèque."></textarea>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="ps-title">⚙️ Génération</div>
+        <div class="ps-body">
+          <div class="field"><label>Niveau cible</label>
+            <select id="mCfgLevel" class="purple">
+              <option value="Débutant">🌱 Débutant</option>
+              <option value="Intermédiaire" selected>📈 Intermédiaire</option>
+              <option value="Avancé">⚡ Avancé</option>
+              <option value="Expert">🏛️ Expert</option>
+            </select>
+          </div>
+          <div class="field"><label>Nom du track</label><input type="text" id="mCfgTrack" class="purple" placeholder="ex: Masterclass Investissement"></div>
+          <div class="field"><label>Nombre de leçons</label>
+            <select id="mCfgCount" class="purple">
+              <option value="1">1 leçon</option><option value="2">2 leçons</option>
+              <option value="3" selected>3 leçons</option><option value="5">5 leçons</option>
+            </select>
+          </div>
+          <div class="hint-txt">✦ Claude génère aussi un résumé + points clés pour chaque source.</div>
+          <button class="cta-btn purple" id="mediaGenBtn" onclick="startMediaGeneration()">
+            <div class="btn-spinner"></div><span class="btn-txt">🎬 Analyser &amp; Générer</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="ps-title">📦 Export JSON</div>
+        <div class="ps-body">
+          <button class="cta-btn green" id="mExportBtn" onclick="exportJSON()" disabled><span class="btn-txt">⬇ Télécharger le JSON</span></button>
+          <button class="cta-btn blue" style="margin-top:.32rem" id="mCopyBtn" onclick="copyJSON()" disabled><span class="btn-txt">📋 Copier le JSON</span></button>
+        </div>
+      </div>
+
+    </div><!-- /pageMedia -->
+
+  </div><!-- /left-panel -->
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="rp-topbar">
+      <div class="rp-title" id="rpTitle">Aperçu des leçons générées</div>
+      <div class="rp-actions">
+        <span class="rp-count" id="lessonCount">0 élément</span>
+        <button class="btn-ghost-sm" onclick="toggleAllCards()" id="toggleAllBtn" style="display:none">Tout développer</button>
+        <button class="btn-danger-sm" onclick="clearResults()" id="clearBtn" style="display:none">Tout effacer</button>
+      </div>
+    </div>
+    <div class="rp-content" id="rpContent">
+      <div class="empty-state">
+        <div class="es-icon">📐</div>
+        <div class="es-title">Aucune leçon générée</div>
+        <div class="es-sub">Charge une source — PDF, texte, vidéo YouTube ou audio — puis clique sur Générer.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   APEX CORPUS BUILDER v2
+═══════════════════════════════════════════════════════ */
+const S = {
+  inputMode:'pdf', genMode:'new',
+  docs:[], mediaItems:[], results:[],
+  allExpanded:false, activeTab:'doc'
+};
+
+// ── Tab switch ───────────────────────────────────────
+function switchMainTab(tab) {
+  S.activeTab = tab;
+  document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('tabDocBtn').classList.toggle('active', tab==='doc');
+  document.getElementById('tabMediaBtn').classList.toggle('active', tab==='media');
+  document.getElementById('pageDoc').classList.toggle('active', tab==='doc');
+  document.getElementById('pageMedia').classList.toggle('active', tab==='media');
+  document.getElementById('rpTitle').textContent = tab==='media'
+    ? 'Résumés & leçons générées depuis les médias'
+    : 'Aperçu des leçons générées';
+}
+
+// ── Doc modes ────────────────────────────────────────
+function setInputMode(m) {
+  S.inputMode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mode'+m.charAt(0).toUpperCase()+m.slice(1))?.classList.add('active');
+  document.getElementById('pdfSection').style.display = m==='text'?'none':'block';
+  document.getElementById('textSection').style.display = m==='pdf'?'none':'block';
+}
+function setGenMode(m) {
+  S.genMode = m;
+  document.querySelectorAll('.gmt-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('gmt'+m.charAt(0).toUpperCase()+m.slice(1))?.classList.add('active');
+  document.getElementById('countField').style.display = m==='enrich'?'none':'block';
+  document.getElementById('enrichField').style.display = m==='enrich'?'block':'none';
+}
+
+// ── PDF ──────────────────────────────────────────────
+const dz = document.getElementById('dropZone');
+const fi = document.getElementById('fileInput');
+dz.addEventListener('dragover', e=>{e.preventDefault();dz.classList.add('over')});
+dz.addEventListener('dragleave', ()=>dz.classList.remove('over'));
+dz.addEventListener('drop', e=>{e.preventDefault();dz.classList.remove('over');handlePDFs([...e.dataTransfer.files])});
+dz.addEventListener('click', ()=>fi.click());
+fi.addEventListener('change', ()=>handlePDFs([...fi.files]));
+
+function handlePDFs(files) {
+  files.filter(f=>f.name.endsWith('.pdf')).forEach(f=>{
+    if(f.size>10*1024*1024){toast(f.name+' > 10Mo',true);return}
+    if(S.docs.find(d=>d.name===f.name))return;
+    const r=new FileReader();
+    r.onload=e=>{S.docs.push({name:f.name,size:f.size,base64:e.target.result.split(',')[1]});renderDocs()};
+    r.readAsDataURL(f);
+  });
+}
+function removeDoc(name){S.docs=S.docs.filter(d=>d.name!==name);renderDocs()}
+function renderDocs(){
+  document.getElementById('docList').innerHTML=S.docs.map(d=>`
+    <div class="doc-item">
+      <span class="di-icon">📄</span>
+      <div class="di-info"><div class="di-name">${d.name}</div><div class="di-meta">${(d.size/1024).toFixed(0)} Ko · PDF</div></div>
+      <span class="di-status ready">✅</span>
+      <button class="di-remove" onclick="removeDoc('${d.name.replace(/'/g,"\\'")}')">✕</button>
+    </div>`).join('');
+}
+
+// ── Audio ────────────────────────────────────────────
+const adz = document.getElementById('audioDropZone');
+const afi = document.getElementById('audioFileInput');
+adz.addEventListener('dragover',e=>{e.preventDefault();adz.classList.add('over')});
+adz.addEventListener('dragleave',()=>adz.classList.remove('over'));
+adz.addEventListener('drop',e=>{e.preventDefault();adz.classList.remove('over');handleAudio([...e.dataTransfer.files])});
+adz.addEventListener('click',()=>afi.click());
+afi.addEventListener('change',()=>handleAudio([...afi.files]));
+
+function handleAudio(files){
+  const EXTS=['.mp3','.wav','.m4a','.ogg','.aac','.flac','.webm'];
+  const MIME={mp3:'audio/mpeg',wav:'audio/wav',m4a:'audio/mp4',ogg:'audio/ogg',aac:'audio/aac',flac:'audio/flac',webm:'audio/webm'};
+  files.filter(f=>EXTS.some(x=>f.name.toLowerCase().endsWith(x))).forEach(f=>{
+    if(f.size>25*1024*1024){toast(f.name+' > 25Mo',true);return}
+    if(S.mediaItems.find(m=>m.id===f.name))return;
+    const ext=f.name.split('.').pop().toLowerCase();
+    const r=new FileReader();
+    r.onload=e=>{
+      S.mediaItems.push({type:'audio',id:f.name,title:f.name.replace(/\.[^.]+$/,''),base64:e.target.result.split(',')[1],mediaType:MIME[ext]||'audio/mpeg',size:f.size,status:'ready',transcript:null});
+      renderMediaList();
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+// ── YouTube ──────────────────────────────────────────
+function addYouTubeUrl(){
+  const inp=document.getElementById('ytUrlInput');
+  const url=inp.value.trim();
+  if(!url)return;
+  const vid=extractYTId(url);
+  if(!vid){toast('URL YouTube invalide',true);return}
+  if(S.mediaItems.find(m=>m.id===vid)){toast('Vidéo déjà ajoutée',true);return}
+  const item={type:'yt',id:vid,title:'Chargement…',url,status:'loading',transcript:null,thumb:`https://img.youtube.com/vi/${vid}/mqdefault.jpg`,transcriptError:null};
+  S.mediaItems.push(item); renderMediaList(); inp.value='';
+  fetchYTSubtitles(vid,item);
+}
+
+function extractYTId(url){
+  const m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/)||url.match(/^([a-zA-Z0-9_-]{11})$/);
+  return m?m[1]:null;
+}
+
+async function fetchYTSubtitles(vid,item){
+  try{
+    const pageResp=await fetch(`https://corsproxy.io/?https://www.youtube.com/watch?v=${vid}`);
+    if(!pageResp.ok) throw new Error('Page YouTube inaccessible');
+    const html=await pageResp.text();
+
+    // Extract title
+    const tm=html.match(/"title":"([^"]+)"/);
+    if(tm) item.title=tm[1].replace(/\\u([0-9A-Fa-f]{4})/g,(_,h)=>String.fromCharCode(parseInt(h,16))).replace(/\\n/g,' ').replace(/\\/g,'');
+
+    // Find captions
+    const cm=html.match(/"captionTracks":\[(.*?)\]/s);
+    if(!cm) throw new Error('Aucun sous-titre disponible pour cette vidéo');
+
+    const buMatch=cm[1].match(/"baseUrl":"([^"]+)"/);
+    if(!buMatch) throw new Error('URL des sous-titres introuvable');
+
+    const capUrl=buMatch[1].replace(/\\u0026/g,'&').replace(/\\/g,'');
+    const capResp=await fetch(`https://corsproxy.io/?${capUrl}&fmt=json3`);
+    if(!capResp.ok) throw new Error('Sous-titres inaccessibles');
+    const capData=await capResp.json();
+
+    const transcript=(capData.events||[]).filter(e=>e.segs).map(e=>e.segs.map(s=>s.utf8||'').join('')).join(' ').replace(/\n/g,' ').replace(/\s+/g,' ').trim();
+    if(!transcript||transcript.length<50) throw new Error('Transcription vide ou trop courte');
+
+    item.transcript=transcript; item.status='ready';
+  }catch(err){
+    item.status='manual'; item.transcriptError=err.message;
+    if(item.title==='Chargement…') item.title=`Vidéo ${vid}`;
+  }
+  renderMediaList();
+}
+
+function pasteTranscript(id){
+  const item=S.mediaItems.find(m=>m.id===id); if(!item)return;
+  const t=prompt('Colle la transcription ou le contenu de la vidéo :');
+  if(t&&t.trim()){item.transcript=t.trim();item.status='ready';renderMediaList();toast('Transcription ajoutée ✓',false,'pm')}
+}
+
+function removeMediaItem(id){S.mediaItems=S.mediaItems.filter(m=>m.id!==id);renderMediaList()}
+
+function renderMediaList(){
+  const ytItems=S.mediaItems.filter(m=>m.type==='yt');
+  const auItems=S.mediaItems.filter(m=>m.type==='audio');
+
+  document.getElementById('ytList').innerHTML=ytItems.map(item=>`
+    <div class="media-item">
+      <div class="mi-thumb">${item.thumb?`<img src="${item.thumb}" alt="">` :'▶'}</div>
+      <div class="mi-info">
+        <div class="mi-title">${item.title}</div>
+        <div class="mi-meta">
+          <span class="mi-badge yt">▶ YouTube</span>
+          <span class="mi-badge ${item.status==='ready'?'ok':item.status==='loading'?'proc':'manual'}">
+            ${item.status==='ready'?'✅ Prêt':item.status==='loading'?'⏳ Extraction…':'⚠ Manuel'}
+          </span>
+        </div>
+        ${item.status==='manual'?`<div style="font-family:'Syne Mono',monospace;font-size:.5rem;color:rgba(244,241,234,.28);line-height:1.6;margin-top:.3rem">${item.transcriptError||'Sous-titres non disponibles.'}<br><span style="color:rgba(167,139,250,.7);cursor:pointer;text-decoration:underline" onclick="pasteTranscript('${item.id}')">→ Coller la transcription manuellement</span></div>`:''}
+        ${item.transcript?`<div class="transcript-snip">${item.transcript.substring(0,180)}…</div>`:''}
+      </div>
+      <button class="di-remove" onclick="removeMediaItem('${item.id}')">✕</button>
+    </div>`).join('');
+
+  document.getElementById('audioList').innerHTML=auItems.map(item=>`
+    <div class="media-item">
+      <div class="mi-thumb" style="font-size:1.1rem">🎵</div>
+      <div class="mi-info">
+        <div class="mi-title">${item.title}</div>
+        <div class="mi-meta"><span class="mi-badge audio">🎙 Audio</span><span class="mi-badge ok">✅ ${(item.size/1024/1024).toFixed(1)} Mo</span></div>
+      </div>
+      <button class="di-remove" onclick="removeMediaItem('${item.id}')">✕</button>
+    </div>`).join('');
+}
+
+// ── Media generation ─────────────────────────────────
+async function startMediaGeneration(){
+  const ready=S.mediaItems.filter(m=>m.status==='ready');
+  if(!ready.length){toast('Aucune source prête',true);return}
+  const level=document.getElementById('mCfgLevel').value;
+  const track=document.getElementById('mCfgTrack').value.trim()||'Médias Corpus';
+  const count=parseInt(document.getElementById('mCfgCount').value)||3;
+  const context=document.getElementById('mediaContext').value.trim();
+  const btn=document.getElementById('mediaGenBtn');
+  btn.classList.add('loading');btn.disabled=true;
+  document.getElementById('mExportBtn').disabled=true;
+  document.getElementById('mCopyBtn').disabled=true;
+  showProgress(true);
+  try{
+    const result=await callClaudeMedia({level,track,count,context,items:ready});
+    S.results=[...S.results,...result];
+    renderResults();
+    document.getElementById('mExportBtn').disabled=false;
+    document.getElementById('mCopyBtn').disabled=false;
+    toast(`${result.length} résultat${result.length>1?'s':''} généré${result.length>1?'s':''}`,false,'pm');
+  }catch(err){showEmpty();toast('Erreur : '+err.message,true)}
+  finally{btn.classList.remove('loading');btn.disabled=false}
+}
+
+async function callClaudeMedia({level,track,count,context,items}){
+  const SCHEMA=`{"type":"lesson_set","source_summary":{"title":"Titre","summary":"Résumé 3-4 phrases","key_points":["Point 1","Point 2","Point 3"]},"lessons":[{"id":"gen_media_[ts]_[n]","e":"emoji","n":"Titre","t":"3 min","coins":120,"xp":100,"tag":"Thème","unlockXP":0,"blocks":[{"type":"hook","emo":"💡","text":"HTML"},{"type":"content","text":"HTML"},{"type":"tip","i":"⚡","text":"HTML"},{"type":"trap","text":"HTML"}],"quiz":{"q":"?","opts":["A","B","C","D"],"correct":0,"expl":"HTML"}}]}`;
+  const sys=`Tu analyses du contenu multimédia (transcriptions) et génères un résumé structuré + des leçons pour APEX Invest.
+RÈGLE : JSON pur uniquement, schéma exact :
+${SCHEMA}
+- source_summary : résumé + 3-5 points clés extraits du contenu.
+- lessons : exactement ${count} leçon(s), niveau "${level}", Français.
+- blocks : 4-8, hook en 1er. quiz.correct = index 0-3.
+- Contenu tiré EXCLUSIVEMENT des sources. Exemples FR/EU.${context?'\n- Contexte : '+context:''}
+- Track : "${track}"`;
+
+  const parts=[];
+  const ytItems=items.filter(m=>m.type==='yt'&&m.transcript);
+  const auItems=items.filter(m=>m.type==='audio');
+  ytItems.forEach((item,i)=>parts.push({type:'text',text:`--- TRANSCRIPTION VIDÉO ${i+1} : "${item.title}" ---\n${item.transcript}\n---`}));
+  auItems.forEach(item=>parts.push({type:'text',text:`--- FICHIER AUDIO : "${item.title}" ---\n[Contenu audio joint — génère les leçons sur la base du titre et du contexte fourni]`}));
+  parts.push({type:'text',text:`Génère ${count} leçon(s) niveau "${level}" pour le track "${track}" depuis ${items.length} source${items.length>1?'s':''}. JSON pur.`});
+
+  const raw = await callAnthropicAPI(sys, parts);
+  const clean=raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  let parsed; try{parsed=JSON.parse(clean)}catch(e){throw new Error('Réponse JSON invalide')}
+  const ts=Date.now(); const res=[];
+  if(parsed.source_summary) res.push({_type:'summary',_track:track,_level:level,_mode:'media',_sources:items.map(i=>i.title).join(', '),_generatedAt:new Date().toLocaleString('fr-FR'),summary:parsed.source_summary});
+  (parsed.lessons||[]).forEach((l,i)=>res.push({...l,id:l.id||`gen_media_${ts}_${i}`,_track:track,_level:level,_mode:'media',_sources:items.map(i=>i.title).join(', '),_generatedAt:new Date().toLocaleString('fr-FR')}));
+  return res;
+}
+
+
+// ── Anthropic API — compatible Claude.ai artifact + fichier local ──────────
+async function callAnthropicAPI(systemPrompt, parts) {
+  // Tenter l'API Anthropic directe (fichier local / serveur avec CORS)
+  try {
+    const userContent = parts.map(p => {
+      if (p.type === 'document' && p.source) return { type: 'document', source: p.source };
+      if (p.type === 'text') return { type: 'text', text: p.text };
+      return null;
+    }).filter(Boolean);
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 6000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userContent }]
+      })
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      const txt = data.content?.[0]?.text || '';
+      if (txt) return txt;
+    }
+  } catch(e) { /* CORS bloqué — fallback ci-dessous */ }
+
+  // Fallback : reconstruire en texte brut et appeler via window.claude si disponible
+  const textOnly = parts.filter(p => p.type === 'text').map(p => p.text).join('\n\n');
+  const hasBinary = parts.some(p => p.type === 'document');
+  const fullPrompt = (hasBinary ? '[Documents binaires joints à analyser]\n\n' : '') + textOnly;
+
+  if (typeof window !== 'undefined' && window.claude && typeof window.claude.complete === 'function') {
+    return await window.claude.complete(`${systemPrompt}\n\n${fullPrompt}`);
+  }
+
+  // Dernier recours : appel API sans clé (claude.ai injecte l'auth automatiquement)
+  const r2 = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 6000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: [{ type: 'text', text: fullPrompt }] }]
+    })
+  });
+  if (!r2.ok) {
+    const e = await r2.json().catch(() => ({}));
+    throw new Error(e.error?.message || `Erreur API (${r2.status}). Ouvre l'outil en tant que fichier HTML sur ton ordinateur.`);
+  }
+  const d2 = await r2.json();
+  return d2.content?.[0]?.text || '';
+}
+
+// ── Doc generation ────────────────────────────────────
+async function startGeneration(){
+  const hasPDF=S.docs.length>0, hasText=document.getElementById('textInput').value.trim().length>20, mode=S.inputMode;
+  if(mode==='pdf'&&!hasPDF){toast('Aucun PDF chargé',true);return}
+  if(mode==='text'&&!hasText){toast('Aucun texte fourni',true);return}
+  if(mode==='both'&&!hasPDF&&!hasText){toast('Aucune source',true);return}
+  const level=document.getElementById('cfgLevel').value, track=document.getElementById('cfgTrack').value.trim()||'Corpus Généré', theme=document.getElementById('cfgTheme').value.trim(), count=parseInt(document.getElementById('cfgCount').value)||3, isEnrich=S.genMode==='enrich';
+  let existing=[];
+  if(isEnrich){try{existing=JSON.parse(document.getElementById('cfgExistingJSON').value.trim()||'[]')}catch(e){toast('JSON invalide',true);return}}
+  const btn=document.getElementById('generateBtn');
+  btn.classList.add('loading');btn.disabled=true;
+  document.getElementById('exportBtn').disabled=true;
+  document.getElementById('copyBtn').disabled=true;
+  showProgress(false);
+  try{
+    const result=await callClaude({level,track,theme,count,isEnrich,existing,hasPDF,hasText,mode});
+    S.results=[...S.results,...result]; renderResults();
+    document.getElementById('exportBtn').disabled=false;
+    document.getElementById('copyBtn').disabled=false;
+    toast(`${result.length} leçon${result.length>1?'s':''} générée${result.length>1?'s':''}✨`);
+  }catch(err){showEmpty();toast('Erreur : '+err.message,true)}
+  finally{btn.classList.remove('loading');btn.disabled=false}
+}
+
+async function callClaude({level,track,theme,count,isEnrich,existing,hasPDF,hasText,mode}){
+  const txt=document.getElementById('textInput').value.trim();
+  const SCHEMA=`{"id":"gen_[ts]_[n]","e":"emoji","n":"Titre","t":"3 min","coins":120,"xp":100,"tag":"Thème","unlockXP":0,"blocks":[{"type":"hook","emo":"💡","text":"HTML"},{"type":"content","text":"HTML"},{"type":"stats","vals":[{"v":"XX%","l":"Label","c":"g"}]},{"type":"tip","i":"⚡","text":"HTML"},{"type":"trap","text":"HTML"},{"type":"real","title":"Cas","text":"HTML"}],"quiz":{"q":"?","opts":["A","B","C","D"],"correct":0,"expl":"HTML"}}`;
+  const sys=isEnrich
+    ?`Enrichis des leçons APEX Invest. JSON pur (tableau). {"id":"orig","additions":[...blocs...],"quiz_additions":[...],"enrichment_note":"..."}. Niveau:${level}. FR.${theme?' Focus:'+theme:''}`
+    :`Génère des leçons APEX Invest. JSON pur (tableau). Schéma:${SCHEMA}. ${count} leçon(s). Niveau:${level}. FR. Blocks:4-8,hook en 1er. stats.vals c=g/r/y. quiz.correct=0-3. Track:"${track}".${theme?' Focus:'+theme:''}`;
+  const parts=[];
+  if((mode==='pdf'||mode==='both')&&S.docs.length) S.docs.forEach(d=>parts.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:d.base64}}));
+  if((mode==='text'||mode==='both')&&txt) parts.push({type:'text',text:`---TEXTE---\n${txt}\n---`});
+  const srcs=[];
+  if((mode==='pdf'||mode==='both')&&S.docs.length) srcs.push(S.docs.length+' PDF');
+  if((mode==='text'||mode==='both')&&txt) srcs.push('texte');
+  parts.push({type:'text',text:isEnrich?`Enrichis:\n${JSON.stringify(existing,null,2)}\nJSON pur.`:`Génère ${count} leçon(s) niveau "${level}"${theme?' sur '+theme:''} track "${track}" depuis ${srcs.join('+')}. JSON pur.`});
+  // Construire le prompt complet pour window.claude.complete()
+  const fullPrompt = parts.map(p => {
+    if (p.type === 'text') return p.text;
+    if (p.type === 'document') return '[Document PDF joint]';
+    return '';
+  }).filter(Boolean).join('\n\n');
+
+  const raw = await callAnthropicAPI(sys, parts);
+  const clean = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  let parsed; try{parsed=JSON.parse(clean)}catch(e){throw new Error('Réponse JSON invalide — réessaie')}
+  if(!Array.isArray(parsed)||!parsed.length) throw new Error('Aucune leçon dans la réponse');
+  const ts=Date.now();
+  return parsed.map((l,i)=>({...l,id:l.id||`gen_${ts}_${i}`,_track:track,_level:level,_mode:S.genMode,_generatedAt:new Date().toLocaleString('fr-FR')}));
+}
+
+// ── Progress ──────────────────────────────────────────
+function showProgress(isMedia){
+  const steps=isMedia
+    ?['Chargement des médias…','Analyse du contenu…','Extraction des concepts…','Génération du résumé…','Création des leçons…']
+    :['Lecture des sources…','Extraction des concepts…','Structuration pédagogique…','Génération des quiz…','Finalisation…'];
+  const r=30; const circ=2*Math.PI*r; let cur=0;
+  document.getElementById('rpContent').innerHTML=`
+    <div class="progress-state">
+      <div class="progress-ring">
+        <svg width="66" height="66" viewBox="0 0 66 66">
+          <circle class="pr-bg" cx="33" cy="33" r="${r}"/>
+          <circle class="pr-fill${isMedia?' pm':''}" cx="33" cy="33" r="${r}" id="prc" style="stroke-dasharray:${circ};stroke-dashoffset:${circ}"/>
+        </svg>
+        <div class="pr-num" id="prn">0%</div>
+      </div>
+      <div class="prog-step" id="pst">${steps[0]}</div>
+      <div class="prog-sub">L'IA analyse les sources et structure les leçons</div>
+      <div class="prog-log">${steps.map((s,i)=>`<div id="pl${i}" class="${i===0?'a'+(isMedia?' pm':''):''}">${i===0?'◉':'○'} ${s}</div>`).join('')}</div>
+    </div>`;
+  const iv=setInterval(()=>{
+    if(cur>=steps.length-1){clearInterval(iv);return}
+    cur++;
+    const pct=Math.round(cur/steps.length*90);
+    const c=document.getElementById('prc'); if(c) c.style.strokeDashoffset=circ*(1-pct/100);
+    const n=document.getElementById('prn'); if(n) n.textContent=pct+'%';
+    const st=document.getElementById('pst'); if(st) st.textContent=steps[cur];
+    steps.forEach((_,i)=>{const e=document.getElementById('pl'+i);if(!e)return;if(i<cur){e.className='d';e.textContent='✓ '+steps[i]}else if(i===cur){e.className='a'+(isMedia?' pm':'');e.textContent='◉ '+steps[i]}});
+  },2000);
+}
+function showEmpty(){document.getElementById('rpContent').innerHTML=`<div class="empty-state"><div class="es-icon">📐</div><div class="es-title">Aucune leçon générée</div><div class="es-sub">Charge une source puis clique sur Générer.</div></div>`}
+
+// ── Render results ────────────────────────────────────
+function renderResults(){
+  if(!S.results.length){showEmpty();return}
+  const n=S.results.length;
+  document.getElementById('lessonCount').textContent=`${n} élément${n>1?'s':''}`;
+  document.getElementById('toggleAllBtn').style.display='inline-flex';
+  document.getElementById('clearBtn').style.display='inline-flex';
+  document.getElementById('rpContent').innerHTML=S.results.map((item,idx)=>item._type==='summary'?renderSummaryCard(item,idx):renderLessonCard(item,idx)).join('');
+}
+
+function renderSummaryCard(item,idx){
+  const s=item.summary||{};
+  return `<div class="lesson-card" id="lcard-${idx}">
+    <div class="lc-header" id="lch-${idx}" onclick="toggleCard(${idx})">
+      <div class="lc-num pm">📋</div>
+      <div class="lc-meta">
+        <div class="lc-name">📊 ${s.title||'Résumé de la source'}</div>
+        <div class="lc-tags"><span class="lc-tag tag-media">🎬 Média</span><span class="lc-tag tag-sum">Résumé</span><span class="lc-tag tag-level">${item._level}</span></div>
+      </div>
+      <span class="lc-toggle">▼</span>
+    </div>
+    <div class="lc-body" id="lcb-${idx}">
+      <div class="media-src-badge">🎬 ${item._sources}</div>
+      <div class="summary-panel">
+        <div class="sp-title">📝 Résumé</div>
+        <div class="sp-body">${s.summary||'—'}</div>
+        ${s.key_points?.length?`<div class="sp-kp">${s.key_points.map(p=>`<div class="sp-kp-item"><div class="sp-kp-dot"></div>${p}</div>`).join('')}</div>`:''}
+      </div>
+      <div style="font-family:'Syne Mono',monospace;font-size:.55rem;color:var(--muted)">Généré le ${item._generatedAt}</div>
+    </div>
+    <div class="lc-actions"><button class="la-btn la-rm" onclick="removeLesson(${idx})">✕ Retirer</button></div>
+  </div>`;
+}
+
+function renderLessonCard(lesson,idx){
+  const isMedia=lesson._mode==='media', isEnrich=lesson._mode==='enrich';
+  const blocks=lesson.blocks||lesson.content||[], quiz=lesson.quiz;
+  return `<div class="lesson-card" id="lcard-${idx}">
+    <div class="lc-header" id="lch-${idx}" onclick="toggleCard(${idx})">
+      <div class="lc-num${isMedia?' pm':''}">${idx+1}</div>
+      <div class="lc-meta">
+        <div class="lc-name">${lesson.e||lesson.icon||'📖'} ${lesson.n}</div>
+        <div class="lc-tags">
+          <span class="lc-tag tag-level">${lesson._level||''}</span>
+          <span class="lc-tag tag-track">${lesson._track||''}</span>
+          ${isMedia?'<span class="lc-tag tag-media">🎬 Média</span>':''}
+          ${isEnrich?'<span class="lc-tag tag-enrich">✏️ Enrichi</span>':''}
+          ${!isMedia&&!isEnrich?'<span class="lc-tag tag-new">✨ Nouvelle</span>':''}
+          ${quiz?`<span class="lc-tag tag-quiz">Quiz·${Array.isArray(quiz)?quiz.length:1}Q</span>`:''}
+          ${lesson.xp?`<span class="lc-tag tag-level">⚡${lesson.xp}XP</span>`:''}
+        </div>
+      </div>
+      <span class="lc-toggle">▼</span>
+    </div>
+    <div class="lc-body" id="lcb-${idx}">
+      ${isMedia&&lesson._sources?`<div class="media-src-badge">🎬 ${lesson._sources}</div>`:''}
+      ${isEnrich&&lesson.enrichment_note?`<div class="lcb-sec"><div class="lcb-sec-title">Enrichissement</div><div class="enrich-diff"><div class="enrich-label">Modifications</div><div class="diff-add">${lesson.enrichment_note}</div></div></div>`:''}
+      ${blocks.length?`<div class="lcb-sec"><div class="lcb-sec-title">Contenu — ${blocks.length} bloc${blocks.length>1?'s':''}</div>${blocks.map(b=>renderBlock(b)).join('')}</div>`:''}
+      ${renderQuizSec(quiz)}
+      <div class="lcb-sec"><div class="lcb-sec-title">JSON brut</div><pre class="json-preview">${sh(JSON.stringify({id:lesson.id,e:lesson.e,n:lesson.n,t:lesson.t,coins:lesson.coins,xp:lesson.xp,tag:lesson.tag,unlockXP:lesson.unlockXP||0,blocks:lesson.blocks||lesson.content||[],quiz:lesson.quiz},null,2))}</pre></div>
+    </div>
+    <div class="lc-actions">
+      <button class="la-btn la-rm" onclick="removeLesson(${idx})">✕ Retirer</button>
+      <button class="la-btn la-dup" onclick="dupLesson(${idx})">⊕ Dupliquer</button>
+      <button class="la-btn la-ed" onclick="editName(${idx})">✏️ Renommer</button>
+    </div>
+  </div>`;
+}
+
+function renderBlock(b){
+  const cls={hook:'block-hook',content:'block-content',example:'block-example',tip:'block-tip',trap:'block-trap',real:'block-real',stats:'block-stats',info:'block-info'}[b.type]||'block-content';
+  let inner=b.type==='stats'&&b.vals?b.vals.map(v=>`<strong>${v.v}</strong> ${v.l}`).join(' · '):b.type==='real'?`<strong>${b.title||''}</strong> — ${(b.text||'').replace(/<[^>]*>/g,'')}`:((b.text||b.content||'').replace(/<[^>]*>/g,''));
+  return `<div class="block-item ${cls}"><span class="block-label">${b.type}${b.emo?' '+b.emo:b.i?' '+b.i:''}</span><div class="block-text">${inner.substring(0,200)}${inner.length>200?'…':''}</div></div>`;
+}
+
+function renderQuizSec(quiz){
+  if(!quiz) return '';
+  const arr=Array.isArray(quiz)?quiz:[quiz];
+  return `<div class="lcb-sec"><div class="lcb-sec-title">Quiz — ${arr.length}Q</div>${arr.map(q=>`<div class="quiz-card"><div class="quiz-q">${q.q}</div><div class="quiz-opts">${(q.opts||[]).map((o,i)=>`<div class="quiz-opt ${i===(q.correct!==undefined?q.correct:q.ans)?'correct':''}"><span style="font-family:'Syne Mono',monospace;font-size:.6rem">${String.fromCharCode(65+i)}.</span>${o}</div>`).join('')}</div>${q.expl?`<div class="quiz-expl">💡 ${(q.expl||'').replace(/<[^>]*>/g,'')}</div>`:''}</div>`).join('')}</div>`;
+}
+
+function sh(json){return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,m=>{let c='jn';if(/^"/.test(m)) c=/:$/.test(m)?'jk':'js';return `<span class="${c}">${m}</span>`})}
+
+// ── Card interactions ─────────────────────────────────
+function toggleCard(idx){document.getElementById('lch-'+idx)?.classList.toggle('open');document.getElementById('lcb-'+idx)?.classList.toggle('visible')}
+function toggleAllCards(){
+  S.allExpanded=!S.allExpanded;
+  document.getElementById('toggleAllBtn').textContent=S.allExpanded?'Tout réduire':'Tout développer';
+  S.results.forEach((_,i)=>{const h=document.getElementById('lch-'+i);const b=document.getElementById('lcb-'+i);if(h&&b){S.allExpanded?h.classList.add('open'):h.classList.remove('open');S.allExpanded?b.classList.add('visible'):b.classList.remove('visible')}});
+}
+function removeLesson(idx){
+  S.results.splice(idx,1);
+  if(!S.results.length) ['exportBtn','copyBtn','mExportBtn','mCopyBtn'].forEach(id=>{const el=document.getElementById(id);if(el) el.disabled=true});
+  renderResults();
+}
+function dupLesson(idx){S.results.push({...S.results[idx],id:S.results[idx].id+'_copy_'+Date.now()});renderResults()}
+function editName(idx){
+  const el=document.querySelector(`#lch-${idx} .lc-name`); if(!el) return;
+  const inp=document.createElement('input');inp.type='text';inp.value=S.results[idx].n;
+  inp.style.cssText='font-family:Syne,sans-serif;font-size:.86rem;font-weight:800;background:var(--paper2);border:1px solid var(--accent);border-radius:4px;padding:.16rem .36rem;color:var(--txt);width:100%;outline:none';
+  el.innerHTML='';el.appendChild(inp);inp.focus();
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){S.results[idx].n=inp.value;renderResults()}if(e.key==='Escape')renderResults()});
+  inp.addEventListener('blur',()=>{S.results[idx].n=inp.value;renderResults()});
+}
+function clearResults(){
+  S.results=[];
+  ['exportBtn','copyBtn','mExportBtn','mCopyBtn'].forEach(id=>{const el=document.getElementById(id);if(el) el.disabled=true});
+  document.getElementById('toggleAllBtn').style.display='none';
+  document.getElementById('clearBtn').style.display='none';
+  document.getElementById('lessonCount').textContent='0 élément';
+  showEmpty();
+}
+
+// ── Export ─────────────────────────────────────────────
+function buildExport(){
+  const byTrack={}, sums=[];
+  S.results.forEach(item=>{
+    if(item._type==='summary'){sums.push(item.summary);return}
+    const key=`${item._level}||${item._track}`;
+    if(!byTrack[key]) byTrack[key]={level:item._level,track:item._track,source:item._mode,lessons:[]};
+    byTrack[key].lessons.push({id:item.id,e:item.e,n:item.n,t:item.t,coins:item.coins,xp:item.xp,tag:item.tag,unlockXP:item.unlockXP||0,blocks:item.blocks||item.content||[],quiz:item.quiz});
+  });
+  return {version:'1.1',generatedAt:new Date().toISOString(),tool:'APEX Corpus Builder v2',summaries:sums,tracks:Object.values(byTrack)};
+}
+function exportJSON(){
+  const d=buildExport();
+  const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`apex-corpus-${Date.now()}.json`;a.click();URL.revokeObjectURL(u);
+  toast('JSON téléchargé ✓');
+}
+function copyJSON(){
+  navigator.clipboard.writeText(JSON.stringify(buildExport(),null,2)).then(()=>toast('JSON copié ✓')).catch(()=>toast('Erreur copie',true));
+}
+
+// ── Toast ──────────────────────────────────────────────
+function toast(msg,isErr=false,cls=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className=`toast${isErr?' err':cls?' '+cls:''} show`;
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>el.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>
