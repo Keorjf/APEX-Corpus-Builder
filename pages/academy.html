@@ -4137,12 +4137,13 @@ function updateStreakUI(){
   document.querySelectorAll('.streak-days-row:not(#streakDotRow)').forEach(w=>refreshWeekDots(w,false));
 }
 function addXP(n){S.xp+=n;updateXPUI();}
+const _coinAudio=(()=>{try{const a=new Audio(COIN_AUDIO_SRC);a.volume=0.6;a.load();return a;}catch(e){return null;}})();
 function addCoins(n,ref){
   S.coins+=n;updateWalletUI();
   const w=el('tbWallet');w.classList.remove('pulse');
   setTimeout(()=>w.classList.add('pulse'),10);
   spawnCoins(ref||w);
-  try{const a=new Audio(COIN_AUDIO_SRC);a.volume=0.6;a.play().catch(()=>{});}catch(e){}
+  try{if(_coinAudio){_coinAudio.currentTime=0;_coinAudio.play().catch(()=>{});}}catch(e){}
 }
 function spawnCoins(ref){
   const r=ref?ref.getBoundingClientRect():{left:window.innerWidth/2,top:80};
