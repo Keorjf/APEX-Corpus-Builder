@@ -215,6 +215,13 @@ select option{background:var(--bg2);}
 .create-backdrop.open{opacity:1;pointer-events:all;}
 .create-drawer{position:fixed;top:0;right:0;height:100vh;width:min(600px,100vw);background:var(--bg1);border-left:1px solid var(--border2);z-index:501;overflow-y:auto;padding:1.4rem 1.6rem 2rem;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);}
 .create-drawer.open{transform:translateX(0);}
+#exploreDrawer{right:auto;left:0;border-left:none;border-right:1px solid var(--border2);transform:translateX(-100%);z-index:501;}
+#exploreDrawer.open{transform:translateX(0);}
+#createDrawer{z-index:601;right:0;left:0;width:100vw;max-width:100vw;border-left:none;border-top:1px solid var(--border2);transform:translateY(100%);}
+#createDrawer.open{transform:translateY(0);}
+#createDrawer .editor-wrap,#createDrawer .create-drawer-hdr{max-width:860px;margin-left:auto;margin-right:auto;width:100%;}
+#createDrawer>div.section-tab{padding:0 1.6rem 2rem;}
+#createBackdrop{z-index:600;}
 .create-drawer-hdr{display:flex;align-items:center;gap:.8rem;margin-bottom:1.4rem;padding-bottom:.9rem;border-bottom:1px solid var(--border);}
 .create-drawer-title{font-family:var(--font-title);font-size:1rem;color:var(--gold);}
 .create-drawer-close{margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:.3rem;transition:.15s;}
@@ -264,36 +271,54 @@ select option{background:var(--bg2);}
   <div class="logo">TACTIC <span>CORPUS BUILDER v3</span></div>
   <div class="stats-chips">
 
-    <span id="syncStatus" style="font-family:var(--font-mono);font-size:.58rem;color:var(--muted);">🔄 Chargement…</span>
-    <button id="importTopBtn" onclick="document.getElementById('importOv').classList.remove('hidden')" style="padding:.28rem .75rem;font-family:var(--font-mono);font-size:.6rem;font-weight:700;background:var(--gold);color:#000;border:none;border-radius:6px;cursor:pointer;letter-spacing:.04em;white-space:nowrap;transition:.15s;">📥 Importer leçons</button>
+    <span id="syncStatus" style="font-family:var(--font-mono);font-size:.58rem;color:var(--muted);">Chargement…</span>
+    <button id="importTopBtn" onclick="document.getElementById('importOv').classList.remove('hidden')" style="padding:.28rem .75rem;font-family:var(--font-mono);font-size:.6rem;font-weight:700;background:var(--gold);color:#000;border:none;border-radius:6px;cursor:pointer;letter-spacing:.04em;white-space:nowrap;transition:.15s;">Importer leçons</button>
     <button class="help-btn" onclick="toggleHelp()" title="Aide">?</button>
   </div>
 </div>
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab-btn active" onclick="showTab('explore',this)">📚 Explorer</button>
-  <button class="tab-btn" onclick="showTab('suggest',this)">💡 Idées</button>
-  <button class="tab-btn" onclick="showTab('export',this)">📤 Exporter</button>
-  <button class="tab-btn" onclick="showTab('stats',this)">📊 Stats</button>
+  <button class="tab-btn" onclick="openExploreDrawer()">Explorer</button>
+  <button class="tab-btn active" onclick="showTab('suggest',this)">Idées</button>
+  <button class="tab-btn" onclick="showTab('export',this)">Exporter</button>
+  <button class="tab-btn" onclick="showTab('stats',this)">Stats</button>
 </div>
 
 <div class="main">
-<div class="sidebar" id="sidebar"></div>
+<div class="sidebar" id="sidebar" style="display:none;"></div>
 <div class="content">
 
   <!-- EXPLORER -->
-  <div class="section-tab active" id="tab-explore">
-    <div id="exploreView"></div>
+  <div class="section-tab" id="tab-explore">
+    <div style="display:flex;align-items:center;justify-content:center;height:200px;">
+      <button class="btn primary" style="font-size:.85rem;padding:.7rem 1.6rem;" onclick="openExploreDrawer()">Ouvrir l'explorateur</button>
+    </div>
+  </div>
+
+  <!-- EXPLORE DRAWER -->
+  <div class="create-backdrop" id="exploreBackdrop" onclick="closeExploreDrawer()"></div>
+  <div class="create-drawer" id="exploreDrawer" style="width:min(860px,100vw);padding:0;display:flex;flex-direction:column;">
+    <div class="create-drawer-hdr" style="padding:1rem 1.4rem;flex-shrink:0;">
+      <div><div class="create-drawer-title">Explorer les leçons</div><div style="font-size:.68rem;color:var(--muted);" id="exploreMeta"></div></div>
+      <div class="btn-row" style="margin-left:auto;">
+        <button class="btn primary" style="font-size:.7rem;" onclick="openCreatePanel()">+ Nouvelle leçon</button>
+        <button class="create-drawer-close" onclick="closeExploreDrawer()">✕</button>
+      </div>
+    </div>
+    <div style="display:flex;flex:1;overflow:hidden;border-top:1px solid var(--border);">
+      <div id="sidebarInDrawer" style="width:240px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--border);padding:.8rem 0;"></div>
+      <div id="exploreView" style="flex:1;overflow-y:auto;padding:1rem 1.2rem;"></div>
+    </div>
   </div>
 
   <!-- CREATE / EDIT -->
   <div class="create-backdrop" id="createBackdrop" onclick="closeCreatePanel()"></div>
   <div class="create-drawer" id="createDrawer">
-    <div class="create-drawer-hdr">
+    <div class="create-drawer-hdr" style="padding:1rem 1.6rem;border-bottom:1px solid var(--border);">
       <div><div class="create-drawer-title" id="editorTitle">Nouvelle leçon</div><div style="font-size:.68rem;color:var(--muted);">Remplis les champs — code JS généré automatiquement</div></div>
       <div class="btn-row" style="margin-left:auto;">
-        <button class="btn primary" onclick="saveLesson()">💾 Sauvegarder</button>
+        <button class="btn primary" onclick="saveLesson()">Sauvegarder</button>
         <button class="create-drawer-close" onclick="closeCreatePanel()">✕</button>
       </div>
     </div>
@@ -307,7 +332,7 @@ select option{background:var(--bg2);}
         <div class="form-col"><label>Tag</label><select id="fTag"><option>Base</option><option>Stratégie</option><option>Pratique</option><option>Analyse</option><option>Psychologie</option><option>Fiscalité</option><option>Vocab</option><option>ETF</option><option>Crypto</option><option>Immo</option><option>Macro</option><option>Retraite</option><option>Expert</option><option>Dérivés</option><option>Risque</option></select></div>
         <div class="form-col full"><label>Titre de la leçon</label><input id="fName" type="text" placeholder="Ex: Les intérêts composés : la machine à richesse"></div>
         <div class="form-col"><label>Durée</label><select id="fDuration"><option>1 min</option><option>2 min</option><option>3 min</option><option>5 min</option></select></div>
-        <div class="form-col"><label>Coins 🪙</label><select id="fCoins"><option value="80">80 — débutant</option><option value="120">120 — intermédiaire</option><option value="150">150 — avancé</option><option value="200">200 — expert</option></select></div>
+        <div class="form-col"><label>Coins</label><select id="fCoins"><option value="80">80 — débutant</option><option value="120">120 — intermédiaire</option><option value="150">150 — avancé</option><option value="200">200 — expert</option></select></div>
       </div>
 
       <!-- BLOCS -->
@@ -315,10 +340,10 @@ select option{background:var(--bg2);}
         <div style="font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;">Blocs de contenu</div>
         <div id="blocksContainer"></div>
         <div class="btn-row" style="margin-top:.5rem;">
-          <button class="btn" onclick="addBlock('hook')">+ Hook 🎯</button>
-          <button class="btn" onclick="addBlock('content')">+ Contenu 📘</button>
-          <button class="btn" onclick="addBlock('tip')">+ Astuce 💡</button>
-          <button class="btn" onclick="addBlock('trap')">+ Piège ⚠️</button>
+          <button class="btn" onclick="addBlock('hook')">+ Hook</button>
+          <button class="btn" onclick="addBlock('content')">+ Contenu</button>
+          <button class="btn" onclick="addBlock('tip')">+ Astuce</button>
+          <button class="btn" onclick="addBlock('trap')">+ Piège</button>
         </div>
       </div>
 
@@ -330,14 +355,14 @@ select option{background:var(--bg2);}
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:.9rem;margin-bottom:1rem;">
         <div class="export-title">Traduction IA</div>
         <div class="lang-tabs">
-          <button class="lang-tab active" onclick="setLang('en',this)">🇬🇧 EN</button>
-          <button class="lang-tab" onclick="setLang('es',this)">🇪🇸 ES</button>
-          <button class="lang-tab" onclick="setLang('de',this)">🇩🇪 DE</button>
-          <button class="lang-tab" onclick="setLang('it',this)">🇮🇹 IT</button>
-          <button class="lang-tab" onclick="setLang('pt',this)">🇧🇷 PT</button>
-          <button class="lang-tab" onclick="setLang('ar',this)">🇸🇦 AR</button>
+          <button class="lang-tab active" onclick="setLang('en',this)">EN</button>
+          <button class="lang-tab" onclick="setLang('es',this)">ES</button>
+          <button class="lang-tab" onclick="setLang('de',this)">DE</button>
+          <button class="lang-tab" onclick="setLang('it',this)">IT</button>
+          <button class="lang-tab" onclick="setLang('pt',this)">PT</button>
+          <button class="lang-tab" onclick="setLang('ar',this)">AR</button>
         </div>
-        <button class="btn" onclick="translateLesson()" id="translateBtn">🌍 Traduire la leçon complète</button>
+        <button class="btn" onclick="translateLesson()" id="translateBtn">Traduire la leçon complète</button>
         <div id="translateResult" style="margin-top:.5rem;font-size:.74rem;color:var(--muted);"></div>
       </div>
 
@@ -346,8 +371,8 @@ select option{background:var(--bg2);}
         <div class="export-title">Aperçu du code généré</div>
         <div class="code-preview" id="codePreview">// Code généré ici...</div>
         <div class="btn-row" style="margin-top:.6rem;">
-          <button class="btn" onclick="updateCodePreview()">🔄 Actualiser</button>
-          <button class="btn primary" onclick="copyCode()">📋 Copier</button>
+          <button class="btn" onclick="updateCodePreview()">Actualiser</button>
+          <button class="btn primary" onclick="copyCode()">Copier</button>
         </div>
       </div>
     </div>
@@ -355,7 +380,7 @@ select option{background:var(--bg2);}
   </div><!-- /create-drawer -->
 
   <!-- SUGGEST -->
-  <div class="section-tab" id="tab-suggest">
+  <div class="section-tab active" id="tab-suggest">
     <div class="editor-wrap">
       <div class="editor-hdr"><div><div class="editor-title">Idées de leçons</div><div style="font-size:.68rem;color:var(--muted);">Lacunes du corpus + programme Digital Learning</div></div></div>
       <div id="suggestContainer"></div>
@@ -369,21 +394,21 @@ select option{background:var(--bg2);}
       <div class="export-box">
         <div class="export-title">Format</div>
         <div class="btn-row">
-          <button class="btn primary" onclick="exportJS()">📄 Code JS complet</button>
-          <button class="btn" onclick="exportJSON()">🔗 JSON</button>
-          <button class="btn" onclick="exportDiff()">📊 Nouvelles leçons seulement</button>
+          <button class="btn primary" onclick="exportJS()">Code JS complet</button>
+          <button class="btn" onclick="exportJSON()">JSON</button>
+          <button class="btn" onclick="exportDiff()">Nouvelles leçons seulement</button>
         </div>
       </div>
       <div class="export-box">
-        <div class="export-title">🔄 Synchronisation GitHub (live)</div>
+        <div class="export-title">Synchronisation GitHub (live)</div>
         <div style="font-size:.75rem;color:var(--soft);line-height:1.7;margin-bottom:.8rem;">
           Pousse directement le corpus mis à jour dans <code style="background:var(--bg3);padding:.1rem .3rem;border-radius:3px;font-family:var(--font-mono);">pages/academy.html</code> sur GitHub. Nécessite un <strong>Personal Access Token</strong> (scope <code style="background:var(--bg3);padding:.1rem .3rem;border-radius:3px;font-family:var(--font-mono);">repo</code>).
         </div>
         <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
-          <button class="btn primary" id="pushBtn" onclick="pushToAcademy()">🚀 Pousser vers Academy</button>
-          <button class="btn" onclick="syncFromAcademy()">🔄 Recharger depuis Academy</button>
-          <button class="btn danger" onclick="localStorage.removeItem('tactic_gh_token');toast('Token GitHub supprimé')">🗑️ Réinitialiser token GitHub</button>
-          <button class="btn danger" onclick="localStorage.removeItem('tactic_claude_key');toast('Clé Claude supprimée')">🗑️ Réinitialiser clé Claude</button>
+          <button class="btn primary" id="pushBtn" onclick="pushToAcademy()">Pousser vers Academy</button>
+          <button class="btn" onclick="syncFromAcademy()">Recharger depuis Academy</button>
+          <button class="btn danger" onclick="localStorage.removeItem('tactic_gh_token');toast('Token GitHub supprimé')">Réinitialiser token GitHub</button>
+          <button class="btn danger" onclick="localStorage.removeItem('tactic_claude_key');toast('Clé Claude supprimée')">Réinitialiser clé Claude</button>
         </div>
       </div>
       <div class="code-preview" id="exportPreview">// Clique sur un bouton ci-dessus...</div>
@@ -413,7 +438,7 @@ select option{background:var(--bg2);}
     </div>
     <div class="modal-body">
       <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;">
-        <button class="btn primary" onclick="editFromModal()">✏️ Modifier cette leçon</button>
+        <button class="btn primary" onclick="editFromModal()">Modifier cette leçon</button>
       </div>
       <div id="modalContent"></div>
     </div>
@@ -429,23 +454,23 @@ select option{background:var(--bg2);}
     </div>
     <div class="help-body">
       <div class="help-card">
-        <div class="help-card-title">📚 Explorer</div>
+        <div class="help-card-title">Explorer</div>
         <div class="help-card-text">Browse toutes les leçons par module. Clique sur une leçon pour voir son contenu, modifier ses blocs, changer le quiz ou supprimer une réponse.</div>
       </div>
       <div class="help-card">
-        <div class="help-card-title">✏️ Créer</div>
+        <div class="help-card-title">Créer</div>
         <div class="help-card-text">Créer une leçon from scratch : niveau, module, blocs (hook/contenu/astuce/piège), quiz avec 4 options. Le code JS est généré en temps réel.</div>
       </div>
       <div class="help-card">
-        <div class="help-card-title">🤖 Générer IA</div>
+        <div class="help-card-title">Générer IA</div>
         <div class="help-card-text">Décris un sujet en langage naturel → l'IA génère la leçon complète au format TACTIC (blocs + quiz 3 questions). Importe en 1 clic.</div>
       </div>
       <div class="help-card">
-        <div class="help-card-title">💡 Idées</div>
+        <div class="help-card-title">Idées</div>
         <div class="help-card-text">12 suggestions basées sur les lacunes du corpus et le programme Digital Learning. Clic → pré-remplit le générateur IA.</div>
       </div>
       <div class="help-card">
-        <div class="help-card-title">📤 Exporter</div>
+        <div class="help-card-title">Exporter</div>
         <div class="help-card-text">Exporte le corpus modifié en code JS complet ou en JSON. Colle le code dans ton academy.html pour mettre à jour l'app.</div>
       </div>
       <div class="help-card">
@@ -531,7 +556,7 @@ function toast(msg,type='success'){
   const w=document.getElementById('toastWrap');
   const t=document.createElement('div');
   t.className=`toast ${type}`;
-  t.innerHTML=`<span>${type==='success'?'✅':'❌'}</span><span>${msg}</span>`;
+  t.innerHTML=`<span>${msg}</span>`;
   w.appendChild(t);
   setTimeout(()=>t.remove(),3200);
 }
@@ -546,10 +571,14 @@ function showTab(id,btn){
   if(btn) btn.classList.add('active');
   if(id==='stats') renderStats();
   if(id==='suggest') renderSuggestions();
-  if(id==='explore') renderExplore();
+  if(id==='explore') openExploreDrawer();
 }
 
 function openCreatePanel(){
+  resetEditor();
+  openDrawer();
+}
+function openDrawer(){
   document.getElementById('createBackdrop').classList.add('open');
   document.getElementById('createDrawer').classList.add('open');
 }
@@ -567,8 +596,7 @@ function renderSidebar(){
     const tracks=getTracksByLevel(lv);
     if(!tracks.length) continue;
     const total=getAllLessons().filter(l=>l.level===lv).length;
-    const icon=lv==='Débutant'?'🟢':lv==='Intermédiaire'?'🔵':lv==='Avancé'?'🟣':'🔴';
-    html+=`<div class="sb-level">${icon} ${lv} <span class="cnt">${total}</span></div>`;
+    html+=`<div class="sb-level">${lv} <span class="cnt">${total}</span></div>`;
     for(const t of tracks){
       const cnt=getLessonsByTrack(t).length;
       html+=`<div class="sb-track ${currentTrack===t?'active':''}" onclick="selectTrack('${t.replace(/'/g,"\\'").replace(/\\/g,'\\\\')}')">\
@@ -577,26 +605,36 @@ function renderSidebar(){
     html+=`<button class="sb-new-track" onclick="newModule('${lv}')">+ Nouveau module</button>`;
   }
   document.getElementById('sidebar').innerHTML=html;
+  const sd=document.getElementById('sidebarInDrawer'); if(sd) sd.innerHTML=html;
 }
 
-function selectTrack(t){ currentTrack=t; renderSidebar(); renderExplore(); }
+function selectTrack(t){ currentTrack=t; renderSidebar(); openExploreDrawer(); }
 
 function newModule(lv){
-  const name=prompt(`Nom du nouveau module (ex: "🔮 Dérivés avancés") :`);
+  const name=prompt(`Nom du nouveau module (ex: "Dérivés avancés") :`);
   if(!name) return;
   currentTrack=name; renderSidebar(); renderExplore();
-  toast(`📁 Module "${name}" créé`);
+  toast(`Module "${name}" créé`);
+}
+
+function openExploreDrawer(){
+  document.getElementById('exploreBackdrop').classList.add('open');
+  document.getElementById('exploreDrawer').classList.add('open');
+  renderSidebar();
+  renderExplore();
+}
+function closeExploreDrawer(){
+  document.getElementById('exploreBackdrop').classList.remove('open');
+  document.getElementById('exploreDrawer').classList.remove('open');
 }
 
 /* ══ EXPLORE ══ */
 function renderExplore(){
   const lessons=currentTrack?getLessonsByTrack(currentTrack):getAllLessons();
   const title=currentTrack||'Toutes les leçons';
-  let html=`<div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.9rem;">
-    <div style="font-size:.88rem;font-weight:700;">${title}</div>
-    <span style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted);">${lessons.length} leçons</span>
-    <button class="btn primary" style="margin-left:auto;font-size:.7rem;" onclick="openCreatePanel()">+ Nouvelle leçon</button>
-  </div><div class="lessons-grid">`;
+  const meta=document.getElementById('exploreMeta');
+  if(meta) meta.textContent=`${title} · ${lessons.length} leçon${lessons.length>1?'s':''}`;
+  let html=`<div class="lessons-grid">`;
   for(const l of lessons){
     const isNew=newLessons.find(x=>x.id===l.id);
     const lvColor=l.level==='Débutant'?'var(--green)':l.level==='Intermédiaire'?'var(--blue)':l.level==='Avancé'?'var(--purple)':'var(--red)';
@@ -610,9 +648,9 @@ function renderExplore(){
       </div>
       <div class="lc-meta"></div>
       <div class="lc-actions">
-        <button class="lc-btn primary" onclick="event.stopPropagation();openModal('${l.id}')">Voir</button>
-        <button class="lc-btn" onclick="event.stopPropagation();editLesson('${l.id}')">Modifier</button>
-${isNew?`<button class="lc-btn del" onclick="event.stopPropagation();delLesson('${l.id}')">🗑️</button>`:''}
+        <button class="lc-btn primary" onclick="event.stopPropagation();closeExploreDrawer();openModal('${l.id}')">Voir</button>
+        <button class="lc-btn" onclick="event.stopPropagation();closeExploreDrawer();editLesson('${l.id}')">Modifier</button>
+${isNew?`<button class="lc-btn del" onclick="event.stopPropagation();delLesson('${l.id}')">Supprimer</button>`:''}
       </div>
     </div>`;
   }
@@ -671,7 +709,7 @@ Durée : ${l.duration}`}]
     toast(`✅ Contenu de "${l.name}" chargé`);
   }catch(e){
     document.getElementById('modalContent').innerHTML=`<div style="color:var(--red);font-size:.78rem;">❌ Erreur de chargement — ${e.message}</div>`;
-    toast('❌ Erreur API','error');
+    toast('Erreur API','error');
   }
   btn.disabled=false;
 }
@@ -688,16 +726,16 @@ function renderModalContent(id){
     html+=`<div class="block-view ${b.type}" id="block-${id}-${i}">
       <div class="block-view-hdr">
         ${b.emo?`<span class="block-emo">${b.emo}</span>`:''}
-        <span class="block-type-pill">${b.type==='hook'?'🎯 Hook':b.type==='content'?'📘 Contenu':b.type==='tip'?'💡 Astuce':'⚠️ Piège'}</span>
-        <button class="block-edit-btn" onclick="toggleBlockEdit('${id}',${i})">✏️ Éditer</button>
-        <button class="block-del-btn" onclick="deleteBlock('${id}',${i})">🗑️</button>
+        <span class="block-type-pill">${b.type==='hook'?'Hook':b.type==='content'?'Contenu':b.type==='tip'?'Astuce':'Piège'}</span>
+        <button class="block-edit-btn" onclick="toggleBlockEdit('${id}',${i})">Éditer</button>
+        <button class="block-del-btn" onclick="deleteBlock('${id}',${i})">✕</button>
       </div>
       <div class="block-text" id="block-text-${id}-${i}">${b.text}</div>
       <div class="inline-editor hidden" id="block-editor-${id}-${i}">
         <textarea id="block-ta-${id}-${i}" rows="4">${b.text}</textarea>
         ${b.type==='hook'?`<div style="display:flex;gap:.4rem;align-items:center;margin-top:.4rem;"><span style="font-size:.65rem;color:var(--muted);">Emoji :</span><input type="text" id="block-emo-${id}-${i}" value="${b.emo||''}" style="width:60px;padding:.3rem;"></div>`:''}
         <div class="inline-editor-btns">
-          <button class="btn primary" onclick="saveBlockEdit('${id}',${i})">✅ Sauvegarder</button>
+          <button class="btn primary" onclick="saveBlockEdit('${id}',${i})">Sauvegarder</button>
           <button class="btn" onclick="toggleBlockEdit('${id}',${i})">Annuler</button>
         </div>
       </div>
@@ -713,22 +751,22 @@ function renderModalContent(id){
     html+=`<div class="quiz-view" style="margin-bottom:.6rem;">
       <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
         <span style="font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);">Quiz ${qi+1}${quizzes.length>1?' / '+quizzes.length:''}</span>
-        <button class="block-edit-btn" onclick="editQuizQ('${id}',${qi})">✏️ Question</button>
+        <button class="block-edit-btn" onclick="editQuizQ('${id}',${qi})">Question</button>
         <button class="btn" onclick="addQuizOptModal('${id}',${qi})" style="font-size:.6rem;padding:.15rem .4rem;">+ Option</button>
-        ${quizzes.length>1?`<button class="block-del-btn" onclick="deleteQuizFromModal('${id}',${qi})">🗑️</button>`:''}
+        ${quizzes.length>1?`<button class="block-del-btn" onclick="deleteQuizFromModal('${id}',${qi})">✕</button>`:''}
       </div>
       <div class="quiz-view-q">${quiz.q}</div>`;
     for(let i=0;i<quiz.opts.length;i++){
       html+=`<div class="quiz-opt ${i===quiz.correct?'correct':'wrong'}">
         <span class="quiz-opt-label">${labels[i]}</span>
         <span class="quiz-opt-text" id="quiz-opt-${id}-${qi}-${i}">${quiz.opts[i]}</span>
-        <button class="block-edit-btn" onclick="editQuizOpt('${id}',${qi},${i})">✏️</button>
-        <button class="block-del-btn" onclick="deleteQuizOpt('${id}',${qi},${i})">🗑️</button>
+        <button class="block-edit-btn" onclick="editQuizOpt('${id}',${qi},${i})">Éditer</button>
+        <button class="block-del-btn" onclick="deleteQuizOpt('${id}',${qi},${i})">✕</button>
         ${i!==quiz.correct?`<button class="block-edit-btn" style="color:var(--green)" onclick="setCorrect('${id}',${qi},${i})">✓ Correct</button>`:'<span style="font-size:.6rem;color:var(--green);margin-left:auto;">✓ Bonne réponse</span>'}
       </div>`;
     }
     html+=`<div class="quiz-expl">${quiz.expl}</div>
-      <button class="block-edit-btn" style="margin-top:.3rem;" onclick="editQuizExpl('${id}',${qi})">✏️ Explication</button>
+      <button class="block-edit-btn" style="margin-top:.3rem;" onclick="editQuizExpl('${id}',${qi})">Explication</button>
     </div>`;
   });
   html+=`<button class="btn" onclick="addQuizToModal('${id}')" style="width:100%;font-size:.7rem;margin-top:.2rem;">+ Ajouter un quiz</button>`;
@@ -748,14 +786,14 @@ function saveBlockEdit(id,i){
   if(emoEl) CONTENT_CACHE[id].blocks[i].emo=emoEl.value;
   document.getElementById(`block-text-${id}-${i}`).innerHTML=ta.value;
   document.getElementById(`block-editor-${id}-${i}`).classList.add('hidden');
-  toast('✅ Bloc mis à jour');
+  toast('Bloc mis à jour');
 }
 
 function deleteBlock(id,i){
   if(!confirm('Supprimer ce bloc ?')) return;
   CONTENT_CACHE[id].blocks.splice(i,1);
   renderModalContent(id);
-  toast('🗑️ Bloc supprimé');
+  toast('Bloc supprimé');
 }
 
 function _getQuiz(id,qi=0){ return (CONTENT_CACHE[id].quizzes||[CONTENT_CACHE[id].quiz])[qi]; }
@@ -763,36 +801,36 @@ function _getQuiz(id,qi=0){ return (CONTENT_CACHE[id].quizzes||[CONTENT_CACHE[id
 function editQuizQ(id,qi=0){
   const qz=_getQuiz(id,qi); if(!qz) return;
   const q=prompt('Nouvelle question :',qz.q); if(!q) return;
-  qz.q=q; renderModalContent(id); toast('✅ Question mise à jour');
+  qz.q=q; renderModalContent(id); toast('Question mise à jour');
 }
 function editQuizOpt(id,qi=0,i=0){
   const qz=_getQuiz(id,qi); if(!qz) return;
   const v=prompt('Nouvelle option :',qz.opts[i]); if(!v) return;
-  qz.opts[i]=v; renderModalContent(id); toast('✅ Option mise à jour');
+  qz.opts[i]=v; renderModalContent(id); toast('Option mise à jour');
 }
 function deleteQuizOpt(id,qi=0,i=0){
   const qz=_getQuiz(id,qi); if(!qz) return;
   if(qz.opts.length<=2){ toast('Minimum 2 options','error'); return; }
   if(!confirm('Supprimer cette option ?')) return;
   qz.opts.splice(i,1); if(qz.correct>=qz.opts.length) qz.correct=0;
-  renderModalContent(id); toast('🗑️ Option supprimée');
+  renderModalContent(id); toast('Option supprimée');
 }
 function setCorrect(id,qi=0,i=0){
   const qz=_getQuiz(id,qi); if(!qz) return;
-  qz.correct=i; renderModalContent(id); toast('✅ Bonne réponse mise à jour');
+  qz.correct=i; renderModalContent(id); toast('Bonne réponse mise à jour');
 }
 function addQuizOptModal(id,qi=0){
   const v=prompt('Nouvelle option :'); if(!v) return;
-  _getQuiz(id,qi).opts.push(v); renderModalContent(id); toast('✅ Option ajoutée');
+  _getQuiz(id,qi).opts.push(v); renderModalContent(id); toast('Option ajoutée');
 }
 function editQuizExpl(id,qi=0){
   const qz=_getQuiz(id,qi); if(!qz) return;
   const v=prompt('Nouvelle explication :',qz.expl); if(!v) return;
-  qz.expl=v; renderModalContent(id); toast('✅ Explication mise à jour');
+  qz.expl=v; renderModalContent(id); toast('Explication mise à jour');
 }
 function deleteQuizFromModal(id,qi){
   if(!confirm('Supprimer ce quiz ?')) return;
-  CONTENT_CACHE[id].quizzes.splice(qi,1); renderModalContent(id); toast('🗑️ Quiz supprimé');
+  CONTENT_CACHE[id].quizzes.splice(qi,1); renderModalContent(id); toast('Quiz supprimé');
 }
 function addQuizToModal(id){
   if(!CONTENT_CACHE[id].quizzes) CONTENT_CACHE[id].quizzes=[CONTENT_CACHE[id].quiz||{q:'',opts:['','',''],correct:0,expl:''}];
@@ -828,8 +866,8 @@ function editLesson(id){
     else quizList=[{q:'',opts:['','','',''],correct:0,expl:''}];
   } else { blocks=[]; quizList=[{q:'',opts:['','','',''],correct:0,expl:''}]; }
   renderBlocks(); renderQuizEditor();
-  openCreatePanel();
-  toast('✏️ Leçon chargée');
+  openDrawer();
+  toast('Leçon chargée');
 }
 
 function dupLesson(id){
@@ -838,13 +876,13 @@ function dupLesson(id){
   const nl={...l,id:generateId(l.level),name:l.name+' (copie)'};
   newLessons.push(nl);
   if(CONTENT_CACHE[id]) CONTENT_CACHE[nl.id]={...CONTENT_CACHE[id]};
-  toast('📋 Dupliqué'); updateChips(); renderExplore();
+  toast('Dupliqué'); updateChips(); renderExplore();
 }
 
 function delLesson(id){
   if(!confirm('Supprimer cette leçon ?')) return;
   newLessons=newLessons.filter(l=>l.id!==id);
-  toast('🗑️ Supprimé'); updateChips(); renderExplore();
+  toast('Supprimé'); updateChips(); renderExplore();
 }
 
 function addBlock(type){ blocks.push({type,emo:'',text:''}); renderBlocks(); }
@@ -874,7 +912,7 @@ function renderQuizEditor(){
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:1rem;margin-bottom:.7rem;">
       <div style="display:flex;align-items:center;margin-bottom:.7rem;">
         <span style="font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);">Quiz ${qi+1}</span>
-        ${quizList.length>1?`<button onclick="quizList.splice(${qi},1);renderQuizEditor();" style="margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:.78rem;">🗑️ Supprimer</button>`:''}
+        ${quizList.length>1?`<button onclick="quizList.splice(${qi},1);renderQuizEditor();" style="margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:.78rem;">Supprimer</button>`:''}
       </div>
       <div class="form-col" style="margin-bottom:.6rem;">
         <label>Question</label>
@@ -959,7 +997,7 @@ function updateCodePreview(){
   generatedCode=code;
 }
 
-function copyCode(){ updateCodePreview(); navigator.clipboard.writeText(generatedCode); toast('📋 Code copié !'); }
+function copyCode(){ updateCodePreview(); navigator.clipboard.writeText(generatedCode); toast('Code copié !'); }
 
 
 /* ══ SUGGEST ══ */
@@ -987,7 +1025,7 @@ function useSuggestion(name,lv,track,tag){
   setTimeout(()=>{
     const inp=document.getElementById('tactInput');
     if(inp){ inp.value=`Crée une leçon sur : ${name} — niveau ${lv}, module "${track}", tag ${tag}`; inp.focus(); }
-    toast('💬 Envoie à TACT pour générer !');
+    toast('Envoie à TACT pour générer !');
   },150);
 }
 
@@ -1026,7 +1064,7 @@ function exportJSON(){
   const j=JSON.stringify(getAllLessons(),null,2);
   document.getElementById('exportPreview').textContent=j;
   navigator.clipboard.writeText(j);
-  toast('📋 JSON copié !');
+  toast('JSON copié !');
 }
 
 function exportDiff(){
@@ -1078,7 +1116,7 @@ async function translateLesson(){
   const name=document.getElementById('fName').value.trim();
   if(!name){ toast('Remplis le titre d\'abord','error'); return; }
   const btn=document.getElementById('translateBtn');
-  btn.textContent='⏳ Traduction en cours...'; btn.disabled=true;
+  btn.textContent='Traduction en cours...'; btn.disabled=true;
   const langLabels={en:'anglais',es:'espagnol',de:'allemand',it:'italien',pt:'portugais',ar:'arabe'};
   const langFlags={en:'🇬🇧',es:'🇪🇸',de:'🇩🇪',it:'🇮🇹',pt:'🇧🇷',ar:'🇸🇦'};
   const payload={
@@ -1111,12 +1149,12 @@ async function translateLesson(){
       html+=`</div>`;
     }
     const jsonStr=JSON.stringify(t,null,2).replace(/'/g,"\\'");
-    html+=`<div style="margin-top:.7rem;"><button class="btn primary" onclick="navigator.clipboard.writeText(JSON.stringify(${JSON.stringify(t)},null,2));toast('📋 Copié !')" style="font-size:.62rem;">📋 Copier JSON</button></div>`;
+    html+=`<div style="margin-top:.7rem;"><button class="btn primary" onclick="navigator.clipboard.writeText(JSON.stringify(${JSON.stringify(t)},null,2));toast('Copié !')" style="font-size:.62rem;">Copier JSON</button></div>`;
     html+=`</div>`;
     document.getElementById('translateResult').innerHTML=html;
-    toast('✅ Traduction complète !');
-  }catch(e){ toast('❌ Erreur traduction','error'); document.getElementById('translateResult').textContent='❌ '+e.message; }
-  btn.textContent='🌍 Traduire la leçon complète'; btn.disabled=false;
+    toast('Traduction complète !');
+  }catch(e){ toast('Erreur traduction','error'); document.getElementById('translateResult').textContent='❌ '+e.message; }
+  btn.textContent='Traduire la leçon complète'; btn.disabled=false;
 }
 
 /* ══ IMPORT ACADEMY ══ */
@@ -1125,14 +1163,14 @@ async function importFromAcademy(mode){
   const topBtn=document.getElementById('importTopBtn');
   const status=document.getElementById('importStatus');
   if(topBtn) topBtn.disabled=true;
-  if(topBtn) topBtn.textContent='⏳ Import...';
+  if(topBtn) topBtn.textContent='Import...';
   btn.disabled=true;
-  status.textContent='⏳ Téléchargement depuis Tactic Academy…';
+  status.textContent='Téléchargement depuis Tactic Academy…';
   try{
     const resp=await fetch('https://raw.githubusercontent.com/Keorjf/Tactic-Academy/master/pages/academy.html');
     if(!resp.ok) throw new Error('Erreur réseau '+resp.status);
     const html=await resp.text();
-    status.textContent='⏳ Extraction des leçons…';
+    status.textContent='Extraction des leçons…';
 
     const startMarker='const LESSONS = {';
     const endMarker='}; // fin LESSONS';
@@ -1191,7 +1229,7 @@ async function importFromAcademy(mode){
     setTimeout(()=>document.getElementById('importOv').classList.add('hidden'),1200);
   }catch(err){
     if(status) status.textContent='❌ '+err.message;
-    toast('❌ Erreur import','error');
+    toast('Erreur import','error');
   }
   if(btn) btn.disabled=false;
   if(topBtn){topBtn.disabled=false;topBtn.textContent='📥 Importer Academy';}
@@ -1312,8 +1350,8 @@ async function pushToAcademy(){
     localStorage.setItem('tactic_gh_token',token);
   }
   const btn=document.getElementById('pushBtn');
-  if(btn){btn.disabled=true; btn.textContent='⏳ Push…';}
-  setSyncStatus('⏳ Push vers GitHub…','var(--gold)');
+  if(btn){btn.disabled=true; btn.textContent='Push…';}
+  setSyncStatus('Push vers GitHub…','var(--gold)');
   try{
     const fileResp=await fetch(ACADEMY_API,{headers:{Authorization:'token '+token,Accept:'application/vnd.github.v3+json'}});
     if(!fileResp.ok) throw new Error('GitHub API '+fileResp.status+' — token invalide ?');
@@ -1335,13 +1373,13 @@ async function pushToAcademy(){
     });
     if(!pushResp.ok){const e=await pushResp.json(); throw new Error(e.message||'Push failed');}
     newLessons=[];
-    toast('✅ Academy mise à jour sur GitHub !');
+    toast('Academy mise à jour sur GitHub !');
     setSyncStatus('✅ Poussé — '+new Date().toLocaleTimeString(),'var(--green)');
   }catch(err){
-    toast('❌ '+err.message,'error');
+    toast(err.message,'error');
     setSyncStatus('❌ '+err.message,'var(--red)');
   }
-  if(btn){btn.disabled=false; btn.textContent='🚀 Pousser vers Academy';}
+  if(btn){btn.disabled=false; btn.textContent='Pousser vers Academy';}
 }
 
 /* ══ INIT ══ */
@@ -1474,7 +1512,7 @@ function applyLessonToForm(l){
 
 function askTactKey(){
   const k=prompt('Clé API Claude (sk-ant-…)\n\nconsole.anthropic.com → API Keys');
-  if(k){ localStorage.setItem('tactic_claude_key',k); toast('✅ Clé Claude sauvegardée'); }
+  if(k){ localStorage.setItem('tactic_claude_key',k); toast('Clé Claude sauvegardée'); }
 }
 
 function toggleTact(){
