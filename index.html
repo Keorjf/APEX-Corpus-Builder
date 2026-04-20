@@ -307,7 +307,7 @@ select option{background:var(--bg2);}
         <div class="form-col"><label>Tag</label><select id="fTag"><option>Base</option><option>Stratégie</option><option>Pratique</option><option>Analyse</option><option>Psychologie</option><option>Fiscalité</option><option>Vocab</option><option>ETF</option><option>Crypto</option><option>Immo</option><option>Macro</option><option>Retraite</option><option>Expert</option><option>Dérivés</option><option>Risque</option></select></div>
         <div class="form-col full"><label>Titre de la leçon</label><input id="fName" type="text" placeholder="Ex: Les intérêts composés : la machine à richesse"></div>
         <div class="form-col"><label>Durée</label><select id="fDuration"><option>1 min</option><option>2 min</option><option>3 min</option><option>5 min</option></select></div>
-        <div class="form-col"><label>Coins 🪙</label><select id="fCoins"><option value="80">80 — débutant</option><option value="100">100 — standard</option><option value="120">120 — intermédiaire</option><option value="150">150 — avancé</option><option value="200">200 — expert</option></select></div>
+        <div class="form-col"><label>Coins 🪙</label><select id="fCoins"><option value="80">80 — débutant</option><option value="120">120 — intermédiaire</option><option value="150">150 — avancé</option><option value="200">200 — expert</option></select></div>
       </div>
 
       <!-- BLOCS -->
@@ -330,10 +330,14 @@ select option{background:var(--bg2);}
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:.9rem;margin-bottom:1rem;">
         <div class="export-title">Traduction IA</div>
         <div class="lang-tabs">
-          <button class="lang-tab active" onclick="setLang('en',this)">🇬🇧 English</button>
-          <button class="lang-tab" onclick="setLang('es',this)">🇪🇸 Español</button>
+          <button class="lang-tab active" onclick="setLang('en',this)">🇬🇧 EN</button>
+          <button class="lang-tab" onclick="setLang('es',this)">🇪🇸 ES</button>
+          <button class="lang-tab" onclick="setLang('de',this)">🇩🇪 DE</button>
+          <button class="lang-tab" onclick="setLang('it',this)">🇮🇹 IT</button>
+          <button class="lang-tab" onclick="setLang('pt',this)">🇧🇷 PT</button>
+          <button class="lang-tab" onclick="setLang('ar',this)">🇸🇦 AR</button>
         </div>
-        <button class="btn" onclick="translateLesson()" id="translateBtn">🌍 Traduire le titre</button>
+        <button class="btn" onclick="translateLesson()" id="translateBtn">🌍 Traduire la leçon complète</button>
         <div id="translateResult" style="margin-top:.5rem;font-size:.74rem;color:var(--muted);"></div>
       </div>
 
@@ -595,20 +599,19 @@ function renderExplore(){
   </div><div class="lessons-grid">`;
   for(const l of lessons){
     const isNew=newLessons.find(x=>x.id===l.id);
-    html+=`<div class="lesson-card" onclick="openModal('${l.id}')">
+    const lvColor=l.level==='Débutant'?'var(--green)':l.level==='Intermédiaire'?'var(--blue)':l.level==='Avancé'?'var(--purple)':'var(--red)';
+    html+=`<div class="lesson-card" style="border-left:3px solid ${lvColor};" onclick="openModal('${l.id}')">
       <div class="lc-header">
         <span class="lc-emoji">${l.emoji}</span>
         <span class="lc-name">${l.name}</span>
         <div class="lc-badges">
-          <span class="badge ${l.level[0]==='D'?'d':'i'}">${l.level[0]}</span>
-          <span class="badge tag">${l.tag}</span>
           ${isNew?'<span class="badge new">NEW</span>':''}
         </div>
       </div>
-      <div class="lc-meta"><span>${l.id}</span><span>⏱ ${l.duration}</span><span>🪙 ${l.coins}</span></div>
+      <div class="lc-meta"></div>
       <div class="lc-actions">
-        <button class="lc-btn primary" onclick="event.stopPropagation();openModal('${l.id}')">👁 Voir</button>
-        <button class="lc-btn" onclick="event.stopPropagation();editLesson('${l.id}')">✏️ Modifier</button>
+        <button class="lc-btn primary" onclick="event.stopPropagation();openModal('${l.id}')">Voir</button>
+        <button class="lc-btn" onclick="event.stopPropagation();editLesson('${l.id}')">Modifier</button>
 ${isNew?`<button class="lc-btn del" onclick="event.stopPropagation();delLesson('${l.id}')">🗑️</button>`:''}
       </div>
     </div>`;
@@ -624,7 +627,7 @@ function openModal(id){
   if(!l) return;
   document.getElementById('modalEmoji').textContent=l.emoji;
   document.getElementById('modalTitle').textContent=l.name;
-  document.getElementById('modalBadges').innerHTML=`<span class="badge ${l.level[0]==='D'?'d':'i'}" style="font-size:.65rem;">${l.level}</span><span class="badge tag" style="font-size:.65rem;">${l.tag}</span><span style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted);margin-left:.3rem;">${l.id} · ${l.duration} · 🪙${l.coins}</span>`;
+  document.getElementById('modalBadges').innerHTML=`<span class="badge ${l.level[0]==='D'?'d':'i'}" style="font-size:.65rem;">${l.level}</span><span class="badge tag" style="font-size:.65rem;">${l.tag}</span><span style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted);margin-left:.3rem;"></span>`;
   document.getElementById('modalContent').innerHTML=`<div style="color:var(--muted);font-size:.78rem;"><span class="loader"><span></span><span></span><span></span></span></div>`;
   document.getElementById('lessonModal').classList.remove('hidden');
   if(CONTENT_CACHE[id]){ renderModalContent(id); } else { loadLessonContent(); }
@@ -1075,15 +1078,45 @@ async function translateLesson(){
   const name=document.getElementById('fName').value.trim();
   if(!name){ toast('Remplis le titre d\'abord','error'); return; }
   const btn=document.getElementById('translateBtn');
-  btn.textContent='⏳...'; btn.disabled=true;
+  btn.textContent='⏳ Traduction en cours...'; btn.disabled=true;
+  const langLabels={en:'anglais',es:'espagnol',de:'allemand',it:'italien',pt:'portugais',ar:'arabe'};
+  const langFlags={en:'🇬🇧',es:'🇪🇸',de:'🇩🇪',it:'🇮🇹',pt:'🇧🇷',ar:'🇸🇦'};
+  const payload={
+    title:name,
+    blocks:blocks.map(b=>({type:b.type,text:b.text,emo:b.emo||''})),
+    quiz:quizList[0]?{q:quizList[0].q,opts:quizList[0].opts,expl:quizList[0].expl}:null
+  };
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:claudeHeaders(),body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:`Traduis ce titre de leçon financière en ${currentLang==='en'?'anglais':'espagnol'}, garde le ton direct et percutant : "${name}". Réponds uniquement avec le titre traduit, rien d'autre.`}]})});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:claudeHeaders(),body:JSON.stringify({
+      model:'claude-haiku-4-5-20251001',max_tokens:2000,
+      messages:[{role:'user',content:`Traduis ce contenu de leçon financière en ${langLabels[currentLang]}. Garde le ton direct, percutant et pédagogique. Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.\n${JSON.stringify(payload)}\nFormat : {"title":"...","blocks":[{"type":"...","text":"...","emo":"..."}],"quiz":{"q":"...","opts":["...","...","...","..."],"expl":"..."}}`}]
+    })});
     const data=await res.json();
-    const translated=data.content?.[0]?.text||'';
-    document.getElementById('translateResult').innerHTML=`<strong>${currentLang==='en'?'🇬🇧':'🇪🇸'} ${translated}</strong>&nbsp;<button class="btn" onclick="navigator.clipboard.writeText('${translated.replace(/'/g,"\\'")}')" style="font-size:.62rem;padding:.2rem .5rem;">📋</button>`;
-    toast('✅ Traduit !');
-  }catch(e){ toast('❌ Erreur','error'); }
-  btn.textContent='🌍 Traduire'; btn.disabled=false;
+    const raw=data.content?.[0]?.text||'';
+    const m=raw.match(/\{[\s\S]*\}/);
+    if(!m) throw new Error('Format invalide');
+    const t=JSON.parse(m[0]);
+    const flag=langFlags[currentLang]||'🌍';
+    const lang=langLabels[currentLang]||currentLang;
+    let html=`<div style="border:1px solid var(--border);border-radius:8px;padding:.8rem;margin-top:.6rem;">`;
+    html+=`<div style="font-size:.65rem;font-weight:700;color:var(--gold);margin-bottom:.7rem;letter-spacing:.06em;text-transform:uppercase;">${flag} ${lang}</div>`;
+    html+=`<div style="margin-bottom:.6rem;"><span style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Titre</span><br><strong style="font-size:.8rem;color:var(--soft);">${t.title||''}</strong></div>`;
+    (t.blocks||[]).forEach(b=>{
+      html+=`<div style="margin-bottom:.5rem;border-left:2px solid var(--border2);padding-left:.6rem;"><span style="font-size:.58rem;color:var(--muted);text-transform:uppercase;">${b.type}</span><br><span style="font-size:.73rem;color:var(--soft);">${b.text||''}</span></div>`;
+    });
+    if(t.quiz&&t.quiz.q){
+      html+=`<div style="margin-top:.6rem;border-left:2px solid var(--gold2);padding-left:.6rem;"><span style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Quiz</span><br><span style="font-size:.74rem;">${t.quiz.q}</span>`;
+      (t.quiz.opts||[]).forEach((o,i)=>{ html+=`<br><span style="font-size:.7rem;color:var(--muted);">${i+1}. ${o}</span>`; });
+      if(t.quiz.expl) html+=`<br><span style="font-size:.68rem;color:var(--muted);font-style:italic;">${t.quiz.expl}</span>`;
+      html+=`</div>`;
+    }
+    const jsonStr=JSON.stringify(t,null,2).replace(/'/g,"\\'");
+    html+=`<div style="margin-top:.7rem;"><button class="btn primary" onclick="navigator.clipboard.writeText(JSON.stringify(${JSON.stringify(t)},null,2));toast('📋 Copié !')" style="font-size:.62rem;">📋 Copier JSON</button></div>`;
+    html+=`</div>`;
+    document.getElementById('translateResult').innerHTML=html;
+    toast('✅ Traduction complète !');
+  }catch(e){ toast('❌ Erreur traduction','error'); document.getElementById('translateResult').textContent='❌ '+e.message; }
+  btn.textContent='🌍 Traduire la leçon complète'; btn.disabled=false;
 }
 
 /* ══ IMPORT ACADEMY ══ */
@@ -1327,7 +1360,7 @@ Quand l'utilisateur décrit une leçon à créer, génère-la et termine TOUJOUR
 <FILL_LESSON>{"level":"Débutant","track":"Nom module","emoji":"🎯","tag":"Base","name":"Titre","duration":"1 min","coins":80,"blocks":[{"type":"hook","emo":"💥","text":"<strong>Accroche</strong>"},{"type":"content","text":"Explication.<br><strong>Clé</strong> : détail."},{"type":"tip","text":"Astuce."}],"quiz":{"q":"Question ?","opts":["A","B","C","D"],"correct":1,"expl":"Explication."}}</FILL_LESSON>
 Valeurs level : Débutant | Intermédiaire | Avancé | Expert
 Valeurs tag : Base | Stratégie | Pratique | Analyse | Psychologie | Fiscalité | Vocab | ETF | Crypto | Immo | Macro | Retraite | Expert | Dérivés | Risque
-Coins : 80=débutant, 100=standard, 120=intermédiaire, 150=avancé, 200=expert
+Coins : 80=débutant, 120=intermédiaire, 150=avancé, 200=expert
 Écris d'abord 1-2 phrases décrivant ce que tu crées, PUIS le bloc <FILL_LESSON>.
 Style blocs : direct, HTML simple (<strong> et <br> uniquement), 2-4 blocs max.`;
 
