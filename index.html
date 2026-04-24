@@ -604,7 +604,6 @@ select option{background:var(--bg2);}
     <div style="max-width:1100px;margin:0 auto;padding:.2rem 0 2rem;">
       <div class="demo-banner">Données simulées — connecte Supabase pour les vraies analytics en temps réel.</div>
       <div class="overview-kpis" id="analyticsOverview"></div>
-      <div class="analytics-nav" id="analyticsNav"></div>
       <div id="analyticsAlerts"></div>
       <div id="statsFilterBar"></div>
       <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
@@ -1571,10 +1570,6 @@ function renderStats(){
     <div class="ov-card"><div class="ov-num" style="color:${alerts.length>5?'var(--red)':'var(--gold)'}">${alerts.length}</div><div class="ov-lbl">Alertes actives</div></div>
     <div class="ov-card"><div class="ov-num" style="color:var(--blue)">${translated}</div><div class="ov-lbl">Leçons traduites</div></div>
     <div class="ov-card"><div class="ov-num" style="color:var(--purple)">${Object.keys(CONTENT_CACHE).length}</div><div class="ov-lbl">Contenus chargés</div></div>`;
-
-  // Nav tabs
-  const views=[{id:'pedagogy',label:'Pédagogie'},{id:'product',label:'Produit & UX'},{id:'impact',label:'Impact & Éco'}];
-  document.getElementById('analyticsNav').innerHTML=views.map(v=>`<button class="anav-btn${_analyticsView===v.id?' active':''}" onclick="setAnalyticsView('${v.id}')">${v.label}</button>`).join('');
 
   // Alert section
   if(alerts.length){
