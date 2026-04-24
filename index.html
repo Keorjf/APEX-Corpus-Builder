@@ -277,6 +277,15 @@ select option{background:var(--bg2);}
 .diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
 @media(max-width:660px){.diag-grid{grid-template-columns:1fr;}}
 .diag-widget{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;}
+.diag-popup{position:fixed;z-index:1000;background:var(--bg1);border:1px solid var(--border2);border-radius:12px;padding:.85rem 1rem;width:290px;box-shadow:0 10px 36px rgba(0,0,0,.55);pointer-events:all;}
+.diag-popup.hidden{display:none;}
+.diag-popup-title{font-size:.66rem;font-weight:800;color:var(--soft);margin-bottom:.4rem;padding-right:1.2rem;line-height:1.35;}
+.diag-popup-desc{font-size:.62rem;color:var(--muted);line-height:1.52;margin-bottom:.5rem;}
+.diag-popup-section{font-size:.52rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:.45rem 0 .25rem;border-top:1px solid var(--border);padding-top:.4rem;}
+.diag-popup-tips{margin:0;padding:0;list-style:none;}
+.diag-popup-tips li{font-size:.6rem;color:var(--soft);line-height:1.48;padding:.1rem 0 .1rem .8rem;position:relative;}
+.diag-popup-tips li::before{content:'→';position:absolute;left:0;color:var(--gold);}
+.diag-popup-close{position:absolute;top:.5rem;right:.6rem;background:none;border:none;color:var(--muted);cursor:pointer;font-size:.75rem;line-height:1;padding:0;}
 .diag-wtitle{font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;}
 .gf-row{display:grid;grid-template-columns:4.5rem 1fr 2.8rem;align-items:center;gap:.45rem;margin-bottom:.32rem;}
 .gf-lbl{font-size:.62rem;color:var(--soft);text-align:right;}
@@ -1687,7 +1696,7 @@ function renderScatterSVG(ld){
     <text x="${W/2}" y="${H-5}" font-size="8" fill="rgba(255,255,255,.25)" text-anchor="middle">Quiz Complétion (%)</text>
     <text x="8" y="${H/2}" font-size="8" fill="rgba(255,255,255,.25)" text-anchor="middle" transform="rotate(-90,8,${H/2})">PnL Sim. (€)</text>
     <line x1="${sx(0)}" y1="${sy(b)}" x2="${sx(100)}" y2="${sy(m*100+b)}" stroke="var(--blue)" stroke-width="1.2" stroke-dasharray="4 3" opacity=".5"/>
-    ${pts.map(p=>`<circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="2.8" fill="${p.h>=70?'var(--green)':p.h>=50?'var(--gold)':'var(--red)'}" fill-opacity=".75" style="cursor:pointer;" onclick="openLessonDetail('${p.id}')"><title>${p.name}</title></circle>`).join('')}
+    ${pts.map(p=>`<circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="2.8" fill="${p.h>=70?'var(--green)':p.h>=50?'var(--gold)':'var(--red)'}" fill-opacity=".75" style="cursor:pointer;" onclick="showScatterPopup(event,'${p.id}')"><title>${p.name}</title></circle>`).join('')}
   </svg>
   <div style="display:flex;gap:.45rem;margin-top:.3rem;flex-wrap:wrap;">
     <span style="font-size:.52rem;color:var(--muted);">Cliquer un point pour le détail</span>
@@ -1712,7 +1721,7 @@ function renderRadarSVG(ld){
   const spokes=[0,1,2,3,4,5].map(i=>`<line x1="${CX}" y1="${CY}" x2="${pt(i,R).split(',')[0]}" y2="${pt(i,R).split(',')[1]}" stroke="rgba(255,255,255,.06)" stroke-width="1"/>`).join('');
   const poly=`<polygon points="${vals.map((v,i)=>pt(i,R*v)).join(' ')}" fill="rgba(77,158,255,.14)" stroke="var(--blue)" stroke-width="1.5"/>`;
   const dots=vals.map((v,i)=>{ const [px,py]=pt(i,R*v).split(','); return `<circle cx="${px}" cy="${py}" r="2.5" fill="var(--blue)"/>`; }).join('');
-  const lbls=[0,1,2,3,4,5].map(i=>{ const a=Math.PI/2-i*(2*Math.PI/6); return `<text x="${(CX+(R+13)*Math.cos(a)).toFixed(1)}" y="${(CY-(R+13)*Math.sin(a)).toFixed(1)}" font-size="8.5" fill="rgba(255,255,255,.4)" text-anchor="middle" dominant-baseline="middle">${axes[i]}</text>`; }).join('');
+  const lbls=[0,1,2,3,4,5].map(i=>{ const a=Math.PI/2-i*(2*Math.PI/6); return `<text x="${(CX+(R+13)*Math.cos(a)).toFixed(1)}" y="${(CY-(R+13)*Math.sin(a)).toFixed(1)}" font-size="8.5" fill="rgba(255,255,255,.4)" text-anchor="middle" dominant-baseline="middle" style="cursor:pointer;" onclick="showRadarAxisPopup(event,'${axes[i]}')">${axes[i]}</text>`; }).join('');
   return `<div style="display:flex;justify-content:center;"><svg viewBox="0 0 200 200" style="max-width:210px;width:100%;">${rings}${spokes}${poly}${dots}${lbls}</svg></div>`;
 }
 
@@ -1723,7 +1732,7 @@ function renderBulletChart(ld){
   return sample.map(l=>{
     const e=est(l),r=l.k.timeOnLesson;
     const col=r<e*.5?'var(--red)':r>e*1.5?'var(--gold)':'var(--green)';
-    return `<div class="bullet-row">
+    return `<div class="bullet-row" style="cursor:pointer;" onclick="showBulletPopup(event,'${l.id}')">
       <div class="bullet-lbl" title="${l.name}">${l.name.slice(0,32)}${l.name.length>32?'…':''}</div>
       <div class="bullet-track">
         <div class="bullet-bg" style="width:${Math.round(e/mx*100)}%;"></div>
@@ -1743,7 +1752,7 @@ function renderHeatTable(ld){
   const tone=l=>Math.round(55+_mh(l.id,83)*45);
   const hc=(v,lo,hi)=>v>=hi?{bg:'rgba(0,232,122,.15)',tc:'var(--green)'}:v>=lo?{bg:'rgba(255,205,13,.1)',tc:'var(--gold)'}:{bg:'rgba(255,59,92,.12)',tc:'var(--red)'};
   const rows=ld.slice(0,10).map(l=>{ const f=flesch(l),bm=bloom(l),t=tone(l),fc=hc(f,50,70),tc2=hc(t,65,80);
-    return `<tr><td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${l.name}">${l.name.slice(0,20)}${l.name.length>20?'…':''}</td><td><span class="heat-cell" style="background:${fc.bg};color:${fc.tc};">${f}</span></td><td><span class="heat-cell" style="background:${bm.bg};color:${bm.tc};">${bm.lbl}</span></td><td><span class="heat-cell" style="background:${tc2.bg};color:${tc2.tc};">${t}%</span></td></tr>`;
+    return `<tr style="cursor:pointer;" onclick="showHeatPopup(event,'${l.id}')"><td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${l.name}">${l.name.slice(0,20)}${l.name.length>20?'…':''}</td><td><span class="heat-cell" style="background:${fc.bg};color:${fc.tc};">${f}</span></td><td><span class="heat-cell" style="background:${bm.bg};color:${bm.tc};">${bm.lbl}</span></td><td><span class="heat-cell" style="background:${tc2.bg};color:${tc2.tc};">${t}%</span></td></tr>`;
   }).join('');
   return `<table class="heat-tbl"><thead><tr><th>Leçon</th><th>Flesch (C-01)</th><th>Bloom (C-10)</th><th>Ton (C-13)</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
@@ -1772,6 +1781,93 @@ function runAuditIA(){
 }
 
 function setAnalyticsView(v){ _analyticsView=v; renderStats(); }
+
+/* ══ DIAG POPUP ══ */
+function showDiagPopup(e,title,desc,tips){
+  const p=document.getElementById('diagPopup');
+  document.getElementById('diagPopupTitle').textContent=title;
+  document.getElementById('diagPopupDesc').textContent=desc;
+  document.getElementById('diagPopupTips').innerHTML=tips.map(t=>`<li>${t}</li>`).join('');
+  p.classList.remove('hidden');
+  const pw=300,ph=260,vw=window.innerWidth,vh=window.innerHeight;
+  let x=e.clientX+14,y=e.clientY+14;
+  if(x+pw>vw-8) x=e.clientX-pw-8;
+  if(y+ph>vh-8) y=e.clientY-ph-8;
+  p.style.left=Math.max(8,x)+'px';
+  p.style.top=Math.max(8,y)+'px';
+  e.stopPropagation();
+}
+function hideDiagPopup(){ document.getElementById('diagPopup').classList.add('hidden'); }
+document.addEventListener('click',()=>hideDiagPopup());
+
+function showScatterPopup(e,id){
+  const l=getAllLessons().find(x=>x.id===id); if(!l) return;
+  const k=mockKpis(id);
+  const pnl=Math.round((k.claimRate/100*k.sessionDepth*k.quizCompletion/100-.3)*300);
+  const tips=[];
+  if(k.quizCompletion<60) tips.push('Taux de complétion quiz faible ('+k.quizCompletion+'%) — revoir la longueur ou la difficulté');
+  if(pnl<0) tips.push('PnL simulé négatif ('+pnl+'€) — la leçon n\'ancre pas assez de réflexes pratiques');
+  if(k.quizCompletion>75&&pnl<50) tips.push('Quiz bien complété mais PnL faible : le quiz évalue la mémorisation, pas l\'application');
+  if(k.errorRate>60) tips.push('Taux d\'erreur quiz élevé ('+k.errorRate+'%) — simplifier ou reformuler les questions');
+  if(tips.length===0) tips.push('Leçon bien corrélée — maintenir la structure pédagogique actuelle');
+  showDiagPopup(e,
+    'T-02 · '+l.name.slice(0,35)+(l.name.length>35?'…':''),
+    'Quiz : '+k.quizCompletion+'% complétion · PnL simulé : '+pnl+'€/30j. Corrélation entre maîtrise quiz et performance en trading simulé — valide l\'impact réel de la leçon.',
+    tips
+  );
+}
+
+function showRadarAxisPopup(e,axis){
+  const info={
+    'Hook':{desc:'Taux moyen de complétion du bloc d\'accroche. Mesure si les apprenants restent après les 15 premières secondes. Cible > 90%.',tips:['Réécrire le titre avec un chiffre ou une question provocatrice pour les leçons < 80%','Ajouter une anecdote ou un paradoxe en ouverture','Tester différents formats (vidéo courte, stat choc) pour améliorer la rétention initiale']},
+    'Densité':{desc:'Taux moyen de lecture du contenu principal. Mesure l\'engagement sur la matière pédagogique. Cible > 85%.',tips:['Découper les blocs > 300 mots en sous-sections titrées','Ajouter des visuels ou tableaux de synthèse pour les leçons denses','Vérifier le score Flesch : < 40 signale un texte trop complexe pour ce niveau']},
+    'Pratique':{desc:'Taux moyen de complétion du quiz. Valide la mise en pratique des connaissances acquises. Cible > 70%.',tips:['Réduire le nombre de questions si l\'abandon quiz > 30%','S\'assurer que la terminologie du quiz correspond exactement au contenu','Ajouter un quiz intermédiaire pour les leçons longues (> 5 min)']},
+    'Ancrage':{desc:'Taux moyen de claim des coins de récompense. Indicateur de satisfaction et de complétion totale. Cible > 85%.',tips:['Vérifier que le bouton de claim est visible immédiatement après le quiz','Réduire le délai et les étapes entre la fin du quiz et la récompense','Analyser les leçons avec claim < 60% pour détecter les frictions UX']},
+    'Diversité':{desc:'Niveau de variété des tracks pédagogiques dans le corpus. Un corpus diversifié réduit la lassitude et élargit les parcours.',tips:['Identifier les thèmes manquants via le module Gap Analysis','Équilibrer la distribution : éviter qu\'un seul track dépasse 30% du corpus','Créer des leçons passerelles entre tracks pour renforcer les connexions conceptuelles']},
+    'Bloom':{desc:'Score d\'équilibre de la taxonomie de Bloom basé sur le taux d\'erreur quiz. Optimal entre 25-40% d\'erreur : ni trop facile, ni décourageant.',tips:['Erreur < 10% : réécrire les questions pour évaluer la compréhension, pas la mémorisation','Erreur > 60% : simplifier les choix ou reformuler les questions ambiguës','Viser les niveaux Application/Analyse de Bloom pour des contenus financiers pratiques']}
+  };
+  const d=info[axis]||{desc:'Axe du radar pédagogique.',tips:['Consulter le détail de chaque leçon pour un diagnostic précis']};
+  showDiagPopup(e,'Radar · '+axis,d.desc,d.tips);
+}
+
+function showBulletPopup(e,id){
+  const l=getAllLessons().find(x=>x.id===id); if(!l) return;
+  const k=mockKpis(id);
+  const est=l.level==='Débutant'?80+Math.round(_mh(l.id,50)*70):l.level==='Intermédiaire'?130+Math.round(_mh(l.id,50)*90):l.level==='Avancé'?190+Math.round(_mh(l.id,50)*110):250+Math.round(_mh(l.id,50)*130);
+  const real=k.timeOnLesson,ratio=real/est;
+  const tips=[];
+  if(ratio<.5) tips.push('Leçon probablement skippée ('+real+'s < 50% du temps estimé '+est+'s) — vérifier la densité du contenu');
+  else if(ratio>.5&&ratio<.8) tips.push('Leçon lue rapidement — s\'assurer que le contenu est suffisamment riche pour le niveau '+l.level);
+  else if(ratio>1.5) tips.push('Lecture bien plus longue que prévu ('+real+'s vs '+est+'s estimé) — envisager de diviser en 2 sous-leçons');
+  if(k.bounceRate>25) tips.push('Bounce rate élevé ('+k.bounceRate+'%) — analyser le point d\'abandon dans le funnel');
+  if(tips.length===0) tips.push('Temps de lecture bien calibré ('+Math.round(ratio*100)+'% de l\'estimé) — maintenir la structure actuelle');
+  showDiagPopup(e,
+    'L-01/A-04 · '+l.name.slice(0,28)+(l.name.length>28?'…':''),
+    'Temps estimé : '+est+'s · Temps réel médian : '+real+'s ('+Math.round(ratio*100)+'% de l\'estimé). Un écart > 50% dans les deux sens signale une mauvaise calibration de la promesse de durée.',
+    tips
+  );
+}
+
+function showHeatPopup(e,id){
+  const l=getAllLessons().find(x=>x.id===id); if(!l) return;
+  const k=mockKpis(id);
+  const f=Math.round(20+_mh(l.id,71)*70);
+  const t=Math.round(55+_mh(l.id,83)*45);
+  const bloomName=k.errorRate<10?'Mémorisation':k.errorRate<25?'Compréhension':k.errorRate<45?'Application':k.errorRate<65?'Analyse':'Évaluation';
+  const tips=[];
+  if(f<40) tips.push('Lisibilité critique (Flesch '+f+') — simplifier le vocabulaire, raccourcir les phrases, éviter le jargon non défini');
+  else if(f<50) tips.push('Texte difficile (Flesch '+f+') — cible > 50 pour ce public. Reformuler les passages théoriques');
+  else if(f>78) tips.push('Texte potentiellement trop simple (Flesch '+f+') — vérifier la profondeur conceptuelle pour le niveau '+l.level);
+  if(t<65) tips.push('Cohérence du ton faible ('+t+'%) — standardiser le registre (tutoiement cohérent, ton direct sans jargon inutile)');
+  if(bloomName==='Mémorisation') tips.push('Niveau Bloom bas — reformuler les questions pour dépasser la mémorisation et atteindre la compréhension');
+  if(bloomName==='Évaluation') tips.push('Niveau Bloom élevé — vérifier que les prérequis sont couverts dans les leçons précédentes du parcours');
+  if(tips.length===0) tips.push('Indicateurs de complexité dans les cibles — maintenir la structure éditoriale actuelle');
+  showDiagPopup(e,
+    'C-01/10/13 · '+l.name.slice(0,25)+(l.name.length>25?'…':''),
+    'Flesch '+f+' · Bloom : '+bloomName+' · Ton : '+t+'%. Ces indicateurs mesurent la qualité rédactionnelle et la cohérence pédagogique du texte.',
+    tips
+  );
+}
 
 
 /* ══ KPI FILTER PANEL ══ */
@@ -2689,6 +2785,15 @@ function toggleTact(){
     <button class="modal-close" onclick="closeKpiFilterPanel()">✕</button>
   </div>
   <div id="kfpBody"></div>
+</div>
+
+<!-- DIAG POPUP -->
+<div class="diag-popup hidden" id="diagPopup" onclick="event.stopPropagation()">
+  <button class="diag-popup-close" onclick="hideDiagPopup()">✕</button>
+  <div class="diag-popup-title" id="diagPopupTitle"></div>
+  <div class="diag-popup-desc" id="diagPopupDesc"></div>
+  <div class="diag-popup-section">Points d'amélioration</div>
+  <ul class="diag-popup-tips" id="diagPopupTips"></ul>
 </div>
 
 <!-- LESSON DETAIL OVERLAY -->
