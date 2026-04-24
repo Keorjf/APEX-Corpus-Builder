@@ -249,6 +249,27 @@ select option{background:var(--bg2);}
 .ld-f-bar{height:100%;border-radius:4px;transition:width .7s cubic-bezier(.4,0,.2,1);width:0;}
 .ld-f-pct{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);width:30px;text-align:right;flex-shrink:0;}
 
+/* ── KPI FILTER PANEL ── */
+.kfp-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:700;opacity:0;pointer-events:none;transition:opacity .22s;}
+.kfp-backdrop.open{opacity:1;pointer-events:all;}
+.kfp-panel{position:fixed;top:0;right:0;height:100vh;width:min(370px,100vw);background:var(--bg1);border-left:1px solid var(--border2);z-index:701;overflow-y:auto;padding:1.2rem 1.4rem 2.5rem;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);}
+.kfp-panel.open{transform:translateX(0);}
+.kfp-panel::-webkit-scrollbar{width:3px;}.kfp-panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.kfp-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;padding-bottom:.8rem;border-bottom:1px solid var(--border);}
+.kfp-title{font-family:var(--font-title);font-size:.9rem;color:var(--gold);flex:1;letter-spacing:.04em;}
+.kfp-section{font-size:.52rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:.85rem 0 .4rem;padding-bottom:.2rem;border-bottom:1px solid var(--border);}
+.kfp-chips{display:flex;flex-wrap:wrap;gap:.3rem;}
+.kfp-chip{padding:.25rem .62rem;font-size:.67rem;font-weight:700;border-radius:6px;border:1px solid var(--border2);background:none;color:var(--muted);cursor:pointer;transition:.12s;}
+.kfp-chip:hover:not(.on){border-color:rgba(255,255,255,.18);color:var(--soft);}
+.kfp-chip.on{border-color:currentColor;}
+.kfp-chip.on.cr{background:rgba(255,59,92,.1);color:var(--red);}
+.kfp-chip.on.or{background:rgba(255,122,0,.1);color:var(--orange);}
+.kfp-chip.on.yl{background:rgba(255,205,13,.1);color:var(--gold);}
+.kfp-chip.on.gn{background:rgba(0,232,122,.1);color:var(--green);}
+.kfp-chip.on.bl{background:rgba(77,158,255,.1);color:var(--blue);}
+.kfp-chip.on.pu{background:rgba(167,139,250,.1);color:var(--purple);}
+.kfp-active-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:.55rem;font-weight:800;margin-left:.3rem;}
+
 /* SECTION TABS */
 .section-tab{display:none;}
 .section-tab.active{display:block;}
@@ -1465,7 +1486,7 @@ function exportDiff(){
 /* ══ STATS ══ */
 /* ══ ANALYTICS ENGINE ══ */
 let _analyticsView='pedagogy';
-let _alertFilter=null;
+let _kpiFilters={tags:new Set(),levels:new Set(),scoreRange:null,errorRate:null,bounceRate:null,rating:null};
 
 function _mh(id,s){
   let h=(s*2654435761)>>>0;
@@ -1557,18 +1578,20 @@ function renderStats(){
 
   // Alert section
   if(alerts.length){
-    // Collect unique tag types for filters
-    const tagTypes=[...new Set(alerts.flatMap(l=>l.tags.map(t=>t.txt)))];
-    const filtered=_alertFilter?alerts.filter(l=>l.tags.some(t=>t.txt===_alertFilter)):alerts;
-    const filterBtns=`<div class="alert-filters">
-      <button class="afilter-btn${!_alertFilter?' active':''}" onclick="_alertFilter=null;renderStats()">Tous (${alerts.length})</button>
-      ${tagTypes.map(txt=>`<button class="afilter-btn${_alertFilter===txt?' active':''}" onclick="_alertFilter='${txt}';renderStats()">${txt} (${alerts.filter(l=>l.tags.some(t=>t.txt===txt)).length})</button>`).join('')}
-    </div>`;
-    const alertCards=filtered.slice(0,8).map(l=>alertCard(l)).join('');
-    const more=filtered.length>8?`<div style="font-size:.65rem;color:var(--muted);padding:.3rem 0;">+${filtered.length-8} autres leçons en alerte</div>`:'';
+    const filtered=applyAlertFilters(alerts);
+    const n=kpiFilterCount();
+    const alertCards=filtered.slice(0,10).map(l=>alertCard(l)).join('');
+    const more=filtered.length>10?`<div style="font-size:.65rem;color:var(--muted);padding:.3rem 0;">+${filtered.length-10} autres leçons en alerte</div>`:'';
+    const emptyMsg=filtered.length===0?`<div style="font-size:.73rem;color:var(--muted);padding:.6rem 0;">Aucune leçon ne correspond aux filtres actifs.</div>`:'';
     document.getElementById('analyticsAlerts').innerHTML=`<div style="margin-bottom:.9rem;">
-      <div style="font-size:.58rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem;">Leçons en alerte (score &lt; 65)</div>
-      ${filterBtns}${alertCards}${more}
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem;">
+        <div style="font-size:.58rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--red);">Leçons en alerte (score &lt; 65) <span style="color:var(--muted);font-size:.56rem;">${filtered.length}/${alerts.length}</span></div>
+        <button class="anav-btn${n>0?' active':''}" onclick="openKpiFilterPanel()" style="margin-left:auto;font-size:.65rem;">
+          Filtrer${n>0?`<span class="kfp-active-badge">${n}</span>`:''}
+        </button>
+        ${n>0?`<button class="anav-btn" onclick="clearKpiFilters()" style="font-size:.62rem;color:var(--muted);">Effacer</button>`:''}
+      </div>
+      ${alertCards}${emptyMsg}${more}
     </div>`;
   } else {
     document.getElementById('analyticsAlerts').innerHTML=`<div style="font-size:.73rem;color:var(--green);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.15);border-radius:8px;">Aucune leçon en alerte — corpus en bonne santé.</div>`;
@@ -1599,6 +1622,116 @@ function setTableLevelFilter(lv){
   _levelFilter=lv;
   renderFilterBar(_lastLd);
   renderAnalyticsTable(_lastLd);
+}
+
+/* ══ KPI FILTER PANEL ══ */
+function kpiFilterCount(){
+  return _kpiFilters.tags.size+_kpiFilters.levels.size+
+    (_kpiFilters.scoreRange?1:0)+(_kpiFilters.errorRate?1:0)+
+    (_kpiFilters.bounceRate?1:0)+(_kpiFilters.rating?1:0);
+}
+
+function applyAlertFilters(alerts){
+  let r=alerts;
+  if(_kpiFilters.tags.size>0) r=r.filter(l=>l.tags.some(t=>_kpiFilters.tags.has(t.txt)));
+  if(_kpiFilters.levels.size>0) r=r.filter(l=>_kpiFilters.levels.has(l.level));
+  if(_kpiFilters.scoreRange==='critical') r=r.filter(l=>l.health<30);
+  else if(_kpiFilters.scoreRange==='low') r=r.filter(l=>l.health>=30&&l.health<50);
+  else if(_kpiFilters.scoreRange==='medium') r=r.filter(l=>l.health>=50&&l.health<65);
+  if(_kpiFilters.errorRate==='easy') r=r.filter(l=>l.k.errorRate<10);
+  else if(_kpiFilters.errorRate==='hard') r=r.filter(l=>l.k.errorRate>60);
+  if(_kpiFilters.bounceRate==='hi') r=r.filter(l=>l.k.bounceRate>30);
+  if(_kpiFilters.rating==='lo') r=r.filter(l=>l.k.rating<3.5);
+  else if(_kpiFilters.rating==='hi') r=r.filter(l=>l.k.rating>=4);
+  return r;
+}
+
+function openKpiFilterPanel(){
+  renderKpiFilterPanel();
+  document.getElementById('kfpBackdrop').classList.add('open');
+  document.getElementById('kfpPanel').classList.add('open');
+}
+function closeKpiFilterPanel(){
+  document.getElementById('kfpBackdrop').classList.remove('open');
+  document.getElementById('kfpPanel').classList.remove('open');
+}
+function clearKpiFilters(){
+  _kpiFilters={tags:new Set(),levels:new Set(),scoreRange:null,errorRate:null,bounceRate:null,rating:null};
+  renderStats();
+  renderKpiFilterPanel();
+}
+
+function _toggleSet(set,val){ if(set.has(val)) set.delete(val); else set.add(val); }
+function toggleKpiTag(txt){ _toggleSet(_kpiFilters.tags,txt); renderStats(); renderKpiFilterPanel(); }
+function toggleKpiLevel(lv){ _toggleSet(_kpiFilters.levels,lv); renderStats(); renderKpiFilterPanel(); }
+function setKpiScore(v){ _kpiFilters.scoreRange=_kpiFilters.scoreRange===v?null:v; renderStats(); renderKpiFilterPanel(); }
+function setKpiError(v){ _kpiFilters.errorRate=_kpiFilters.errorRate===v?null:v; renderStats(); renderKpiFilterPanel(); }
+function setKpiBounce(v){ _kpiFilters.bounceRate=_kpiFilters.bounceRate===v?null:v; renderStats(); renderKpiFilterPanel(); }
+function setKpiRating(v){ _kpiFilters.rating=_kpiFilters.rating===v?null:v; renderStats(); renderKpiFilterPanel(); }
+
+function renderKpiFilterPanel(){
+  const all=getAllLessons();
+  const ld=all.map(l=>{ const k=mockKpis(l.id); return {...l,k,health:calcHealth(k),tags:alertTags(k)}; });
+  const alerts=ld.filter(x=>x.health<65);
+  const tagTypes=[...new Set(alerts.flatMap(l=>l.tags.map(t=>t.txt)))];
+  const tagColorMap={};
+  alerts.flatMap(l=>l.tags).forEach(t=>{ tagColorMap[t.txt]=t.c==='red'?'cr':t.c==='orange'?'or':'yl'; });
+
+  const chip=(label,cls,active,fn)=>`<button class="kfp-chip${active?' on '+cls:''}" onclick="${fn}">${label}</button>`;
+
+  const n=kpiFilterCount();
+  const filtered=applyAlertFilters(alerts);
+
+  document.getElementById('kfpBody').innerHTML=`
+    <div style="font-size:.7rem;color:var(--muted);margin-bottom:.7rem;">
+      ${n>0?`<strong style="color:var(--gold);">${filtered.length}</strong> leçon(s) sur ${alerts.length} en alerte correspondent.`:`${alerts.length} leçons en alerte — aucun filtre actif.`}
+    </div>
+
+    <div class="kfp-section">Type d'alerte</div>
+    <div class="kfp-chips">
+      ${tagTypes.map(txt=>{
+        const cls=tagColorMap[txt]||'cr';
+        const cnt=alerts.filter(l=>l.tags.some(t=>t.txt===txt)).length;
+        return chip(`${txt} (${cnt})`,cls,_kpiFilters.tags.has(txt),`toggleKpiTag('${txt.replace(/'/g,"\\'")}')`);
+      }).join('')}
+    </div>
+
+    <div class="kfp-section">Niveau</div>
+    <div class="kfp-chips">
+      ${[['Débutant','gn'],['Intermédiaire','bl'],['Avancé','pu'],['Expert','cr']].map(([lv,cls])=>{
+        const cnt=alerts.filter(l=>l.level===lv).length;
+        return cnt>0?chip(`${lv} (${cnt})`,cls,_kpiFilters.levels.has(lv),`toggleKpiLevel('${lv}')`):'';
+      }).join('')}
+    </div>
+
+    <div class="kfp-section">Score de santé</div>
+    <div class="kfp-chips">
+      ${chip('Critique &lt; 30','cr',_kpiFilters.scoreRange==='critical',"setKpiScore('critical')")}
+      ${chip('Faible 30–50','yl',_kpiFilters.scoreRange==='low',"setKpiScore('low')")}
+      ${chip('Moyen 50–65','or',_kpiFilters.scoreRange==='medium',"setKpiScore('medium')")}
+    </div>
+
+    <div class="kfp-section">Erreur quiz (L-09)</div>
+    <div class="kfp-chips">
+      ${chip('Trop facile &lt; 10%','gn',_kpiFilters.errorRate==='easy',"setKpiError('easy')")}
+      ${chip('Trop dur &gt; 60%','cr',_kpiFilters.errorRate==='hard',"setKpiError('hard')")}
+    </div>
+
+    <div class="kfp-section">Bounce (N-05)</div>
+    <div class="kfp-chips">
+      ${chip('Élevé &gt; 30%','cr',_kpiFilters.bounceRate==='hi',"setKpiBounce('hi')")}
+    </div>
+
+    <div class="kfp-section">Note (Q-01)</div>
+    <div class="kfp-chips">
+      ${chip('Faible &lt; 3.5','cr',_kpiFilters.rating==='lo',"setKpiRating('lo')")}
+      ${chip('Bonne &ge; 4','gn',_kpiFilters.rating==='hi',"setKpiRating('hi')")}
+    </div>
+
+    ${n>0?`<div style="margin-top:1.2rem;padding-top:.8rem;border-top:1px solid var(--border);">
+      <button class="btn danger" onclick="clearKpiFilters()" style="width:100%;font-size:.72rem;">Effacer tous les filtres (${n} actif${n>1?'s':''})</button>
+    </div>`:''}
+  `;
 }
 
 function alertCard(l){
@@ -2394,6 +2527,17 @@ function toggleTact(){
   }
 }
 </script>
+
+<!-- KPI FILTER PANEL -->
+<div class="kfp-backdrop" id="kfpBackdrop" onclick="closeKpiFilterPanel()"></div>
+<div class="kfp-panel" id="kfpPanel">
+  <div class="kfp-hdr">
+    <div class="kfp-title">Filtres KPI</div>
+    <button class="btn" style="font-size:.65rem;padding:.28rem .65rem;" onclick="clearKpiFilters()">Effacer tout</button>
+    <button class="modal-close" onclick="closeKpiFilterPanel()">✕</button>
+  </div>
+  <div id="kfpBody"></div>
+</div>
 
 <!-- LESSON DETAIL OVERLAY -->
 <div class="ld-ov hidden" id="ldOv" onclick="if(event.target===this)closeLessonDetail()">
