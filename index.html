@@ -605,7 +605,6 @@ select option{background:var(--bg2);}
       <div class="demo-banner">Données simulées — connecte Supabase pour les vraies analytics en temps réel.</div>
       <div class="overview-kpis" id="analyticsOverview"></div>
       <div id="analyticsAlerts"></div>
-      <div id="statsFilterBar"></div>
       <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
         <table class="kpi-tbl" id="analyticsTable"><thead id="analyticsHead"></thead><tbody id="analyticsBody"></tbody></table>
       </div>
@@ -1593,31 +1592,11 @@ function renderStats(){
   }
 
   _lastLd = ld;
-  renderFilterBar(ld);
   renderAnalyticsTable(ld);
 }
 
 function setAnalyticsView(v){ _analyticsView=v; renderStats(); }
 
-function renderFilterBar(ld){
-  const fb=document.getElementById('statsFilterBar'); if(!fb) return;
-  const c={Débutant:0,Intermédiaire:0,Avancé:0,Expert:0};
-  ld.forEach(l=>{ if(c[l.level]!==undefined) c[l.level]++; });
-  fb.innerHTML=`<div class="stat-filter-bar">
-    <input class="stat-search" type="text" placeholder="Rechercher une leçon..." value="${_tableSearch.replace(/"/g,'&quot;')}" oninput="_tableSearch=this.value;renderAnalyticsTable(_lastLd)">
-    <button class="lvl-filter lvl-all${!_levelFilter?' active':''}" onclick="setTableLevelFilter(null)">Tous (${ld.length})</button>
-    <button class="lvl-filter lvl-deb${_levelFilter==='Débutant'?' active':''}" onclick="setTableLevelFilter('Débutant')">Deb. (${c['Débutant']})</button>
-    <button class="lvl-filter lvl-int${_levelFilter==='Intermédiaire'?' active':''}" onclick="setTableLevelFilter('Intermédiaire')">Inter. (${c['Intermédiaire']})</button>
-    <button class="lvl-filter lvl-avd${_levelFilter==='Avancé'?' active':''}" onclick="setTableLevelFilter('Avancé')">Avancé (${c['Avancé']})</button>
-    <button class="lvl-filter lvl-exp${_levelFilter==='Expert'?' active':''}" onclick="setTableLevelFilter('Expert')">Expert (${c['Expert']})</button>
-  </div>`;
-}
-
-function setTableLevelFilter(lv){
-  _levelFilter=lv;
-  renderFilterBar(_lastLd);
-  renderAnalyticsTable(_lastLd);
-}
 
 /* ══ KPI FILTER PANEL ══ */
 function kpiFilterCount(){
