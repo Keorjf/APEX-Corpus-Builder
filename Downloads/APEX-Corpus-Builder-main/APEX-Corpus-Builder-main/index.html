@@ -1,4 +1,4 @@
-a<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -234,6 +234,92 @@ select option{background:var(--bg2);}
 
 @media(max-width:700px){.main{grid-template-columns:1fr;}.sidebar{display:none;}.form-row{grid-template-columns:1fr;}.help-body{grid-template-columns:1fr;}}
 
+/* ── ANALYTICS DASHBOARD ── */
+.analytics-nav{display:flex;gap:.3rem;margin:.6rem 0 .9rem;flex-wrap:wrap;}
+.anav-btn{padding:.32rem .8rem;font-size:.7rem;font-weight:700;border-radius:7px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;transition:.12s;}
+.anav-btn.active{background:var(--gold2);border-color:var(--gold);color:var(--gold);}
+.anav-btn:hover:not(.active){border-color:var(--border2);color:var(--soft);}
+.health-pill{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:19px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;padding:0 .3rem;}
+.health-hi{background:rgba(0,232,122,.15);color:var(--green);border:1px solid rgba(0,232,122,.3);}
+.health-mid{background:rgba(255,205,13,.12);color:var(--gold);border:1px solid rgba(255,205,13,.25);}
+.health-lo{background:rgba(255,59,92,.12);color:var(--red);border:1px solid rgba(255,59,92,.3);}
+.atag{display:inline-flex;align-items:center;font-size:.48rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:.1rem .28rem;border-radius:3px;white-space:nowrap;line-height:1.4;}
+.atag.red{background:rgba(255,59,92,.1);color:var(--red);border:1px solid rgba(255,59,92,.18);}
+.atag.orange{background:rgba(255,122,0,.1);color:var(--orange);border:1px solid rgba(255,122,0,.18);}
+.atag.yellow{background:rgba(255,205,13,.08);color:var(--gold);border:1px solid rgba(255,205,13,.18);}
+.funnel-wrap{display:flex;align-items:center;gap:2px;min-width:80px;}
+.funnel-seg{height:5px;border-radius:2px;transition:.2s;}
+.kpi-tbl{width:100%;border-collapse:collapse;font-size:.73rem;}
+.kpi-tbl th{font-size:.54rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:.38rem .5rem;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;background:var(--bg);}
+.kpi-tbl td{padding:.4rem .5rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+.kpi-tbl tr:hover td{background:rgba(255,255,255,.025);}
+.kpi-lname{font-size:.71rem;font-weight:600;color:var(--soft);max-width:185px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;}
+.kpi-lname:hover{color:var(--gold);}
+.sparkline{display:flex;align-items:flex-end;gap:1px;height:15px;min-width:40px;}
+.sp-bar{width:4px;border-radius:1px;background:var(--blue);opacity:.55;}
+.demo-banner{background:rgba(77,158,255,.06);border:1px solid rgba(77,158,255,.14);border-radius:8px;padding:.45rem .8rem;font-size:.67rem;color:var(--blue);margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem;}
+.kpi-num{font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:600;}
+.kpi-num.good{color:var(--green);}.kpi-num.warn{color:var(--gold);}.kpi-num.bad{color:var(--red);}
+.act-btn{padding:.17rem .42rem;font-size:.56rem;font-weight:700;border-radius:4px;border:1px solid var(--border2);background:none;color:var(--muted);cursor:pointer;white-space:nowrap;transition:.1s;}
+.act-btn:hover{border-color:var(--gold);color:var(--gold);}
+.act-btn.ai:hover{border-color:var(--purple);color:var(--purple);}
+.alert-card{background:var(--bg1);border:1px solid rgba(255,59,92,.2);border-radius:10px;padding:.65rem .85rem;margin-bottom:.4rem;cursor:pointer;transition:.15s;}
+.alert-card:hover{border-color:rgba(255,59,92,.4);background:var(--bg2);}
+.alert-card-row{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
+.alert-detail{display:none;margin-top:.7rem;padding-top:.65rem;border-top:1px solid var(--border);display:none;}
+.alert-detail.open{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.45rem;}
+.kpi-detail-cell{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:.45rem .6rem;}
+.kpi-detail-label{font-size:.52rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem;}
+.kpi-detail-val{font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:700;}
+.kpi-detail-target{font-size:.58rem;color:var(--muted);margin-top:.1rem;}
+.alert-filters{display:flex;gap:.3rem;flex-wrap:wrap;margin:.4rem 0 .7rem;}
+.afilter-btn{padding:.22rem .6rem;font-size:.62rem;font-weight:700;border-radius:5px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;transition:.1s;}
+.afilter-btn.active{background:rgba(255,59,92,.1);border-color:rgba(255,59,92,.35);color:var(--red);}
+.afilter-btn:hover:not(.active){border-color:var(--border2);color:var(--soft);}
+.overview-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.5rem;margin-bottom:.9rem;}
+.ov-card{background:var(--bg1);border:1px solid var(--border);border-radius:9px;padding:.65rem .75rem;text-align:center;}
+.ov-num{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;}
+.ov-lbl{font-size:.55rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:.15rem;}
+.th-info{position:relative;cursor:help;border-bottom:1px dashed rgba(160,220,235,.25);}
+.th-info::after{content:attr(data-tip);position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#0a1929;border:1px solid var(--border2);border-radius:8px;padding:.5rem .7rem;font-size:.65rem;font-weight:400;letter-spacing:0;text-transform:none;color:var(--soft);white-space:pre-line;min-width:200px;max-width:280px;line-height:1.55;pointer-events:none;opacity:0;transition:opacity .15s;z-index:9999;box-shadow:0 6px 24px rgba(0,0,0,.5);}
+.th-info:hover::after{opacity:1;}
+.kpi-tbl th:first-child .th-info::after{left:0;transform:none;}
+.kpi-tbl th:last-child .th-info::after{left:auto;right:0;transform:none;}
+
+/* ── APP PREVIEW ── */
+.preview-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:700;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px);}
+.preview-ov.hidden{display:none;}
+.preview-phone{background:#0a1929;border:1.5px solid rgba(255,255,255,.1);border-radius:28px;width:100%;max-width:390px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.8);}
+.preview-phone-bar{display:flex;align-items:center;gap:.6rem;padding:.75rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+.preview-back{background:none;border:none;color:rgba(255,205,13,.8);font-size:1rem;cursor:pointer;padding:.2rem .4rem;line-height:1;}
+.preview-lesson-title{font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;color:#E8F8FA;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.preview-scroll{overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.75rem;}
+.preview-scroll::-webkit-scrollbar{width:3px;}.preview-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+.pv-block{border-radius:14px;padding:.9rem 1rem;}
+.pv-block.hook{background:rgba(255,205,13,.07);border:1px solid rgba(255,205,13,.2);}
+.pv-block.content{background:rgba(77,158,255,.07);border:1px solid rgba(77,158,255,.18);}
+.pv-block.tip{background:rgba(0,232,122,.07);border:1px solid rgba(0,232,122,.18);}
+.pv-block.trap{background:rgba(255,59,92,.07);border:1px solid rgba(255,59,92,.2);}
+.pv-block-label{font-size:.52rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.45rem;display:flex;align-items:center;gap:.4rem;}
+.pv-block.hook .pv-block-label{color:var(--gold);}
+.pv-block.content .pv-block-label{color:var(--blue);}
+.pv-block.tip .pv-block-label{color:var(--green);}
+.pv-block.trap .pv-block-label{color:var(--red);}
+.pv-block-emo{font-size:1.5rem;line-height:1;margin-bottom:.4rem;}
+.pv-block-text{font-size:.82rem;color:#d4eef4;line-height:1.7;}
+.pv-quiz{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:.9rem 1rem;}
+.pv-quiz-label{font-size:.52rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.55rem;}
+.pv-quiz-q{font-size:.86rem;font-weight:700;color:#E8F8FA;line-height:1.5;margin-bottom:.7rem;}
+.pv-opt{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border-radius:10px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);cursor:pointer;margin-bottom:.35rem;transition:.15s;font-size:.8rem;color:#c8e8f0;}
+.pv-opt:hover{border-color:rgba(255,205,13,.35);background:rgba(255,205,13,.05);}
+.pv-opt.correct-reveal{border-color:rgba(0,232,122,.5)!important;background:rgba(0,232,122,.1)!important;color:#00E87A!important;}
+.pv-opt.wrong-reveal{border-color:rgba(255,59,92,.35)!important;background:rgba(255,59,92,.06)!important;color:rgba(255,59,92,.7)!important;}
+.pv-opt-lbl{font-family:'JetBrains Mono',monospace;font-size:.65rem;width:20px;flex-shrink:0;opacity:.6;}
+.pv-expl{font-size:.75rem;color:rgba(255,205,13,.75);margin-top:.55rem;padding:.5rem .7rem;background:rgba(255,205,13,.05);border:1px solid rgba(255,205,13,.12);border-radius:8px;display:none;line-height:1.6;}
+.preview-hint{text-align:center;font-size:.65rem;color:rgba(160,220,235,.4);padding:.5rem 0 .2rem;font-family:'JetBrains Mono',monospace;}
+.pv-next-btn{width:100%;padding:.65rem;background:var(--gold);color:#000;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;cursor:pointer;margin-top:.3rem;transition:.12s;}
+.pv-next-btn:hover{filter:brightness(1.08);}
+
 /* ── TACT ROBOT ── */
 .tact-fab{position:fixed;bottom:1.4rem;right:1.4rem;z-index:4000;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--orange));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 4px 20px rgba(255,122,0,.4);user-select:none;transition:transform .15s;}
 .tact-fab:hover{transform:scale(1.08);}
@@ -354,6 +440,8 @@ select option{background:var(--bg2);}
       <!-- TRADUCTION -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:.9rem;margin-bottom:1rem;">
         <div class="export-title">Traduction IA</div>
+        <button class="btn primary" id="translateMultiBtn" onclick="translateMulti()" style="width:100%;margin-bottom:.75rem;font-size:.78rem;">Générer EN + ES (simultané)</button>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;"><div style="flex:1;height:1px;background:var(--border);"></div><span style="font-size:.6rem;color:var(--muted);">ou une langue</span><div style="flex:1;height:1px;background:var(--border);"></div></div>
         <div class="lang-tabs">
           <button class="lang-tab active" onclick="setLang('en',this)">EN</button>
           <button class="lang-tab" onclick="setLang('es',this)">ES</button>
@@ -362,8 +450,8 @@ select option{background:var(--bg2);}
           <button class="lang-tab" onclick="setLang('pt',this)">PT</button>
           <button class="lang-tab" onclick="setLang('ar',this)">AR</button>
         </div>
-        <button class="btn" onclick="translateLesson()" id="translateBtn">Traduire la leçon complète</button>
-        <div id="translateResult" style="margin-top:.5rem;font-size:.74rem;color:var(--muted);"></div>
+        <button class="btn" onclick="translateLesson()" id="translateBtn">Traduire</button>
+        <div id="translateResult" style="margin-top:.7rem;font-size:.74rem;color:var(--muted);"></div>
       </div>
 
       <!-- APERÇU CODE -->
@@ -411,6 +499,17 @@ select option{background:var(--bg2);}
   <div class="section-tab" id="tab-export">
     <div class="editor-wrap">
       <div class="editor-hdr"><div class="editor-title">Exporter le corpus</div></div>
+
+      <!-- TRADUCTION BATCH -->
+      <div class="export-box" style="margin-bottom:1rem;">
+        <div class="export-title">Traductions EN + ES</div>
+        <div id="batchTranslateInfo" style="font-size:.74rem;color:var(--soft);margin-bottom:.7rem;line-height:1.6;"></div>
+        <div class="btn-row">
+          <button class="btn primary" id="batchTranslateBtn" onclick="batchTranslateMissing()">Traduire les leçons sans traduction</button>
+        </div>
+        <div id="batchTranslateProgress" style="margin-top:.6rem;font-size:.74rem;color:var(--muted);min-height:1rem;"></div>
+      </div>
+
       <div class="export-box">
         <div class="export-title">Format</div>
         <div class="btn-row">
@@ -435,12 +534,16 @@ select option{background:var(--bg2);}
     </div>
   </div>
 
-  <!-- STATS -->
+  <!-- STATS / ANALYTICS -->
   <div class="section-tab" id="tab-stats">
-    <div class="editor-wrap">
-      <div class="editor-title" style="margin-bottom:1rem;">Statistiques du corpus</div>
-      <div class="stats-grid" id="statsGrid"></div>
-      <div id="statsDetails"></div>
+    <div style="max-width:1100px;margin:0 auto;padding:.2rem 0 2rem;">
+      <div class="demo-banner">Données simulées — connecte Supabase pour les vraies analytics en temps réel.</div>
+      <div class="overview-kpis" id="analyticsOverview"></div>
+      <div class="analytics-nav" id="analyticsNav"></div>
+      <div id="analyticsAlerts"></div>
+      <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
+        <table class="kpi-tbl" id="analyticsTable"><thead id="analyticsHead"></thead><tbody id="analyticsBody"></tbody></table>
+      </div>
     </div>
   </div>
 
@@ -459,6 +562,7 @@ select option{background:var(--bg2);}
     <div class="modal-body">
       <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;">
         <button class="btn primary" onclick="editFromModal()">Modifier cette leçon</button>
+        <button class="btn" id="previewBtn" onclick="openPreview(currentModalId)">Voir le rendu</button>
       </div>
       <div id="modalContent"></div>
     </div>
@@ -537,6 +641,7 @@ let editingId = null;
 let currentTrack = null;
 let currentModalId = null;
 let currentLang = 'en';
+let pendingTranslations = {}; // { en: {...}, es: {...} } pour la leçon en cours d'édition
 let blocks = [];
 let quizList = [{q:'',opts:['','','',''],correct:0,expl:''}];
 let generatedCode = '';
@@ -590,6 +695,7 @@ function showTab(id,btn){
   document.getElementById('tab-'+id).classList.add('active');
   if(btn) btn.classList.add('active');
   if(id==='stats') renderStats();
+  if(id==='export') updateBatchInfo();
   if(id==='suggest'){ renderSuggestions(); renderModuleIdeas(); }
   if(id==='explore') openExploreDrawer();
 }
@@ -863,6 +969,89 @@ function editFromModal(){
   closeModal();
 }
 
+/* ══ APP PREVIEW ══ */
+function openPreview(id){
+  if(!id) return;
+  const l=getAllLessons().find(x=>x.id===id);
+  if(!l) return;
+  document.getElementById('previewLessonTitle').textContent=l.emoji+' '+l.name;
+  if(CONTENT_CACHE[id]){ renderPreview(id); }
+  else {
+    document.getElementById('previewContent').innerHTML=`<div style="color:var(--muted);font-size:.78rem;text-align:center;padding:2rem;"><span class="loader"><span></span><span></span><span></span></span><br><br>Chargement du contenu…</div>`;
+    document.getElementById('previewOv').classList.remove('hidden');
+    loadLessonContent();
+    const poll=setInterval(()=>{ if(CONTENT_CACHE[id]){ clearInterval(poll); renderPreview(id); }},300);
+    setTimeout(()=>clearInterval(poll),15000);
+    return;
+  }
+  document.getElementById('previewOv').classList.remove('hidden');
+}
+
+function closePreview(){ document.getElementById('previewOv').classList.add('hidden'); }
+
+let _pvId=null, _pvQi=0;
+
+function renderPreview(id){
+  const data=CONTENT_CACHE[id]; if(!data) return;
+  _pvId=id; _pvQi=0;
+  const typeLabel={hook:'Hook',content:'Contenu',tip:'Astuce',trap:'Piège'};
+  let html='';
+  for(const b of (data.blocks||[])){
+    html+=`<div class="pv-block ${b.type}">
+      ${b.emo?`<div class="pv-block-emo">${b.emo}</div>`:''}
+      <div class="pv-block-label">${typeLabel[b.type]||b.type}</div>
+      <div class="pv-block-text">${b.text}</div>
+    </div>`;
+  }
+  html+=`<div id="pv-quiz-slot"></div>`;
+  document.getElementById('previewContent').innerHTML=html;
+  renderPreviewQuiz(id,0);
+}
+
+function renderPreviewQuiz(id,qi){
+  const data=CONTENT_CACHE[id]; if(!data) return;
+  const quizzes=data.quizzes||(data.quiz?[data.quiz]:[]);
+  const slot=document.getElementById('pv-quiz-slot'); if(!slot) return;
+  if(qi>=quizzes.length){ slot.innerHTML=`<div class="preview-hint" style="font-size:.78rem;color:var(--green);padding:1rem 0;">Lecon terminee !</div>`; return; }
+  const quiz=quizzes[qi]; if(!quiz||!quiz.q) return;
+  const labels=['A','B','C','D','E'];
+  const total=quizzes.length;
+  let html=`<div class="pv-quiz">
+    <div class="pv-quiz-label">Quiz ${total>1?qi+1+' / '+total:''}</div>
+    <div class="pv-quiz-q">${quiz.q}</div>
+    <div id="pv-opts-slot">`;
+  for(let i=0;i<quiz.opts.length;i++){
+    html+=`<div class="pv-opt" onclick="revealQuiz(${i},${quiz.correct},'${quiz.expl.replace(/'/g,"\\'")}',${qi},${total})">
+      <span class="pv-opt-lbl">${labels[i]}</span>${quiz.opts[i]}</div>`;
+  }
+  html+=`</div>
+    <div class="pv-expl" id="pv-expl-slot"></div>
+  </div>
+  <div class="preview-hint">Appuie sur une reponse</div>`;
+  slot.innerHTML=html;
+}
+
+function revealQuiz(chosen,correct,expl,qi,total){
+  const container=document.getElementById('pv-opts-slot');
+  if(!container||container.dataset.answered) return;
+  container.dataset.answered='1';
+  container.querySelectorAll('.pv-opt').forEach((el,i)=>{
+    el.classList.add(i===correct?'correct-reveal':'wrong-reveal');
+  });
+  const explEl=document.getElementById('pv-expl-slot');
+  if(explEl&&expl){ explEl.textContent=expl; explEl.style.display='block'; }
+  // Bouton suite
+  const hint=document.getElementById('pv-quiz-slot').querySelector('.preview-hint');
+  if(hint){
+    const nextQi=qi+1;
+    if(nextQi<total){
+      hint.innerHTML=`<button class="pv-next-btn" onclick="renderPreviewQuiz(_pvId,${nextQi})">Essayer une autre question</button>`;
+    } else {
+      hint.innerHTML=`<div style="color:var(--green);font-size:.78rem;padding:.4rem 0;">Bravo, lecon terminee !</div>`;
+    }
+  }
+}
+
 /* ══ EDITOR ══ */
 function editLesson(id){
   const l=getAllLessons().find(x=>x.id===id);
@@ -972,8 +1161,16 @@ function saveLesson(){
     toast(`✅ "${name}" mis à jour`);
   } else { newLessons.push(lesson); toast(`✅ "${name}" créé (${id})`); }
   const quizzes=quizList.map(qz=>({q:qz.q,opts:qz.opts.filter(o=>o),correct:qz.correct,expl:qz.expl})).filter(qz=>qz.q||qz.opts.length);
-  CONTENT_CACHE[id]={blocks:[...blocks],quizzes,quiz:quizzes[0]||{q:'',opts:[],correct:0,expl:''}};
-  updateChips(); renderSidebar(); updateCodePreview(); editingId=null;
+  const existingTr=(editingId&&CONTENT_CACHE[editingId]?.translations)||{};
+  const translations=Object.keys(pendingTranslations).length?pendingTranslations:existingTr;
+  CONTENT_CACHE[id]={blocks:[...blocks],quizzes,quiz:quizzes[0]||{q:'',opts:[],correct:0,expl:''},translations};
+  pendingTranslations={};
+  updateChips(); renderSidebar(); updateCodePreview();
+  const savedId=id; editingId=null;
+  // Traduction automatique EN+ES si absente
+  if(!translations||(!translations.en&&!translations.es)){
+    autoTranslateLesson(savedId).then(()=>{ if(CONTENT_CACHE[savedId]?.translations?.en) toast('EN + ES traduits automatiquement'); });
+  }
 }
 
 function resetEditor(){
@@ -981,8 +1178,9 @@ function resetEditor(){
   document.getElementById('editorTitle').textContent='Nouvelle leçon';
   document.getElementById('fName').value='';
   document.getElementById('fEmoji').value='📖';
-  blocks=[]; quizList=[{q:'',opts:['','','',''],correct:0,expl:''}];
+  blocks=[]; quizList=[{q:'',opts:['','','',''],correct:0,expl:''}]; pendingTranslations={};
   renderBlocks(); renderQuizEditor();
+  document.getElementById('translateResult').innerHTML='';
   document.getElementById('codePreview').textContent='// Code généré ici...';
 }
 
@@ -1196,10 +1394,15 @@ function exportJS(){
 }
 
 function exportJSON(){
-  const j=JSON.stringify(getAllLessons(),null,2);
+  const lessons=getAllLessons().map(l=>{
+    const cache=CONTENT_CACHE[l.id];
+    if(!cache) return l;
+    return {...l,blocks:cache.blocks,quizzes:cache.quizzes,...(cache.translations&&Object.keys(cache.translations).length?{translations:cache.translations}:{})};
+  });
+  const j=JSON.stringify(lessons,null,2);
   document.getElementById('exportPreview').textContent=j;
   navigator.clipboard.writeText(j);
-  toast('JSON copié !');
+  toast('JSON copié (avec traductions) !');
 }
 
 function exportDiff(){
@@ -1211,33 +1414,266 @@ function exportDiff(){
 }
 
 /* ══ STATS ══ */
+/* ══ ANALYTICS ENGINE ══ */
+let _analyticsView='pedagogy';
+let _alertFilter=null;
+
+function _mh(id,s){
+  let h=(s*2654435761)>>>0;
+  for(const c of String(id)) h=(Math.imul(h^c.charCodeAt(0),2246822519))>>>0;
+  return (h%10000)/10000;
+}
+function mockKpis(id){
+  const h=s=>_mh(id,s);
+  return {
+    timeOnLesson: Math.round(18+h(1)*290),
+    scrollCount: Math.floor(h(2)*14),
+    blockReads: Math.floor(h(3)*5),
+    hookCompletion: Math.round(62+h(4)*38),
+    contentCompletion: Math.round(52+h(5)*43),
+    quizCompletion: Math.round(42+h(6)*53),
+    quizResponseTime: Math.round(1+h(8)*52),
+    errorRate: Math.round(4+h(9)*74),
+    rating: Math.round((2+h(10)*3)*10)/10,
+    bounceRate: Math.round(4+h(11)*48),
+    helpClicks: Math.floor(h(12)*9),
+    claimRate: Math.round(42+h(13)*58),
+    streakImpact: Math.round((1+h(14)*5)*10)/10,
+    sessionDepth: Math.round((1+h(15)*5)*10)/10,
+    spark7: Array.from({length:7},(_,i)=>Math.round(15+h(20+i)*85))
+  };
+}
+function calcHealth(k){
+  const comp=k.hookCompletion*.25+k.contentCompletion*.35+k.quizCompletion*.4;
+  const rat=(k.rating-1)/4*100;
+  let pen=0;
+  if(k.errorRate>60) pen+=18;
+  if(k.bounceRate>30) pen+=12;
+  if(k.rating<3.5) pen+=10;
+  if(k.helpClicks>5) pen+=8;
+  return Math.max(0,Math.min(100,Math.round(comp*.45+rat*.45-pen)));
+}
+function alertTags(k){
+  const t=[];
+  if(k.errorRate>60) t.push({c:'red',txt:'Quiz trop dur',kpi:'L-09'});
+  if(k.bounceRate>30||k.hookCompletion<72) t.push({c:'orange',txt:'Titre à revoir',kpi:'L-05'});
+  if(k.helpClicks>5) t.push({c:'orange',txt:'Contenu confus',kpi:'L-06'});
+  if(k.quizResponseTime<2) t.push({c:'yellow',txt:'Quiz trop facile',kpi:'L-08'});
+  if(k.rating<3.5) t.push({c:'red',txt:'Note faible',kpi:'Q-01'});
+  if(k.claimRate<60) t.push({c:'orange',txt:'Friction claim',kpi:'L-13'});
+  if(k.errorRate<10&&k.quizCompletion>90) t.push({c:'yellow',txt:'Trop facile',kpi:'L-09'});
+  return t;
+}
+function healthPill(s){ const c=s>=70?'hi':s>=50?'mid':'lo'; return `<span class="health-pill health-${c}">${s}</span>`; }
+function funnelBar(h,c,q){
+  const seg=(v,col)=>`<div class="funnel-seg" style="width:${v}%;background:${col};" title="${v}%"></div>`;
+  return `<div class="funnel-wrap">${seg(h,'var(--gold)')}${seg(c,'var(--blue)')}${seg(q,'var(--green)')}</div>`;
+}
+function sparkline(arr){
+  const mx=Math.max(...arr,1);
+  return '<div class="sparkline">'+arr.map(v=>`<div class="sp-bar" style="height:${Math.round(v/mx*100)}%;opacity:${.3+v/mx*.7}"></div>`).join('')+'</div>';
+}
+function kpiNum(v,lo,hiGood){
+  const cls=hiGood?(v>=hiGood?'good':v>=lo?'warn':'bad'):(v<=lo?'good':v<=hiGood?'warn':'bad');
+  return `<span class="kpi-num ${cls}">${v}</span>`;
+}
+function tagsHtml(tags,max=2){
+  return tags.slice(0,max).map(t=>`<span class="atag ${t.c}">${t.txt}</span>`).join(' ');
+}
+function actionBtns(id){
+  return `<div style="display:flex;gap:.2rem;">
+    <button class="act-btn" onclick="closeExploreDrawer();editLesson('${id}')" title="Éditer">Editer</button>
+    <button class="act-btn ai" id="simplify-${id}" onclick="simplifyBlock('${id}')" title="Simplifier avec IA">IA</button>
+  </div>`;
+}
+
 function renderStats(){
   const all=getAllLessons();
-  const byLv={},byTag={},byTr={};
-  for(const l of all){
-    byLv[l.level]=(byLv[l.level]||0)+1;
-    byTag[l.tag]=(byTag[l.tag]||0)+1;
-    byTr[l.track]=(byTr[l.track]||0)+1;
+  const ld=all.map(l=>{ const k=mockKpis(l.id); return {...l,k,health:calcHealth(k),tags:alertTags(k)}; });
+  const alerts=ld.filter(x=>x.health<65).sort((a,b)=>a.health-b.health);
+  const avgHealth=Math.round(ld.reduce((s,x)=>s+x.health,0)/Math.max(ld.length,1));
+  const translated=all.filter(l=>CONTENT_CACHE[l.id]?.translations?.en).length;
+
+  // Overview KPIs
+  document.getElementById('analyticsOverview').innerHTML=`
+    <div class="ov-card"><div class="ov-num" style="color:var(--gold)">${all.length}</div><div class="ov-lbl">Leçons</div></div>
+    <div class="ov-card"><div class="ov-num" style="color:${avgHealth>=70?'var(--green)':avgHealth>=50?'var(--gold)':'var(--red)'}">${avgHealth}</div><div class="ov-lbl">Score Santé moyen</div></div>
+    <div class="ov-card"><div class="ov-num" style="color:${alerts.length>5?'var(--red)':'var(--gold)'}">${alerts.length}</div><div class="ov-lbl">Alertes actives</div></div>
+    <div class="ov-card"><div class="ov-num" style="color:var(--blue)">${translated}</div><div class="ov-lbl">Leçons traduites</div></div>
+    <div class="ov-card"><div class="ov-num" style="color:var(--purple)">${Object.keys(CONTENT_CACHE).length}</div><div class="ov-lbl">Contenus chargés</div></div>`;
+
+  // Nav tabs
+  const views=[{id:'pedagogy',label:'Pédagogie'},{id:'product',label:'Produit & UX'},{id:'impact',label:'Impact & Éco'}];
+  document.getElementById('analyticsNav').innerHTML=views.map(v=>`<button class="anav-btn${_analyticsView===v.id?' active':''}" onclick="setAnalyticsView('${v.id}')">${v.label}</button>`).join('');
+
+  // Alert section
+  if(alerts.length){
+    // Collect unique tag types for filters
+    const tagTypes=[...new Set(alerts.flatMap(l=>l.tags.map(t=>t.txt)))];
+    const filtered=_alertFilter?alerts.filter(l=>l.tags.some(t=>t.txt===_alertFilter)):alerts;
+    const filterBtns=`<div class="alert-filters">
+      <button class="afilter-btn${!_alertFilter?' active':''}" onclick="_alertFilter=null;renderStats()">Tous (${alerts.length})</button>
+      ${tagTypes.map(txt=>`<button class="afilter-btn${_alertFilter===txt?' active':''}" onclick="_alertFilter='${txt}';renderStats()">${txt} (${alerts.filter(l=>l.tags.some(t=>t.txt===txt)).length})</button>`).join('')}
+    </div>`;
+    const alertCards=filtered.slice(0,8).map(l=>alertCard(l)).join('');
+    const more=filtered.length>8?`<div style="font-size:.65rem;color:var(--muted);padding:.3rem 0;">+${filtered.length-8} autres leçons en alerte</div>`:'';
+    document.getElementById('analyticsAlerts').innerHTML=`<div style="margin-bottom:.9rem;">
+      <div style="font-size:.58rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem;">Leçons en alerte (score &lt; 65)</div>
+      ${filterBtns}${alertCards}${more}
+    </div>`;
+  } else {
+    document.getElementById('analyticsAlerts').innerHTML=`<div style="font-size:.73rem;color:var(--green);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.15);border-radius:8px;">Aucune leçon en alerte — corpus en bonne santé.</div>`;
   }
-  document.getElementById('statsGrid').innerHTML=`
-    <div class="stat-card"><div class="stat-num">${all.length}</div><div class="stat-lbl">Total</div><div class="stat-bar"><div class="stat-fill" style="width:100%"></div></div></div>
-    <div class="stat-card"><div class="stat-num">${byLv['Débutant']||0}</div><div class="stat-lbl">Débutant</div><div class="stat-bar"><div class="stat-fill" style="width:${((byLv['Débutant']||0)/all.length*100).toFixed(0)}%;background:var(--green)"></div></div></div>
-    <div class="stat-card"><div class="stat-num">${byLv['Intermédiaire']||0}</div><div class="stat-lbl">Intermédiaire</div><div class="stat-bar"><div class="stat-fill" style="width:${((byLv['Intermédiaire']||0)/all.length*100).toFixed(0)}%;background:var(--blue)"></div></div></div>
-    <div class="stat-card"><div class="stat-num">${newLessons.length}</div><div class="stat-lbl">Nouvelles</div><div class="stat-bar"><div class="stat-fill" style="width:${(newLessons.length/Math.max(all.length,1)*100).toFixed(0)}%;background:var(--orange)"></div></div></div>
-    <div class="stat-card"><div class="stat-num">${Object.keys(byTr).length}</div><div class="stat-lbl">Modules</div><div class="stat-bar"><div class="stat-fill" style="width:100%"></div></div></div>
-    <div class="stat-card"><div class="stat-num">${Object.keys(CONTENT_CACHE).length}</div><div class="stat-lbl">Contenus chargés</div><div class="stat-bar"><div class="stat-fill" style="width:${(Object.keys(CONTENT_CACHE).length/all.length*100).toFixed(0)}%;background:var(--purple)"></div></div></div>`;
-  const sortedT=Object.entries(byTr).sort((a,b)=>b[1]-a[1]);
-  const sortedTg=Object.entries(byTag).sort((a,b)=>b[1]-a[1]);
-  const maxT=sortedT[0]?.[1]||1;
-  document.getElementById('statsDetails').innerHTML=`
-    <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:1.2rem 0 .6rem;">Tags</div>
-    <div style="display:flex;flex-wrap:wrap;gap:.35rem;">${sortedTg.map(([t,n])=>`<span class="badge tag" style="font-size:.66rem;padding:.2rem .55rem;">${t} · ${n}</span>`).join('')}</div>
-    <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:1rem 0 .6rem;">Modules</div>
-    ${sortedT.map(([t,n])=>`<div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.3rem;">
-      <div style="font-size:.73rem;color:var(--soft);min-width:200px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t}</div>
-      <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="height:100%;background:var(--gold);border-radius:3px;width:${(n/maxT*100).toFixed(0)}%"></div></div>
-      <div style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted);width:18px;text-align:right;">${n}</div>
-    </div>`).join('')}`;
+
+  renderAnalyticsTable(ld);
+}
+
+function setAnalyticsView(v){ _analyticsView=v; renderStats(); }
+
+function alertCard(l){
+  const k=l.k;
+  const kpiColor=(v,lo,hi,hiGood)=>hiGood?(v>=hi?'var(--green)':v>=lo?'var(--gold)':'var(--red)'):(v<=lo?'var(--green)':v<=hi?'var(--gold)':'var(--red)');
+  const cell=(code,label,val,color,target)=>`<div class="kpi-detail-cell">
+    <div class="kpi-detail-label">${code} · ${label}</div>
+    <div class="kpi-detail-val" style="color:${color}">${val}</div>
+    <div class="kpi-detail-target">${target}</div>
+  </div>`;
+  const detail=`<div class="alert-detail" id="ad-${l.id}">
+    ${cell('L-01','Temps',k.timeOnLesson+'s',kpiColor(k.timeOnLesson,45,180,true),'Cible 45–180s')}
+    ${cell('L-04','Hook',k.hookCompletion+'%',kpiColor(k.hookCompletion,80,95,true),'Cible >95%')}
+    ${cell('L-04','Contenu',k.contentCompletion+'%',kpiColor(k.contentCompletion,70,85,true),'Cible >85%')}
+    ${cell('L-04','Quiz',k.quizCompletion+'%',kpiColor(k.quizCompletion,55,70,true),'Cible >70%')}
+    ${cell('L-09','Erreur quiz',k.errorRate+'%',kpiColor(k.errorRate,10,60,false),'Cible 25–40%')}
+    ${cell('Q-01','Note',k.rating+'/5',kpiColor(k.rating,3.5,4,true),'Cible >4.0')}
+    ${cell('N-05','Bounce',k.bounceRate+'%',kpiColor(k.bounceRate,10,30,false),'Cible <15%')}
+    ${cell('L-06','Aide clics',k.helpClicks,kpiColor(k.helpClicks,2,5,false),'Cible <3')}
+    ${cell('L-03','Relectures',k.blockReads,kpiColor(k.blockReads,1,3,false),'Cible <3')}
+    ${cell('L-13','Claim coins',k.claimRate+'%',kpiColor(k.claimRate,70,85,true),'Cible >85%')}
+    ${cell('L-08','Tps quiz',k.quizResponseTime+'s',kpiColor(k.quizResponseTime,2,30,true),'Cible 2–30s')}
+    ${cell('L-02','Scrolls',k.scrollCount,kpiColor(k.scrollCount,1,10,true),'Cible 1–10')}
+  </div>`;
+  return `<div class="alert-card" onclick="toggleAlertDetail('${l.id}')">
+    <div class="alert-card-row">
+      <span>${l.emoji}</span>
+      ${healthPill(l.health)}
+      <span class="kpi-lname" style="flex:1;">${l.name}</span>
+      <div style="display:flex;gap:.3rem;flex-wrap:wrap;">${tagsHtml(l.tags,3)}</div>
+      <span style="font-size:.65rem;color:var(--muted);flex-shrink:0;" id="ad-arrow-${l.id}">▼</span>
+      <div onclick="event.stopPropagation()">${actionBtns(l.id)}</div>
+    </div>
+    ${detail}
+  </div>`;
+}
+
+function toggleAlertDetail(id){
+  const el=document.getElementById('ad-'+id);
+  const arrow=document.getElementById('ad-arrow-'+id);
+  if(!el) return;
+  const open=el.classList.toggle('open');
+  if(arrow) arrow.textContent=open?'▲':'▼';
+}
+
+function renderAnalyticsTable(ld){
+  let head='', rows='';
+  if(_analyticsView==='pedagogy'){
+    const th=(label,tip)=>`<th><span class="th-info" data-tip="${tip}">${label}</span></th>`;
+    head=`<tr>
+      ${th('Leçon','Titre de la leçon.\nClique pour ouvrir le détail.')}
+      ${th('Score','Score de Santé (0-100).\nCalcul : complétion × 45% + note × 45% − pénalités\n(erreur quiz, bounce, note faible, aide).\n≥70 = vert · 50-69 = orange · <50 = rouge')}
+      ${th('Alertes','Tags générés automatiquement quand un KPI\nsort de sa zone cible.\nExemple : "Quiz trop dur" si erreur >60%.')}
+      ${th('Temps (s)','L-01 · Durée passée sur la leçon (secondes).\nCible : 45s–180s\n<15s = skippée · >480s = bloqué')}
+      ${th('Complétion Hook/Cont/Quiz','L-04 · % d\'utilisateurs ayant vu chaque bloc.\nBarre : jaune=Hook · bleu=Contenu · vert=Quiz\nCibles : Hook >95% · Contenu >85% · Quiz >70%')}
+      ${th('Erreur quiz %','L-09 · Taux d\'erreur au 1er essai.\nCible : 25–40%\n<10% = trop facile · >60% = trop difficile')}
+      ${th('Note /5','Q-01 · Note moyenne laissée par les apprenants.\nCible : >4.0\n<3.5 = révision nécessaire\nSparkline = tendance sur 7 jours.')}
+      ${th('Actions','Éditer : ouvre l\'éditeur de la leçon.\nIA : envoie le bloc "Contenu" à Claude\npour une réécriture simplifiée.')}
+    </tr>`;
+    rows=ld.map(l=>{
+      const k=l.k;
+      const timeColor=k.timeOnLesson<15?'bad':k.timeOnLesson>480?'warn':'good';
+      return `<tr>
+        <td><div style="display:flex;align-items:center;gap:.4rem;">${l.emoji}<span class="kpi-lname" onclick="openModal('${l.id}')">${l.name}</span></div></td>
+        <td>${healthPill(l.health)}</td>
+        <td>${tagsHtml(l.tags,2)}</td>
+        <td><span class="kpi-num ${timeColor}">${k.timeOnLesson}</span></td>
+        <td>${funnelBar(k.hookCompletion,k.contentCompletion,k.quizCompletion)}<span style="font-size:.58rem;color:var(--muted);margin-left:.3rem;">${k.hookCompletion}/${k.contentCompletion}/${k.quizCompletion}%</span></td>
+        <td>${kpiNum(k.errorRate,40,false)}<span style="font-size:.55rem;color:var(--muted);margin-left:.2rem;">%</span></td>
+        <td>${sparkline(k.spark7)}<span class="kpi-num ${k.rating>=4?'good':k.rating>=3.5?'warn':'bad'}" style="font-size:.68rem;margin-left:.3rem;">${k.rating}</span></td>
+        <td>${actionBtns(l.id)}</td>
+      </tr>`;
+    }).join('');
+  } else if(_analyticsView==='product'){
+    const th=(label,tip)=>`<th><span class="th-info" data-tip="${tip}">${label}</span></th>`;
+    head=`<tr>
+      ${th('Leçon','Titre de la leçon.\nClique pour ouvrir le détail.')}
+      ${th('Score','Score de Santé (0-100).\nCalcul : complétion × 45% + note × 45% − pénalités.\n≥70 = vert · 50-69 = orange · <50 = rouge')}
+      ${th('Alertes','Tags générés automatiquement quand un KPI\nsort de sa zone cible.')}
+      ${th('Bounce %','N-05 · Sessions abandonnées en <10s.\nCible : <15%\n>30% = titre ou hook non accrocheur')}
+      ${th('Scrolls','L-02 · Nombre de scrolls pendant la lecture.\n0 = leçon trop courte\n>10 = leçon trop longue')}
+      ${th('Aide clics','L-06 · Nb de clics sur le bouton Aide\npendant cette leçon.\n>5 = contenu trop complexe')}
+      ${th('Relectures','L-03 · Nb de fois qu\'un bloc redevient visible\n(IntersectionObserver).\n>3 = contenu difficile à comprendre')}
+      ${th('Actions','Éditer : ouvre l\'éditeur.\nIA : simplifie le bloc Contenu avec Claude.')}
+    </tr>`;
+    rows=ld.map(l=>{
+      const k=l.k;
+      return `<tr>
+        <td><div style="display:flex;align-items:center;gap:.4rem;">${l.emoji}<span class="kpi-lname" onclick="openModal('${l.id}')">${l.name}</span></div></td>
+        <td>${healthPill(l.health)}</td>
+        <td>${tagsHtml(l.tags,2)}</td>
+        <td><span class="kpi-num ${k.bounceRate>30?'bad':k.bounceRate>15?'warn':'good'}">${k.bounceRate}%</span></td>
+        <td><span class="kpi-num ${k.scrollCount===0?'bad':k.scrollCount>10?'warn':'good'}">${k.scrollCount}</span></td>
+        <td><span class="kpi-num ${k.helpClicks>5?'bad':k.helpClicks>2?'warn':'good'}">${k.helpClicks}</span></td>
+        <td><span class="kpi-num ${k.blockReads>3?'bad':k.blockReads>1?'warn':'good'}">${k.blockReads}</span></td>
+        <td>${actionBtns(l.id)}</td>
+      </tr>`;
+    }).join('');
+  } else {
+    const th=(label,tip)=>`<th><span class="th-info" data-tip="${tip}">${label}</span></th>`;
+    head=`<tr>
+      ${th('Leçon','Titre de la leçon.\nClique pour ouvrir le détail.')}
+      ${th('Score','Score de Santé (0-100).\n≥70 = vert · 50-69 = orange · <50 = rouge')}
+      ${th('Alertes','Tags générés automatiquement quand un KPI\nsort de sa zone cible.')}
+      ${th('Claim coins %','L-13 · % d\'utilisateurs ayant réclamé\nleurs coins après la leçon.\nCible : >85% · <60% = friction UX')}
+      ${th('Tps réponse quiz (s)','L-08 · Délai entre affichage du quiz\net premier clic (secondes).\n<2s = réponse devinée · >30s = question ambiguë')}
+      ${th('Profondeur session','N-13 · Score = (leçons + trades + missions)\npar session.\n>3 = session riche et engagée')}
+      ${th('Tendance 7j','Engagement relatif sur les 7 derniers jours.\nHauteur des barres = activité du jour.')}
+      ${th('Actions','Éditer : ouvre l\'éditeur.\nIA : simplifie le bloc Contenu avec Claude.')}
+    </tr>`;
+    rows=ld.map(l=>{
+      const k=l.k;
+      return `<tr>
+        <td><div style="display:flex;align-items:center;gap:.4rem;">${l.emoji}<span class="kpi-lname" onclick="openModal('${l.id}')">${l.name}</span></div></td>
+        <td>${healthPill(l.health)}</td>
+        <td>${tagsHtml(l.tags,2)}</td>
+        <td><span class="kpi-num ${k.claimRate>=85?'good':k.claimRate>=60?'warn':'bad'}">${k.claimRate}%</span></td>
+        <td><span class="kpi-num ${k.quizResponseTime<2?'warn':k.quizResponseTime>30?'warn':'good'}">${k.quizResponseTime}s</span></td>
+        <td><span class="kpi-num ${k.sessionDepth>=3?'good':k.sessionDepth>=2?'warn':'bad'}">${k.sessionDepth}</span></td>
+        <td>${sparkline(k.spark7)}</td>
+        <td>${actionBtns(l.id)}</td>
+      </tr>`;
+    }).join('');
+  }
+  document.getElementById('analyticsHead').innerHTML=head;
+  document.getElementById('analyticsBody').innerHTML=rows;
+}
+
+async function simplifyBlock(id){
+  const cache=CONTENT_CACHE[id];
+  if(!cache||!cache.blocks||!cache.blocks.length){ toast('Charge le contenu d\'abord','error'); return; }
+  const l=getAllLessons().find(x=>x.id===id);
+  const k=mockKpis(id);
+  const target=cache.blocks.find(b=>b.type==='content')||cache.blocks[0];
+  const btn=document.getElementById('simplify-'+id);
+  if(btn){btn.disabled=true;btn.textContent='...';}
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:claudeHeaders(),body:JSON.stringify({
+      model:'claude-haiku-4-5-20251001',max_tokens:600,
+      messages:[{role:'user',content:`Ce bloc de leçon financière est relu en moyenne ${k.blockReads} fois (signe de difficulté de compréhension). Réécris-le de façon plus simple, plus claire et plus directe, en gardant exactement le même sens. Réponds UNIQUEMENT avec le texte réécrit, sans introduction.\n\nBloc:\n${target.text}`}]
+    })});
+    const data=await res.json();
+    const txt=data.content?.[0]?.text?.trim();
+    if(txt){ target.text=txt; toast('Bloc simplifié !'); renderStats(); }
+  }catch(e){ toast('Erreur IA','error'); }
+  if(btn){btn.disabled=false;btn.textContent='IA';}
 }
 
 /* ══ UTILS ══ */
@@ -1290,6 +1726,173 @@ async function translateLesson(){
     toast('Traduction complète !');
   }catch(e){ toast('Erreur traduction','error'); document.getElementById('translateResult').textContent='❌ '+e.message; }
   btn.textContent='Traduire la leçon complète'; btn.disabled=false;
+}
+
+/* ══ TRADUCTION — helpers partagés ══ */
+async function _callTranslate(lang, label, payload){
+  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:claudeHeaders(),body:JSON.stringify({
+    model:'claude-haiku-4-5-20251001',max_tokens:2500,
+    messages:[{role:'user',content:`Traduis ce contenu de leçon financière en ${label}. Ton direct et pédagogique. Réponds UNIQUEMENT JSON valide, sans texte autour.\n${JSON.stringify(payload)}\nFormat exact : {"title":"...","blocks":[{"type":"...","text":"...","emo":"..."}],"quizzes":[{"q":"...","opts":["...","...","...","..."],"correct":0,"expl":"..."}]}`}]
+  })});
+  const data=await res.json();
+  const raw=data.content?.[0]?.text||'{}';
+  const m=raw.match(/\{[\s\S]*\}/);
+  if(!m) throw new Error('Format invalide ('+lang+')');
+  return JSON.parse(m[0]);
+}
+
+async function autoTranslateLesson(id){
+  const l=getAllLessons().find(x=>x.id===id);
+  const cache=CONTENT_CACHE[id];
+  if(!l||!cache||!cache.blocks||!cache.blocks.length) return;
+  if(cache.translations&&cache.translations.en&&cache.translations.es) return; // déjà traduit
+  try{
+    const payload={
+      title:l.name,
+      blocks:cache.blocks.map(b=>({type:b.type,text:b.text,emo:b.emo||''})),
+      quizzes:(cache.quizzes||[cache.quiz].filter(Boolean)).map(qz=>({q:qz.q,opts:qz.opts,correct:qz.correct,expl:qz.expl})).filter(qz=>qz.q)
+    };
+    const [en,es]=await Promise.all([
+      _callTranslate('en','anglais',payload),
+      _callTranslate('es','espagnol',payload)
+    ]);
+    CONTENT_CACHE[id].translations={en,es};
+  }catch(e){ console.warn('autoTranslate failed:',id,e.message); }
+}
+
+/* ══ TRADUCTION MULTI (EN + ES simultané — éditeur) ══ */
+async function translateMulti(){
+  const name=document.getElementById('fName').value.trim();
+  if(!name){ toast('Remplis le titre d\'abord','error'); return; }
+  const btn=document.getElementById('translateMultiBtn');
+  btn.disabled=true;
+  const resultDiv=document.getElementById('translateResult');
+  resultDiv.innerHTML=`<div style="color:var(--muted);font-size:.76rem;"><span class="loader"><span></span><span></span><span></span></span> Génération EN + ES en parallèle…</div>`;
+
+  const payload={
+    title:name,
+    blocks:blocks.map(b=>({type:b.type,text:b.text,emo:b.emo||''})),
+    quizzes:quizList.map(qz=>({q:qz.q,opts:qz.opts.filter(o=>o),correct:qz.correct,expl:qz.expl})).filter(qz=>qz.q)
+  };
+
+  try{
+    const [en,es]=await Promise.all([
+      _callTranslate('en','anglais',payload),
+      _callTranslate('es','espagnol',payload)
+    ]);
+    pendingTranslations={en,es};
+    const id=editingId;
+    if(id&&CONTENT_CACHE[id]) CONTENT_CACHE[id].translations={en,es};
+    renderMultiTranslationResult(name,en,es);
+    toast('EN + ES générés !');
+  }catch(e){
+    resultDiv.innerHTML=`<div style="color:var(--red);font-size:.76rem;">Erreur : ${e.message}</div>`;
+    toast('Erreur traduction','error');
+  }
+  btn.disabled=false;
+}
+
+function renderMultiTranslationResult(frTitle,en,es){
+  const langs=[
+    {code:'fr',flag:'🇫🇷',label:'FR',title:frTitle,data:{title:frTitle,blocks:blocks,quizzes:quizList}},
+    {code:'en',flag:'🇬🇧',label:'EN',title:en.title,data:en},
+    {code:'es',flag:'🇪🇸',label:'ES',title:es.title,data:es},
+  ];
+  let tabsHtml=`<div style="display:flex;gap:.3rem;margin-bottom:.6rem;border-bottom:1px solid var(--border);padding-bottom:.4rem;">`;
+  langs.forEach((l,i)=>{
+    tabsHtml+=`<button onclick="showTransTab(${i})" id="ttab-${i}" style="padding:.25rem .6rem;font-size:.68rem;font-weight:700;border-radius:5px;border:1px solid ${i===0?'var(--gold)':'var(--border)'};background:${i===0?'var(--gold2)':'none'};color:${i===0?'var(--gold)':'var(--muted)'};cursor:pointer;transition:.12s;">${l.flag} ${l.label}</button>`;
+  });
+  tabsHtml+=`</div>`;
+
+  let contentHtml='';
+  langs.forEach((l,i)=>{
+    const d=l.data;
+    const bs=(d.blocks||[]);
+    const qzs=(d.quizzes||[]);
+    contentHtml+=`<div id="tcontent-${i}" style="display:${i===0?'block':'none'}">`;
+    contentHtml+=`<div style="font-size:.72rem;font-weight:700;color:var(--soft);margin-bottom:.5rem;">${l.title||''}</div>`;
+    bs.forEach(b=>{
+      const color=b.type==='hook'?'var(--gold)':b.type==='content'?'var(--blue)':b.type==='tip'?'var(--green)':'var(--red)';
+      contentHtml+=`<div style="border-left:2px solid ${color};padding-left:.6rem;margin-bottom:.4rem;"><span style="font-size:.55rem;color:var(--muted);text-transform:uppercase;">${b.type}</span><br><span style="font-size:.73rem;color:var(--soft);">${b.emo?b.emo+' ':''}${b.text||''}</span></div>`;
+    });
+    qzs.forEach((qz,qi)=>{
+      if(!qz.q) return;
+      contentHtml+=`<div style="background:rgba(255,205,13,.04);border:1px solid rgba(255,205,13,.1);border-radius:6px;padding:.5rem .6rem;margin-top:.4rem;">`;
+      contentHtml+=`<div style="font-size:.58rem;color:var(--gold);text-transform:uppercase;margin-bottom:.25rem;">Quiz ${qzs.length>1?qi+1:''}</div>`;
+      contentHtml+=`<div style="font-size:.72rem;font-weight:700;margin-bottom:.3rem;">${qz.q}</div>`;
+      (qz.opts||[]).forEach((o,oi)=>{ contentHtml+=`<div style="font-size:.68rem;color:${oi===qz.correct?'var(--green)':'var(--muted)'};">${['A','B','C','D'][oi]}. ${o}</div>`; });
+      if(qz.expl) contentHtml+=`<div style="font-size:.65rem;color:var(--muted);font-style:italic;margin-top:.2rem;">${qz.expl}</div>`;
+      contentHtml+=`</div>`;
+    });
+    // Bouton copier JSON langue
+    const jsonStr=JSON.stringify(d,null,2);
+    contentHtml+=`<button class="btn" onclick="navigator.clipboard.writeText(${JSON.stringify(jsonStr)});toast('JSON ${l.label} copié !')" style="font-size:.6rem;margin-top:.5rem;">Copier JSON ${l.label}</button>`;
+    contentHtml+=`</div>`;
+  });
+
+  document.getElementById('translateResult').innerHTML=tabsHtml+contentHtml;
+}
+
+function showTransTab(i){
+  [0,1,2].forEach(j=>{
+    const tab=document.getElementById(`ttab-${j}`);
+    const content=document.getElementById(`tcontent-${j}`);
+    if(!tab||!content) return;
+    const active=j===i;
+    tab.style.borderColor=active?'var(--gold)':'var(--border)';
+    tab.style.background=active?'var(--gold2)':'none';
+    tab.style.color=active?'var(--gold)':'var(--muted)';
+    content.style.display=active?'block':'none';
+  });
+}
+
+/* ══ BATCH TRANSLATE ══ */
+function getMissingTranslations(){
+  return getAllLessons().filter(l=>{
+    const c=CONTENT_CACHE[l.id];
+    return c&&c.blocks&&c.blocks.length&&(!c.translations||!c.translations.en||!c.translations.es);
+  });
+}
+
+function updateBatchInfo(){
+  const missing=getMissingTranslations();
+  const total=getAllLessons().filter(l=>CONTENT_CACHE[l.id]?.blocks?.length).length;
+  const done=total-missing.length;
+  const infoEl=document.getElementById('batchTranslateInfo');
+  const btn=document.getElementById('batchTranslateBtn');
+  if(!infoEl) return;
+  if(missing.length===0){
+    infoEl.innerHTML=`<span style="color:var(--green);">Toutes les leçons avec contenu sont traduites (${done}/${total}).</span>`;
+    if(btn) btn.disabled=true;
+  } else {
+    infoEl.innerHTML=`<strong style="color:var(--gold);">${missing.length}</strong> leçon(s) sans traduction EN/ES sur ${total} avec contenu chargé.<br><span style="font-size:.68rem;color:var(--muted);">Seules les leçons avec contenu déjà chargé peuvent être traduites.</span>`;
+    if(btn) btn.disabled=false;
+  }
+}
+
+async function batchTranslateMissing(){
+  const missing=getMissingTranslations();
+  if(!missing.length){ toast('Toutes les leçons sont déjà traduites !'); return; }
+  const btn=document.getElementById('batchTranslateBtn');
+  const progress=document.getElementById('batchTranslateProgress');
+  btn.disabled=true;
+  let done=0;
+  const errors=[];
+  for(const l of missing){
+    progress.innerHTML=`<span class="loader"><span></span><span></span><span></span></span> ${done}/${missing.length} — <em>${l.name.slice(0,40)}…</em>`;
+    try{
+      await autoTranslateLesson(l.id);
+      done++;
+    }catch(e){
+      errors.push(l.name);
+    }
+    // petite pause pour éviter le rate-limit
+    await new Promise(r=>setTimeout(r,400));
+  }
+  const errMsg=errors.length?` (${errors.length} erreur(s))`:'';
+  progress.innerHTML=`<span style="color:var(--green);">✓ ${done} leçon(s) traduites${errMsg}</span>`;
+  toast(`${done} traductions EN+ES ajoutées${errMsg}`);
+  updateBatchInfo();
 }
 
 /* ══ IMPORT ACADEMY ══ */
@@ -1467,10 +2070,12 @@ function buildLessonsBlock(){
       lessons:lessons.map(l=>{
         const c=CONTENT_CACHE[l.id]||{blocks:[],quizzes:[]};
         const qzs=c.quizzes&&c.quizzes.length?c.quizzes:(c.quiz&&c.quiz.q?[c.quiz]:[]);
+        const tr=c.translations&&(c.translations.en||c.translations.es)?{translations:c.translations}:{};
         return {id:l.id,e:l.emoji,n:l.name,t:l.duration,coins:l.coins,tag:l.tag,
           blocks:c.blocks||[],
           quizzes:qzs,
-          quiz:qzs[0]||{q:'',opts:[],correct:0,expl:''}};
+          quiz:qzs[0]||{q:'',opts:[],correct:0,expl:''},
+          ...tr};
       })
     }));
   }
@@ -1670,6 +2275,17 @@ function toggleTact(){
   }
 }
 </script>
+
+<!-- APP PREVIEW OVERLAY -->
+<div class="preview-ov hidden" id="previewOv" onclick="if(event.target===this)closePreview()">
+  <div class="preview-phone">
+    <div class="preview-phone-bar">
+      <button class="preview-back" onclick="closePreview()">←</button>
+      <div class="preview-lesson-title" id="previewLessonTitle"></div>
+    </div>
+    <div class="preview-scroll" id="previewContent"></div>
+  </div>
+</div>
 
 <!-- TACT ROBOT -->
 <div class="tact-panel" id="tactPanel">
