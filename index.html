@@ -1756,7 +1756,7 @@ function openLessonDetail(id){
   const lvc=l.level==='Débutant'?'deb':l.level==='Intermédiaire'?'int':l.level==='Avancé'?'avd':'exp';
   const lvColor=l.level==='Débutant'?'var(--green)':l.level==='Intermédiaire'?'var(--blue)':l.level==='Avancé'?'var(--purple)':'var(--red)';
   document.getElementById('ldTitle').textContent=l.name;
-  document.getElementById('ldMeta').innerHTML=`<span class="lvl-badge ${lvc}">${l.level}</span><span style="font-size:.6rem;color:var(--muted);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.track}</span>${tags.map(t=>`<span class="atag ${t.c}">${t.txt}</span>`).join('')}`;
+  document.getElementById('ldMeta').innerHTML=`<span class="lvl-badge ${lvc}">${l.level}</span><span style="font-size:.6rem;color:var(--muted);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.track}</span>`;
   const circ=2*Math.PI*28;
   const offset=circ*(1-health/100);
   const scoreColor=health>=70?'var(--green)':health>=50?'var(--gold)':'var(--red)';
@@ -1769,6 +1769,7 @@ function openLessonDetail(id){
     <div class="ld-kpi-target">${target}</div>
   </div>`;
   document.getElementById('ldBody').innerHTML=`
+    ${tags.length?`<div style="grid-column:1/-1;display:flex;gap:.35rem;flex-wrap:wrap;padding-bottom:.5rem;border-bottom:1px solid var(--border);">${tags.map(t=>`<span class="atag ${t.c}" style="font-size:.62rem;padding:.2rem .5rem;">${t.txt}</span>`).join('')}</div>`:''}
     <div class="ld-score-block">
       <div class="ld-ring-wrap">
         <svg class="ld-ring-svg" viewBox="0 0 72 72">
