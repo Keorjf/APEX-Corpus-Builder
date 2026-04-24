@@ -1757,7 +1757,7 @@ function openLessonDetail(id){
   const lvColor=l.level==='Débutant'?'var(--green)':l.level==='Intermédiaire'?'var(--blue)':l.level==='Avancé'?'var(--purple)':'var(--red)';
   document.getElementById('ldTitle').textContent=l.name;
   document.getElementById('ldMeta').innerHTML=`<span style="font-size:.6rem;color:var(--muted);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.track}</span>`;
-  document.querySelector('#ldOv .ld-modal').style.borderLeft='4px solid '+lvColor;
+  document.getElementById('ldModal').style.borderLeft='4px solid '+lvColor;
   const circ=2*Math.PI*28;
   const offset=circ*(1-health/100);
   const scoreColor=health>=70?'var(--green)':health>=50?'var(--gold)':'var(--red)';
@@ -2543,7 +2543,7 @@ function toggleTact(){
 
 <!-- LESSON DETAIL OVERLAY -->
 <div class="ld-ov hidden" id="ldOv" onclick="if(event.target===this)closeLessonDetail()">
-  <div class="ld-modal">
+  <div class="ld-modal" id="ldModal">
     <div class="ld-hdr">
       <div style="flex:1;min-width:0;">
         <div class="ld-title" id="ldTitle"></div>
