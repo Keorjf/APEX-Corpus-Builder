@@ -205,6 +205,50 @@ select option{background:var(--bg2);}
 .loader span:nth-child(3){animation-delay:.4s;}
 @keyframes lb{0%,60%,100%{opacity:.4;transform:translateY(0);}30%{opacity:1;transform:translateY(-4px);}}
 
+/* ── STATS FILTER BAR ── */
+.stat-filter-bar{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;padding:.45rem 0;margin:.35rem 0 .65rem;border-top:1px solid var(--border);}
+.stat-search{flex:1;min-width:140px;background:var(--bg2);border:1px solid var(--border2);color:var(--txt);border-radius:7px;padding:.3rem .6rem;font-family:var(--font-body);font-size:.72rem;outline:none;}
+.stat-search:focus{border-color:var(--gold);}
+.lvl-filter{padding:.23rem .6rem;font-size:.66rem;font-weight:700;border-radius:6px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;transition:.12s;white-space:nowrap;}
+.lvl-filter:hover:not(.active){border-color:var(--border2);color:var(--soft);}
+.lvl-filter.lvl-all.active{background:rgba(255,205,13,.1);color:var(--gold);border-color:rgba(255,205,13,.3);}
+.lvl-filter.lvl-deb.active{background:rgba(0,232,122,.1);color:var(--green);border-color:rgba(0,232,122,.3);}
+.lvl-filter.lvl-int.active{background:rgba(77,158,255,.1);color:var(--blue);border-color:rgba(77,158,255,.3);}
+.lvl-filter.lvl-avd.active{background:rgba(167,139,250,.1);color:var(--purple);border-color:rgba(167,139,250,.3);}
+.lvl-filter.lvl-exp.active{background:rgba(255,59,92,.1);color:var(--red);border-color:rgba(255,59,92,.3);}
+.lvl-badge{display:inline-flex;align-items:center;font-size:.5rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:.1rem .35rem;border-radius:4px;white-space:nowrap;flex-shrink:0;}
+.lvl-badge.deb{background:rgba(0,232,122,.12);color:var(--green);border:1px solid rgba(0,232,122,.22);}
+.lvl-badge.int{background:rgba(77,158,255,.12);color:var(--blue);border:1px solid rgba(77,158,255,.22);}
+.lvl-badge.avd{background:rgba(167,139,250,.12);color:var(--purple);border:1px solid rgba(167,139,250,.22);}
+.lvl-badge.exp{background:rgba(255,59,92,.12);color:var(--red);border:1px solid rgba(255,59,92,.22);}
+
+/* ── LESSON DETAIL OVERLAY ── */
+.ld-ov{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:800;display:flex;align-items:center;justify-content:center;padding:1.2rem;backdrop-filter:blur(6px);}
+.ld-ov.hidden{display:none;}
+.ld-modal{background:var(--bg1);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:700px;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;}
+.ld-modal::-webkit-scrollbar{width:4px;}.ld-modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.ld-hdr{display:flex;align-items:flex-start;gap:.8rem;padding:.9rem 1.1rem;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;border-radius:16px 16px 0 0;position:sticky;top:0;z-index:1;}
+.ld-title{font-size:.85rem;font-weight:700;color:var(--soft);flex:1;line-height:1.35;}
+.ld-body{padding:.9rem 1.1rem;display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+@media(max-width:500px){.ld-body{grid-template-columns:1fr;}}
+.ld-section{grid-column:1/-1;font-size:.52rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:.4rem;padding-bottom:.25rem;border-bottom:1px solid var(--border);}
+.ld-kpi{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem;}
+.ld-kpi-code{font-size:.48rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.15rem;}
+.ld-kpi-val{font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:700;margin-bottom:.25rem;}
+.ld-kpi-target{font-size:.52rem;color:var(--muted);margin-top:.2rem;}
+.ld-bar-wrap{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-top:.3rem;}
+.ld-bar{height:100%;border-radius:3px;transition:width .65s cubic-bezier(.4,0,.2,1);width:0;}
+.ld-score-block{grid-column:1/-1;display:flex;align-items:center;gap:1.2rem;background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:.85rem 1rem;}
+.ld-ring-wrap{position:relative;width:72px;height:72px;flex-shrink:0;}
+.ld-ring-svg{width:72px;height:72px;transform:rotate(-90deg);}
+.ld-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:1.15rem;font-weight:700;}
+.ld-funnel{display:flex;flex-direction:column;gap:.4rem;flex:1;}
+.ld-f-row{display:flex;align-items:center;gap:.5rem;}
+.ld-f-label{font-size:.6rem;color:var(--muted);width:52px;flex-shrink:0;}
+.ld-f-bar-wrap{flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;}
+.ld-f-bar{height:100%;border-radius:4px;transition:width .7s cubic-bezier(.4,0,.2,1);width:0;}
+.ld-f-pct{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);width:30px;text-align:right;flex-shrink:0;}
+
 /* SECTION TABS */
 .section-tab{display:none;}
 .section-tab.active{display:block;}
@@ -541,6 +585,7 @@ select option{background:var(--bg2);}
       <div class="overview-kpis" id="analyticsOverview"></div>
       <div class="analytics-nav" id="analyticsNav"></div>
       <div id="analyticsAlerts"></div>
+      <div id="statsFilterBar"></div>
       <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
         <table class="kpi-tbl" id="analyticsTable"><thead id="analyticsHead"></thead><tbody id="analyticsBody"></tbody></table>
       </div>
@@ -645,6 +690,10 @@ let pendingTranslations = {}; // { en: {...}, es: {...} } pour la leçon en cour
 let blocks = [];
 let quizList = [{q:'',opts:['','','',''],correct:0,expl:''}];
 let generatedCode = '';
+let _levelFilter = null;
+let _tableSearch = '';
+let _lastLd = [];
+let _detailLessonId = null;
 
 const SUGGESTIONS = [
   {emoji:'📉',name:'Méthode avalanche vs snowball : rembourser ses dettes intelligemment',tag:'Pratique',level:'Débutant',track:'💰 Gérer son argent',why:'Dettes non couverte dans le corpus'},
@@ -1525,55 +1574,122 @@ function renderStats(){
     document.getElementById('analyticsAlerts').innerHTML=`<div style="font-size:.73rem;color:var(--green);margin-bottom:.8rem;padding:.5rem .7rem;background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.15);border-radius:8px;">Aucune leçon en alerte — corpus en bonne santé.</div>`;
   }
 
+  _lastLd = ld;
+  renderFilterBar(ld);
   renderAnalyticsTable(ld);
 }
 
 function setAnalyticsView(v){ _analyticsView=v; renderStats(); }
 
+function renderFilterBar(ld){
+  const fb=document.getElementById('statsFilterBar'); if(!fb) return;
+  const c={Débutant:0,Intermédiaire:0,Avancé:0,Expert:0};
+  ld.forEach(l=>{ if(c[l.level]!==undefined) c[l.level]++; });
+  fb.innerHTML=`<div class="stat-filter-bar">
+    <input class="stat-search" type="text" placeholder="Rechercher une leçon..." value="${_tableSearch.replace(/"/g,'&quot;')}" oninput="_tableSearch=this.value;renderAnalyticsTable(_lastLd)">
+    <button class="lvl-filter lvl-all${!_levelFilter?' active':''}" onclick="setTableLevelFilter(null)">Tous (${ld.length})</button>
+    <button class="lvl-filter lvl-deb${_levelFilter==='Débutant'?' active':''}" onclick="setTableLevelFilter('Débutant')">Deb. (${c['Débutant']})</button>
+    <button class="lvl-filter lvl-int${_levelFilter==='Intermédiaire'?' active':''}" onclick="setTableLevelFilter('Intermédiaire')">Inter. (${c['Intermédiaire']})</button>
+    <button class="lvl-filter lvl-avd${_levelFilter==='Avancé'?' active':''}" onclick="setTableLevelFilter('Avancé')">Avancé (${c['Avancé']})</button>
+    <button class="lvl-filter lvl-exp${_levelFilter==='Expert'?' active':''}" onclick="setTableLevelFilter('Expert')">Expert (${c['Expert']})</button>
+  </div>`;
+}
+
+function setTableLevelFilter(lv){
+  _levelFilter=lv;
+  renderFilterBar(_lastLd);
+  renderAnalyticsTable(_lastLd);
+}
+
 function alertCard(l){
-  const k=l.k;
-  const kpiColor=(v,lo,hi,hiGood)=>hiGood?(v>=hi?'var(--green)':v>=lo?'var(--gold)':'var(--red)'):(v<=lo?'var(--green)':v<=hi?'var(--gold)':'var(--red)');
-  const cell=(code,label,val,color,target)=>`<div class="kpi-detail-cell">
-    <div class="kpi-detail-label">${code} · ${label}</div>
-    <div class="kpi-detail-val" style="color:${color}">${val}</div>
-    <div class="kpi-detail-target">${target}</div>
-  </div>`;
-  const detail=`<div class="alert-detail" id="ad-${l.id}">
-    ${cell('L-01','Temps',k.timeOnLesson+'s',kpiColor(k.timeOnLesson,45,180,true),'Cible 45–180s')}
-    ${cell('L-04','Hook',k.hookCompletion+'%',kpiColor(k.hookCompletion,80,95,true),'Cible >95%')}
-    ${cell('L-04','Contenu',k.contentCompletion+'%',kpiColor(k.contentCompletion,70,85,true),'Cible >85%')}
-    ${cell('L-04','Quiz',k.quizCompletion+'%',kpiColor(k.quizCompletion,55,70,true),'Cible >70%')}
-    ${cell('L-09','Erreur quiz',k.errorRate+'%',kpiColor(k.errorRate,10,60,false),'Cible 25–40%')}
-    ${cell('Q-01','Note',k.rating+'/5',kpiColor(k.rating,3.5,4,true),'Cible >4.0')}
-    ${cell('N-05','Bounce',k.bounceRate+'%',kpiColor(k.bounceRate,10,30,false),'Cible <15%')}
-    ${cell('L-06','Aide clics',k.helpClicks,kpiColor(k.helpClicks,2,5,false),'Cible <3')}
-    ${cell('L-03','Relectures',k.blockReads,kpiColor(k.blockReads,1,3,false),'Cible <3')}
-    ${cell('L-13','Claim coins',k.claimRate+'%',kpiColor(k.claimRate,70,85,true),'Cible >85%')}
-    ${cell('L-08','Tps quiz',k.quizResponseTime+'s',kpiColor(k.quizResponseTime,2,30,true),'Cible 2–30s')}
-    ${cell('L-02','Scrolls',k.scrollCount,kpiColor(k.scrollCount,1,10,true),'Cible 1–10')}
-  </div>`;
-  return `<div class="alert-card" onclick="toggleAlertDetail('${l.id}')">
+  const lvc=l.level==='Débutant'?'deb':l.level==='Intermédiaire'?'int':l.level==='Avancé'?'avd':'exp';
+  return `<div class="alert-card" ondblclick="openLessonDetail('${l.id}')" title="Double-cliquer pour voir les KPIs détaillés">
     <div class="alert-card-row">
-      <span>${l.emoji}</span>
+      <span class="lvl-badge ${lvc}">${l.level.slice(0,3)}</span>
       ${healthPill(l.health)}
       <span class="kpi-lname" style="flex:1;">${l.name}</span>
       <div style="display:flex;gap:.3rem;flex-wrap:wrap;">${tagsHtml(l.tags,3)}</div>
-      <span style="font-size:.65rem;color:var(--muted);flex-shrink:0;" id="ad-arrow-${l.id}">▼</span>
       <div onclick="event.stopPropagation()">${actionBtns(l.id)}</div>
     </div>
-    ${detail}
   </div>`;
 }
 
-function toggleAlertDetail(id){
-  const el=document.getElementById('ad-'+id);
-  const arrow=document.getElementById('ad-arrow-'+id);
-  if(!el) return;
-  const open=el.classList.toggle('open');
-  if(arrow) arrow.textContent=open?'▲':'▼';
+function openLessonDetail(id){
+  _detailLessonId=id;
+  const l=getAllLessons().find(x=>x.id===id); if(!l) return;
+  const k=mockKpis(id);
+  const health=calcHealth(k);
+  const tags=alertTags(k);
+  const lvc=l.level==='Débutant'?'deb':l.level==='Intermédiaire'?'int':l.level==='Avancé'?'avd':'exp';
+  const lvColor=l.level==='Débutant'?'var(--green)':l.level==='Intermédiaire'?'var(--blue)':l.level==='Avancé'?'var(--purple)':'var(--red)';
+  document.getElementById('ldTitle').textContent=l.name;
+  document.getElementById('ldMeta').innerHTML=`<span class="lvl-badge ${lvc}">${l.level}</span><span style="font-size:.6rem;color:var(--muted);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.track}</span>${tags.map(t=>`<span class="atag ${t.c}">${t.txt}</span>`).join('')}`;
+  const circ=2*Math.PI*28;
+  const offset=circ*(1-health/100);
+  const scoreColor=health>=70?'var(--green)':health>=50?'var(--gold)':'var(--red)';
+  const good='var(--green)',warn='var(--gold)',bad='var(--red)';
+  const bar=(pct,color)=>`<div class="ld-bar" data-w="${pct}" style="width:0;background:${color};"></div>`;
+  const kpi=(code,label,val,valColor,pct,barColor,target)=>`<div class="ld-kpi">
+    <div class="ld-kpi-code">${code} · ${label}</div>
+    <div class="ld-kpi-val" style="color:${valColor}">${val}</div>
+    <div class="ld-bar-wrap">${bar(pct,barColor)}</div>
+    <div class="ld-kpi-target">${target}</div>
+  </div>`;
+  document.getElementById('ldBody').innerHTML=`
+    <div class="ld-score-block">
+      <div class="ld-ring-wrap">
+        <svg class="ld-ring-svg" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="6"/>
+          <circle cx="36" cy="36" r="28" fill="none" stroke="${scoreColor}" stroke-width="6"
+            stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round"
+            style="transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)"/>
+        </svg>
+        <div class="ld-ring-num" style="color:${scoreColor}">${health}</div>
+      </div>
+      <div class="ld-funnel">
+        <div style="font-size:.62rem;font-weight:700;color:var(--soft);margin-bottom:.25rem;">Complétion des blocs</div>
+        <div class="ld-f-row"><span class="ld-f-label">Hook</span><div class="ld-f-bar-wrap"><div class="ld-f-bar" data-w="${k.hookCompletion}" style="width:0;background:var(--gold);"></div></div><span class="ld-f-pct">${k.hookCompletion}%</span></div>
+        <div class="ld-f-row"><span class="ld-f-label">Contenu</span><div class="ld-f-bar-wrap"><div class="ld-f-bar" data-w="${k.contentCompletion}" style="width:0;background:var(--blue);"></div></div><span class="ld-f-pct">${k.contentCompletion}%</span></div>
+        <div class="ld-f-row"><span class="ld-f-label">Quiz</span><div class="ld-f-bar-wrap"><div class="ld-f-bar" data-w="${k.quizCompletion}" style="width:0;background:var(--green);"></div></div><span class="ld-f-pct">${k.quizCompletion}%</span></div>
+      </div>
+    </div>
+    <div class="ld-section">Engagement</div>
+    ${kpi('L-01','Temps',k.timeOnLesson+'s',k.timeOnLesson<15?bad:k.timeOnLesson>480?warn:good,Math.min(100,k.timeOnLesson/480*100),k.timeOnLesson<45?bad:k.timeOnLesson<=180?good:warn,'Cible 45–180s')}
+    ${kpi('N-05','Bounce',k.bounceRate+'%',k.bounceRate>30?bad:k.bounceRate>15?warn:good,k.bounceRate,k.bounceRate>30?bad:k.bounceRate>15?warn:good,'Cible <15%')}
+    <div class="ld-section">Quiz</div>
+    ${kpi('L-09','Erreur quiz',k.errorRate+'%',k.errorRate>60?bad:k.errorRate<10?warn:good,k.errorRate,k.errorRate>60?bad:k.errorRate<10?warn:good,'Cible 25–40%')}
+    ${kpi('L-08','Tps réponse',k.quizResponseTime+'s',k.quizResponseTime<2?warn:k.quizResponseTime>30?bad:good,Math.min(100,k.quizResponseTime/60*100),k.quizResponseTime<2?warn:k.quizResponseTime>30?bad:good,'Cible 2–30s')}
+    <div class="ld-section">Satisfaction</div>
+    ${kpi('Q-01','Note',k.rating+'/5',k.rating>=4?good:k.rating>=3.5?warn:bad,k.rating/5*100,k.rating>=4?good:k.rating>=3.5?warn:bad,'Cible >4.0')}
+    ${kpi('L-06','Aide clics',String(k.helpClicks),k.helpClicks>5?bad:k.helpClicks>2?warn:good,Math.min(100,k.helpClicks/9*100),k.helpClicks>5?bad:k.helpClicks>2?warn:good,'Cible <3')}
+    <div class="ld-section">Economique</div>
+    ${kpi('L-13','Claim coins',k.claimRate+'%',k.claimRate>=85?good:k.claimRate>=60?warn:bad,k.claimRate,k.claimRate>=85?good:k.claimRate>=60?warn:bad,'Cible >85%')}
+    ${kpi('N-13','Profondeur session',String(k.sessionDepth),k.sessionDepth>=3?good:k.sessionDepth>=2?warn:bad,Math.min(100,k.sessionDepth/6*100),k.sessionDepth>=3?good:k.sessionDepth>=2?warn:bad,'Cible >3')}
+    <div style="grid-column:1/-1;display:flex;gap:.4rem;justify-content:flex-end;padding-top:.3rem;">
+      <button class="btn primary" onclick="closeExploreDrawer();editLesson('${id}');closeLessonDetail()" style="font-size:.7rem;">Modifier la leçon</button>
+      <button class="btn" onclick="simplifyBlock('${id}');closeLessonDetail()" style="font-size:.7rem;">Simplifier avec IA</button>
+    </div>`;
+  document.getElementById('ldOv').classList.remove('hidden');
+  setTimeout(()=>{
+    document.querySelectorAll('#ldBody .ld-bar,#ldBody .ld-f-bar').forEach(b=>{
+      const w=b.dataset.w||'0';
+      requestAnimationFrame(()=>{ b.style.width=w+'%'; });
+    });
+  },80);
+}
+
+function closeLessonDetail(){
+  document.getElementById('ldOv').classList.add('hidden');
+}
+
+function editLessonFromDetail(){
+  if(!_detailLessonId) return;
+  closeExploreDrawer(); editLesson(_detailLessonId); closeLessonDetail();
 }
 
 function renderAnalyticsTable(ld){
+  if(_levelFilter) ld=ld.filter(l=>l.level===_levelFilter);
+  if(_tableSearch) ld=ld.filter(l=>l.name.toLowerCase().includes(_tableSearch.toLowerCase()));
   let head='', rows='';
   if(_analyticsView==='pedagogy'){
     const th=(label,tip)=>`<th><span class="th-info" data-tip="${tip}">${label}</span></th>`;
@@ -1589,9 +1705,10 @@ function renderAnalyticsTable(ld){
     </tr>`;
     rows=ld.map(l=>{
       const k=l.k;
+      const lvc=l.level==='Débutant'?'deb':l.level==='Intermédiaire'?'int':l.level==='Avancé'?'avd':'exp';
       const timeColor=k.timeOnLesson<15?'bad':k.timeOnLesson>480?'warn':'good';
-      return `<tr>
-        <td><div style="display:flex;align-items:center;gap:.4rem;">${l.emoji}<span class="kpi-lname" onclick="openModal('${l.id}')">${l.name}</span></div></td>
+      return `<tr ondblclick="openLessonDetail('${l.id}')" style="cursor:pointer;" title="Double-cliquer pour le détail">
+        <td><div style="display:flex;align-items:center;gap:.35rem;"><span class="lvl-badge ${lvc}">${l.level.slice(0,3)}</span><span class="kpi-lname" onclick="event.stopPropagation();openModal('${l.id}')">${l.name}</span></div></td>
         <td>${healthPill(l.health)}</td>
         <td>${tagsHtml(l.tags,2)}</td>
         <td><span class="kpi-num ${timeColor}">${k.timeOnLesson}</span></td>
@@ -1615,8 +1732,9 @@ function renderAnalyticsTable(ld){
     </tr>`;
     rows=ld.map(l=>{
       const k=l.k;
-      return `<tr>
-        <td><div style="display:flex;align-items:center;gap:.4rem;">${l.emoji}<span class="kpi-lname" onclick="openModal('${l.id}')">${l.name}</span></div></td>
+      const lvc=l.level==='Débutant'?'deb':l.level==='Intermédiaire'?'int':l.level==='Avancé'?'avd':'exp';
+      return `<tr ondblclick="openLessonDetail('${l.id}')" style="cursor:pointer;" title="Double-cliquer pour le détail">
+        <td><div style="display:flex;align-items:center;gap:.35rem;"><span class="lvl-badge ${lvc}">${l.level.slice(0,3)}</span><span class="kpi-lname" onclick="event.stopPropagation();openModal('${l.id}')">${l.name}</span></div></td>
         <td>${healthPill(l.health)}</td>
         <td>${tagsHtml(l.tags,2)}</td>
         <td><span class="kpi-num ${k.bounceRate>30?'bad':k.bounceRate>15?'warn':'good'}">${k.bounceRate}%</span></td>
@@ -1640,8 +1758,9 @@ function renderAnalyticsTable(ld){
     </tr>`;
     rows=ld.map(l=>{
       const k=l.k;
-      return `<tr>
-        <td><div style="display:flex;align-items:center;gap:.4rem;">${l.emoji}<span class="kpi-lname" onclick="openModal('${l.id}')">${l.name}</span></div></td>
+      const lvc=l.level==='Débutant'?'deb':l.level==='Intermédiaire'?'int':l.level==='Avancé'?'avd':'exp';
+      return `<tr ondblclick="openLessonDetail('${l.id}')" style="cursor:pointer;" title="Double-cliquer pour le détail">
+        <td><div style="display:flex;align-items:center;gap:.35rem;"><span class="lvl-badge ${lvc}">${l.level.slice(0,3)}</span><span class="kpi-lname" onclick="event.stopPropagation();openModal('${l.id}')">${l.name}</span></div></td>
         <td>${healthPill(l.health)}</td>
         <td>${tagsHtml(l.tags,2)}</td>
         <td><span class="kpi-num ${k.claimRate>=85?'good':k.claimRate>=60?'warn':'bad'}">${k.claimRate}%</span></td>
@@ -2275,6 +2394,23 @@ function toggleTact(){
   }
 }
 </script>
+
+<!-- LESSON DETAIL OVERLAY -->
+<div class="ld-ov hidden" id="ldOv" onclick="if(event.target===this)closeLessonDetail()">
+  <div class="ld-modal">
+    <div class="ld-hdr">
+      <div style="flex:1;min-width:0;">
+        <div class="ld-title" id="ldTitle"></div>
+        <div id="ldMeta" style="display:flex;gap:.3rem;flex-wrap:wrap;align-items:center;margin-top:.35rem;"></div>
+      </div>
+      <div style="display:flex;gap:.3rem;align-items:flex-start;flex-shrink:0;margin-left:.5rem;">
+        <button class="btn" onclick="editLessonFromDetail()" style="font-size:.65rem;padding:.3rem .65rem;">Editer</button>
+        <button class="modal-close" onclick="closeLessonDetail()">✕</button>
+      </div>
+    </div>
+    <div class="ld-body" id="ldBody"></div>
+  </div>
+</div>
 
 <!-- APP PREVIEW OVERLAY -->
 <div class="preview-ov hidden" id="previewOv" onclick="if(event.target===this)closePreview()">
