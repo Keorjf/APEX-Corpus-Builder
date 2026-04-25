@@ -1654,10 +1654,9 @@ function renderLeaderboard(ld,alerts){
   const rows=top5.map((l,i)=>{
     const comp=Math.round((l.k.hookCompletion+l.k.contentCompletion+l.k.quizCompletion)/3);
     const badge=comp<60?`<span class="lb-badge cr">Complétion ${comp}%</span>`:`<span class="lb-badge or">Santé ${l.health}</span>`;
-    const lvc=l.level==='Débutant'?'deb':l.level==='Intermédiaire'?'int':l.level==='Avancé'?'avd':'exp';
-    return `<div class="lb-row" ondblclick="openLessonDetail('${l.id}')" title="Double-cliquer pour les KPIs détaillés">
+    const lvColor=l.level==='Débutant'?'var(--green)':l.level==='Intermédiaire'?'var(--blue)':l.level==='Avancé'?'var(--purple)':'var(--red)';
+    return `<div class="lb-row" ondblclick="openLessonDetail('${l.id}')" title="Double-cliquer pour les KPIs détaillés" style="border-left:3px solid ${lvColor};">
       <span class="lb-rank">${i+1}</span>
-      <span class="lvl-badge ${lvc}">${l.level.slice(0,3)}</span>
       ${healthPill(l.health)}
       <span class="lb-name">${l.name}</span>
       ${badge}
@@ -1688,10 +1687,9 @@ function _renderDiag(){
 function renderDiagLessons(ld){
   const el=document.getElementById('diagLessons'); if(!el) return;
   const open=el.dataset.open==='1';
-  const lvc=l=>l.level==='Débutant'?'deb':l.level==='Intermédiaire'?'int':l.level==='Avancé'?'avd':'exp';
+  const lvColor=l=>l.level==='Débutant'?'var(--green)':l.level==='Intermédiaire'?'var(--blue)':l.level==='Avancé'?'var(--purple)':'var(--red)';
   const rows=ld.map(l=>`
-    <div class="lb-row" ondblclick="openLessonDetail('${l.id}')" title="Double-cliquer pour le détail KPI">
-      <span class="lvl-badge ${lvc(l)}">${l.level.slice(0,3)}</span>
+    <div class="lb-row" ondblclick="openLessonDetail('${l.id}')" title="Double-cliquer pour le détail KPI" style="border-left:3px solid ${lvColor(l)};">
       ${healthPill(l.health)}
       <span class="lb-name" style="flex:1;">${l.name}</span>
       <span style="font-size:.58rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">${l.track}</span>
