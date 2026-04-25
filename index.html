@@ -649,6 +649,7 @@ select option{background:var(--bg2);}
       <div id="globalFunnel"></div>
       <div id="analyticsAlerts"></div>
       <div class="dash-section-hdr" style="margin-top:1.5rem;"><span class="dash-section-title">Vue Secondaire — Diagnostic &amp; Deep Dive</span></div>
+      <div id="diagFilters"></div>
       <div class="diag-grid" id="diagnosticGrid"></div>
     </div>
   </div>
@@ -754,6 +755,8 @@ let generatedCode = '';
 let _levelFilter = null;
 let _tableSearch = '';
 let _lastLd = [];
+let _diagLevel=null;
+let _diagTrack=null;
 let _detailLessonId = null;
 
 const SUGGESTIONS = [
@@ -1616,8 +1619,8 @@ function renderStats(){
 
   renderGlobalFunnel(ld);
   renderLeaderboard(ld,alerts);
-  renderDiagnosticGrid(ld);
   _lastLd=ld;
+  _renderDiag();
 }
 
 function renderGlobalFunnel(ld){
@@ -1667,6 +1670,35 @@ function renderLeaderboard(ld,alerts){
       ${n>0?`<button class="anav-btn" onclick="clearKpiFilters()" style="font-size:.6rem;color:var(--muted);">Effacer</button>`:''}
     </div>
     ${top5.length?rows:'<div style="font-size:.72rem;color:var(--green);padding:.4rem 0;">Aucune leçon critique — corpus en bonne santé.</div>'}
+  </div>`;
+}
+
+function setDiagLevel(v){ _diagLevel=v||null; _renderDiag(); }
+function setDiagTrack(v){ _diagTrack=v||null; _renderDiag(); }
+
+function _renderDiag(){
+  let ld=_lastLd;
+  if(_diagLevel) ld=ld.filter(l=>l.level===_diagLevel);
+  if(_diagTrack) ld=ld.filter(l=>l.track===_diagTrack);
+  renderDiagFiltersUI();
+  renderDiagnosticGrid(ld.length?ld:_lastLd.slice(0,1));
+}
+
+function renderDiagFiltersUI(){
+  const el=document.getElementById('diagFilters'); if(!el) return;
+  const tracks=[...new Set(getAllLessons().map(l=>l.track))].sort((a,b)=>a.replace(/\p{Emoji}/gu,'').trim().localeCompare(b.replace(/\p{Emoji}/gu,'').trim()));
+  const lvlClass={'Débutant':'deb','Intermédiaire':'int','Avancé':'avd','Expert':'exp'};
+  const lvls=[['Tous',null],['Débutant','Débutant'],['Intermédiaire','Intermédiaire'],['Avancé','Avancé'],['Expert','Expert']];
+  const count=v=>v?_lastLd.filter(l=>l.level===v).length:_lastLd.length;
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;padding:.5rem 0 .65rem;border-bottom:1px solid var(--border);margin-bottom:.7rem;">
+    <span style="font-size:.54rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Niveau</span>
+    ${lvls.map(([lbl,val])=>`<button class="lvl-filter lvl-${val?lvlClass[val]:'all'}${_diagLevel===val?' active':''}" onclick="setDiagLevel('${val||''}')" style="font-size:.6rem;">${lbl} (${count(val)})</button>`).join('')}
+    <span style="font-size:.54rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-left:.5rem;">Module</span>
+    <select onchange="setDiagTrack(this.value)" style="background:var(--bg2);border:1px solid var(--border2);color:var(--soft);border-radius:6px;padding:.22rem .5rem;font-size:.62rem;font-family:var(--font-body);outline:none;cursor:pointer;max-width:220px;">
+      <option value="">Tous les modules</option>
+      ${tracks.map(t=>`<option value="${t.replace(/"/g,'&quot;')}"${_diagTrack===t?' selected':''}>${t}</option>`).join('')}
+    </select>
+    ${(_diagLevel||_diagTrack)?`<button class="anav-btn" onclick="setDiagLevel(null);setDiagTrack('')" style="font-size:.6rem;color:var(--muted);">Réinitialiser</button>`:''}
   </div>`;
 }
 
