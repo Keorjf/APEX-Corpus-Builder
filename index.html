@@ -1726,10 +1726,10 @@ function renderDiagFiltersUI(){
 function renderDiagnosticGrid(ld){
   const el=document.getElementById('diagnosticGrid'); if(!el) return;
   el.innerHTML=`
-    <div class="diag-widget"><div class="diag-wtitle">Corrélation Quiz / Trading Simulé (T-02)</div>${renderScatterSVG(ld)}</div>
-    <div class="diag-widget"><div class="diag-wtitle">Qualité Pédagogique Radar (C-02, C-04, A-11)</div>${renderRadarSVG(ld)}</div>
-    <div class="diag-widget"><div class="diag-wtitle">Écart Temps Estimé vs Réel (L-01, A-04)</div>${renderBulletChart(ld)}</div>
-    <div class="diag-widget"><div class="diag-wtitle">Complexité Textuelle (C-01, C-10, C-13)</div>${renderHeatTable(ld)}</div>`;
+    <div class="diag-widget"><div class="diag-wtitle">Corrélation Quiz / Trading Simulé</div>${renderScatterSVG(ld)}</div>
+    <div class="diag-widget"><div class="diag-wtitle">Qualité Pédagogique Radar</div>${renderRadarSVG(ld)}</div>
+    <div class="diag-widget"><div class="diag-wtitle">Écart Temps Estimé vs Réel</div>${renderBulletChart(ld)}</div>
+    <div class="diag-widget"><div class="diag-wtitle">Complexité Textuelle</div>${renderHeatTable(ld)}</div>`;
   setTimeout(()=>{ el.querySelectorAll('.bullet-fg').forEach(b=>{ requestAnimationFrame(()=>{ b.style.width=(b.dataset.w||'0')+'%'; }); }); },80);
 }
 
