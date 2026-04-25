@@ -1693,7 +1693,6 @@ function renderDiagLessons(ld){
       ${healthPill(l.health)}
       <span class="lb-name" style="flex:1;">${l.name}</span>
       <span style="font-size:.58rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">${l.track}</span>
-      <div onclick="event.stopPropagation()">${actionBtns(l.id)}</div>
     </div>`).join('');
   el.innerHTML=`
     <button onclick="(()=>{const e=document.getElementById('diagLessons');e.dataset.open=e.dataset.open==='1'?'0':'1';renderDiagLessons(window._lastDiagLd||[]);})()"
