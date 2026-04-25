@@ -651,6 +651,7 @@ select option{background:var(--bg2);}
       <div class="dash-section-hdr" style="margin-top:1.5rem;"><span class="dash-section-title">Vue Secondaire — Diagnostic &amp; Deep Dive</span></div>
       <div id="diagFilters"></div>
       <div class="diag-grid" id="diagnosticGrid"></div>
+      <div id="diagLessons" style="margin-top:.6rem;"></div>
     </div>
   </div>
 
@@ -1680,8 +1681,33 @@ function _renderDiag(){
   let ld=_lastLd;
   if(_diagLevel) ld=ld.filter(l=>l.level===_diagLevel);
   if(_diagTrack) ld=ld.filter(l=>l.track===_diagTrack);
+  const filtered=ld.length?ld:_lastLd.slice(0,1);
   renderDiagFiltersUI();
-  renderDiagnosticGrid(ld.length?ld:_lastLd.slice(0,1));
+  renderDiagnosticGrid(filtered);
+  renderDiagLessons(filtered);
+}
+
+function renderDiagLessons(ld){
+  const el=document.getElementById('diagLessons'); if(!el) return;
+  const open=el.dataset.open==='1';
+  const lvc=l=>l.level==='Débutant'?'deb':l.level==='Intermédiaire'?'int':l.level==='Avancé'?'avd':'exp';
+  const rows=ld.map(l=>`
+    <div class="lb-row" ondblclick="openLessonDetail('${l.id}')" title="Double-cliquer pour le détail KPI">
+      <span class="lvl-badge ${lvc(l)}">${l.level.slice(0,3)}</span>
+      ${healthPill(l.health)}
+      <span class="lb-name" style="flex:1;">${l.name}</span>
+      <span style="font-size:.58rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">${l.track}</span>
+      <div onclick="event.stopPropagation()">${actionBtns(l.id)}</div>
+    </div>`).join('');
+  el.innerHTML=`
+    <button onclick="(()=>{const e=document.getElementById('diagLessons');e.dataset.open=e.dataset.open==='1'?'0':'1';renderDiagLessons(window._lastDiagLd||[]);})()"
+      style="width:100%;background:none;border:1px solid var(--border);border-radius:8px;padding:.45rem .8rem;color:var(--muted);font-size:.65rem;font-weight:700;text-align:left;cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:.15s;"
+      onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+      <span style="flex:1;">Voir les cours (${ld.length})</span>
+      <span style="font-size:.7rem;">${open?'▲':'▼'}</span>
+    </button>
+    ${open?`<div style="margin-top:.4rem;">${rows}</div>`:''}`;
+  window._lastDiagLd=ld;
 }
 
 function renderDiagFiltersUI(){
