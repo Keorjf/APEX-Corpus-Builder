@@ -1629,7 +1629,7 @@ function renderGlobalFunnel(ld){
   const worst=hook>cont+10?'Hook → Contenu':cont>quiz+10?'Contenu → Quiz':'Quiz';
   const el=document.getElementById('globalFunnel'); if(!el) return;
   el.innerHTML=`<div class="diag-widget" style="margin-bottom:.75rem;">
-    <div class="diag-wtitle">Entonnoir de Drop-off par Leçon (B-04, L-05)</div>
+    <div class="diag-wtitle">Entonnoir de Drop-off par Leçon</div>
     ${steps.map(s=>`<div class="gf-row"><span class="gf-lbl">${s.lbl}</span><div class="gf-bwrap"><div class="gf-bar" data-w="${s.val}" style="background:${s.col};"></div></div><span class="gf-pct">${s.val}%</span></div>`).join('')}
     <div style="font-size:.58rem;color:var(--muted);margin-top:.4rem;">Perte Hook→Quiz : <strong style="color:${drop>30?'var(--red)':'var(--gold)'};">−${drop}pp</strong> &nbsp;·&nbsp; Rupture : <strong style="color:var(--soft);">${worst}</strong></div>
   </div>`;
