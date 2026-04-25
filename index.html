@@ -1806,7 +1806,7 @@ function renderHeatTable(ld){
   const rows=ld.slice(0,10).map(l=>{ const f=flesch(l),bm=bloom(l),t=tone(l),fc=hc(f,50,70),tc2=hc(t,65,80);
     return `<tr style="cursor:pointer;" onclick="showHeatPopup(event,'${l.id}')"><td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${l.name}">${l.name.slice(0,20)}${l.name.length>20?'…':''}</td><td><span class="heat-cell" style="background:${fc.bg};color:${fc.tc};">${f}</span></td><td><span class="heat-cell" style="background:${bm.bg};color:${bm.tc};">${bm.lbl}</span></td><td><span class="heat-cell" style="background:${tc2.bg};color:${tc2.tc};">${t}%</span></td></tr>`;
   }).join('');
-  return `<table class="heat-tbl"><thead><tr><th>Leçon</th><th>Flesch (C-01)</th><th>Bloom (C-10)</th><th>Ton (C-13)</th></tr></thead><tbody>${rows}</tbody></table>`;
+  return `<table class="heat-tbl"><thead><tr><th>Leçon</th><th>Flesch</th><th>Bloom</th><th>Ton</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function runAuditIA(){
