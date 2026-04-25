@@ -1728,7 +1728,7 @@ function renderDiagnosticGrid(ld){
   el.innerHTML=`
     <div class="diag-widget"><div class="diag-wtitle">Corrélation Quiz / Trading Simulé</div>${renderScatterSVG(ld)}</div>
     <div class="diag-widget"><div class="diag-wtitle">Qualité Pédagogique Radar</div>${renderRadarSVG(ld)}</div>
-    <div class="diag-widget"><div class="diag-wtitle">Écart Temps Estimé vs Réel</div>${renderBulletChart(ld)}</div>
+    <div class="diag-widget"><div class="diag-wtitle">Temps Réel par Leçon</div>${renderBulletChart(ld)}</div>
     <div class="diag-widget"><div class="diag-wtitle">Complexité Textuelle</div>${renderHeatTable(ld)}</div>`;
   setTimeout(()=>{ el.querySelectorAll('.bullet-fg').forEach(b=>{ requestAnimationFrame(()=>{ b.style.width=(b.dataset.w||'0')+'%'; }); }); },80);
 }
@@ -1787,7 +1787,6 @@ function renderBulletChart(ld){
     return `<div class="bullet-row" style="cursor:pointer;" onclick="showBulletPopup(event,'${l.id}')">
       <div class="bullet-lbl" title="${l.name}">${l.name.slice(0,32)}${l.name.length>32?'…':''}</div>
       <div class="bullet-track">
-        <div class="bullet-bg" style="width:${Math.round(e/mx*100)}%;"></div>
         <div class="bullet-fg" data-w="${Math.round(r/mx*100)}" style="background:${col};"></div>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:.1rem;">
