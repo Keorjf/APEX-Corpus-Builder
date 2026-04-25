@@ -1611,7 +1611,7 @@ function renderStats(){
     <div class="ov-card"><div class="ov-num" style="color:${j7>=20?'var(--green)':'var(--red)'}">${j7}%</div><div class="ov-lbl">Rétention J+7 (R-01)</div></div>
     <div class="ov-card"><div class="ov-num" style="color:${j30>=40?'var(--green)':'var(--gold)'}">${j30}%</div><div class="ov-lbl">Rétention J+30 (R-02)</div></div>
     <div class="ov-card"><div class="ov-num" style="color:${alerts.length>5?'var(--red)':'var(--gold)'}">${alerts.length}</div><div class="ov-lbl">Alertes actives</div></div>
-    <div class="ov-card"><div class="ov-num" style="color:var(--blue)">${translated}</div><div class="ov-lbl">Leçons traduites</div></div>`;
+    <div class="ov-card"><div class="ov-num" style="color:var(--gold)">${translated}</div><div class="ov-lbl">Leçons traduites</div></div>`;
 
   renderGlobalFunnel(ld);
   renderLeaderboard(ld,alerts);
