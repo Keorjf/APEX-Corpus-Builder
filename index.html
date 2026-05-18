@@ -835,6 +835,19 @@ select option{background:var(--bg2);}
             <button class="btn primary" style="font-size:.7rem;" onclick="runAgent('reco')" id="btn-reco">▶ Lancer</button>
             <label class="agent-auto-label"><input type="checkbox" id="auto-reco" onchange="setAgentAuto('reco',this.checked)"> Auto</label>
           </div>
+        <!-- Agent Création -->
+        <div class="agent-card" id="card-create" style="border-color:rgba(0,232,122,.2);">
+          <div class="agent-card-hdr">
+            <div class="agent-dot idle" id="dot-create"></div>
+            <span class="agent-name">🛠️ Agent Création</span>
+            <span class="agent-run-time" id="time-create">—</span>
+          </div>
+          <div class="agent-role">Génère automatiquement des leçons complètes (blocs + quiz) pour combler les lacunes identifiées par les autres agents. Prêtes à importer en un clic.</div>
+          <div class="agent-results" id="res-create"><span style="color:var(--muted);font-style:italic;">Lance d'abord les agents Corpus, Syllabus et Recommandations.</span></div>
+          <div class="agent-footer">
+            <button class="btn primary" style="font-size:.7rem;background:var(--green);border-color:var(--green);color:#000;" onclick="runAgent('create')" id="btn-create">▶ Générer des leçons</button>
+            <label class="agent-auto-label"><input type="checkbox" id="auto-create" onchange="setAgentAuto('create',this.checked)"> Auto</label>
+          </div>
         </div>
 
       </div>
@@ -1847,6 +1860,86 @@ function deleteHistoryEntry(i){
   hist.splice(i,1);
   localStorage.setItem('syllabus_history',JSON.stringify(hist));
   renderSyllabusHistory();
+}
+
+/* ── AGENT CRÉATION ── */
+async function _runCreationAgent(){
+  const corpus  =(_agentResults.corpus?.findings||[]).filter(f=>f.sev!=='ok').map(f=>f.text);
+  const syllabus=(_agentResults.syllabus?.findings||[]).filter(f=>f.sev!=='ok').map(f=>f.text);
+  const reco    =(_agentResults.reco?.findings||[]).map(f=>f.text);
+  const allGaps =[...corpus,...syllabus,...reco];
+  if(!allGaps.length) return {
+    findings:[{sev:'warning',text:'Lance d\'abord les agents Corpus, Syllabus et Recommandations pour identifier les lacunes à combler.'}],
+    lessons:[],extra:{}
+  };
+  const cs=_corpusSummary();
+  const existing=getAllLessons().slice(0,40).map(l=>l.name);
+  const prompt=`Tu es expert en ingénierie pédagogique et éducation financière. Génère 3 leçons TACTIC complètes pour combler ces lacunes du corpus.
+
+Lacunes identifiées : ${JSON.stringify(allGaps,null,2)}
+Modules existants : ${Object.keys(cs.byTrack).join(', ')}
+Leçons déjà présentes (ne pas dupliquer) : ${existing.join(', ')}
+
+Retourne UNIQUEMENT un tableau JSON de 3 leçons :
+[{"name":"Titre","emoji":"📊","level":"Débutant|Intermédiaire|Avancé|Expert","track":"Module","tag":"Base|Stratégie|Pratique|Analyse","duration":"2 min","coins":100,"blocks":[{"type":"hook","emo":"💥","text":"<strong>Accroche</strong>"},{"type":"content","text":"Contenu.<br><strong>Point clé</strong> : détail."},{"type":"tip","text":"Conseil."}],"quiz":{"q":"Question ?","opts":["A","B","C","D"],"correct":0,"expl":"Explication."}}]`;
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:claudeHeaders(),
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:3000,
+      messages:[{role:'user',content:prompt}]})
+  });
+  const data=await res.json();
+  if(!res.ok) throw new Error(data.error?.message||'Erreur API');
+  const raw=data.content?.[0]?.text||'[]';
+  const m=raw.match(/\[[\s\S]*\]/);
+  if(!m) throw new Error('Format JSON invalide');
+  const lessons=JSON.parse(m[0]);
+  const findings=lessons.map(l=>({sev:'ok',text:`${l.emoji||'📖'} ${l.name} — ${l.level} · ${l.track}`}));
+  return {findings,lessons,extra:{count:lessons.length}};
+}
+
+function _lvColor(lv){
+  return lv==='Débutant'?'var(--green)':lv==='Intermédiaire'?'var(--blue)':lv==='Avancé'?'var(--purple)':'var(--red)';
+}
+
+function _lessonProposalHtml(lessons){
+  if(!lessons||!lessons.length) return '<span style="color:var(--muted);font-style:italic;">Aucune leçon générée</span>';
+  return `<div style="font-size:.63rem;color:var(--muted);margin-bottom:.4rem;">${lessons.length} leçon(s) générées — prêtes à importer</div>`+
+    lessons.map((l,i)=>`
+      <div style="background:var(--bg3);border-radius:8px;padding:.5rem .65rem;margin-bottom:.4rem;border-left:3px solid ${_lvColor(l.level)};">
+        <div style="font-size:.74rem;font-weight:700;margin-bottom:.1rem;">${l.emoji||'📖'} ${l.name}</div>
+        <div style="font-size:.61rem;color:var(--muted);margin-bottom:.35rem;">${l.level} · ${l.track} · ${l.tag||'Base'} · ${l.duration||'2 min'}</div>
+        <div style="display:flex;gap:.35rem;">
+          <button id="import-lesson-${i}" class="btn primary" style="font-size:.62rem;padding:.2rem .5rem;" onclick="importAgentLesson(${i})">+ Ajouter</button>
+          <button class="btn" style="font-size:.62rem;padding:.2rem .5rem;" onclick="previewAgentLesson(${i})">👁 Aperçu</button>
+        </div>
+      </div>`).join('')+
+    `<button class="btn" style="font-size:.65rem;width:100%;margin-top:.1rem;padding:.28rem;" onclick="importAllAgentLessons()">+ Tout importer (${lessons.length})</button>`;
+}
+
+function importAgentLesson(idx){
+  const r=_agentResults.create; if(!r?.lessons) return;
+  const lesson=r.lessons[idx]; if(!lesson) return;
+  const id=generateId(lesson.level);
+  newLessons.push({id,emoji:lesson.emoji||'📖',name:lesson.name,duration:lesson.duration||'2 min',coins:lesson.coins||100,tag:lesson.tag||'Base',level:lesson.level,track:lesson.track});
+  const quiz=lesson.quiz?{q:lesson.quiz.q||'',opts:lesson.quiz.opts||['','','',''],correct:lesson.quiz.correct??0,expl:lesson.quiz.expl||''}:{q:'',opts:['','','',''],correct:0,expl:''};
+  CONTENT_CACHE[id]={blocks:lesson.blocks||[],quizzes:[quiz],quiz};
+  renderSidebar(); renderExplore(); updateChips();
+  toast(`"${lesson.name}" ajoutée au corpus ✅`);
+  const btn=document.getElementById('import-lesson-'+idx);
+  if(btn){btn.textContent='✅ Ajoutée';btn.disabled=true;btn.style.background='var(--green)';btn.style.color='#000';}
+}
+
+function importAllAgentLessons(){
+  const r=_agentResults.create; if(!r?.lessons?.length) return;
+  r.lessons.forEach((_,i)=>importAgentLesson(i));
+}
+
+function previewAgentLesson(idx){
+  const r=_agentResults.create; if(!r?.lessons) return;
+  const lesson=r.lessons[idx]; if(!lesson) return;
+  const tmpId='__preview_agent__';
+  CONTENT_CACHE[tmpId]={blocks:lesson.blocks||[],quizzes:[],quiz:lesson.quiz||{}};
+  openPreview(tmpId,lesson.name);
 }
 
 function useSuggestion(name,lv,track,tag){
@@ -3069,7 +3162,8 @@ Tu aides les créateurs de contenu à : créer et structurer des leçons, rédig
 Tu as accès aux résultats des 4 agents IA intégrés (Corpus, Performance, Syllabus, Recommandations) et tu peux les invoquer.
 Domaine : éducation financière (investissement, bourse, ETF, crypto, fiscalité, etc.)
 Ton ton : direct, chaleureux, expert. Réponses courtes (3-5 phrases max). HTML simple autorisé (<b>, <br>, <em>). Jamais de markdown avec *.
-Pour déclencher un agent, utilise UNIQUEMENT la balise sur une ligne isolée : <RUN_AGENT>corpus|perf|syllabus|reco|all</RUN_AGENT>`;
+Pour déclencher un agent, utilise UNIQUEMENT la balise sur une ligne isolée : <RUN_AGENT>corpus|perf|syllabus|reco|create|all</RUN_AGENT>
+L'Agent Création génère des leçons complètes prêtes à importer. Si l'utilisateur demande de créer des leçons automatiquement ou de combler les lacunes, utilise <RUN_AGENT>create</RUN_AGENT>.`;
 
 function _buildAgentContext(){
   _agentLoad();
@@ -3092,7 +3186,10 @@ function _buildAgentContext(){
     const cs=_corpusSummary();
     lines.push(`— CORPUS : ${cs.total} leçons, ${cs.tracks} modules, niveaux=${JSON.stringify(cs.byLevel)}`);
   }catch(e){}
-  lines.push('Pour relancer une analyse : <RUN_AGENT>corpus|perf|syllabus|reco|all</RUN_AGENT>');
+  if(_agentResults.create?.lessons?.length){
+    lines.push(`🛠️ Création : ${_agentResults.create.lessons.length} leçon(s) générée(s) prêtes à importer : ${_agentResults.create.lessons.map(l=>l.name).join(', ')}`);
+  }
+  lines.push('Pour relancer une analyse : <RUN_AGENT>corpus|perf|syllabus|reco|create|all</RUN_AGENT>');
   return lines.join('\n');
 }
 
@@ -3247,10 +3344,11 @@ initSyllabus();
    AGENTS IA — Analyse continue du corpus
    ══════════════════════════════════════════════ */
 const AGENT_DEFS={
-  corpus:{id:'corpus',name:'Agent Corpus'},
-  perf:  {id:'perf',  name:'Agent Performance'},
+  corpus:{id:'corpus',  name:'Agent Corpus'},
+  perf:  {id:'perf',   name:'Agent Performance'},
   syllabus:{id:'syllabus',name:'Agent Syllabus'},
-  reco:  {id:'reco',  name:'Agent Recommandations'}
+  reco:  {id:'reco',   name:'Agent Recommandations'},
+  create:{id:'create', name:'Agent Création'}
 };
 let _agentResults={};
 let _agentAutoTimer=null;
@@ -3315,15 +3413,17 @@ async function runAgent(id){
   try{
     let findings=[];
     let extra={};
-    if(id==='corpus') { const r=await _runCorpusAgent(); findings=r.findings; extra=r.extra; }
-    else if(id==='perf') { const r=await _runPerfAgent(); findings=r.findings; extra=r.extra; }
-    else if(id==='syllabus') { const r=await _runSyllabusAgent(); findings=r.findings; extra=r.extra; }
-    else if(id==='reco') { const r=await _runRecoAgent(); findings=r.findings; extra=r.extra; }
+    let lessons=[];
+    if(id==='corpus')  { const r=await _runCorpusAgent();   findings=r.findings; extra=r.extra; }
+    else if(id==='perf')    { const r=await _runPerfAgent();    findings=r.findings; extra=r.extra; }
+    else if(id==='syllabus'){ const r=await _runSyllabusAgent();findings=r.findings; extra=r.extra; }
+    else if(id==='reco')    { const r=await _runRecoAgent();    findings=r.findings; extra=r.extra; }
+    else if(id==='create')  { const r=await _runCreationAgent();findings=r.findings; extra=r.extra; lessons=r.lessons||[]; }
     const ts=_now2();
     _agentDot(id,'done');
     _agentTime(id,'Mis à jour '+ts);
-    _agentRes(id,_findingHtml(findings));
-    _agentStore(id,{findings,extra,ts});
+    _agentRes(id, id==='create'&&lessons.length ? _lessonProposalHtml(lessons) : _findingHtml(findings));
+    _agentStore(id,{findings,extra,lessons,ts});
     _updateAgentBadge();
     _updateSummaryBar();
   }catch(e){
@@ -3336,7 +3436,7 @@ async function runAgent(id){
 async function runAllAgents(){
   const btn=document.getElementById('agentsRunAllBtn');
   btn.disabled=true; btn.textContent='⏳ Analyse en cours…';
-  for(const id of ['corpus','perf','syllabus','reco']) await runAgent(id);
+  for(const id of ['corpus','perf','syllabus','reco','create']) await runAgent(id);
   btn.disabled=false; btn.textContent='▶ Lancer tous les agents';
   document.getElementById('agentsLastRun').textContent='Dernière analyse : '+_now2();
   localStorage.setItem('agents_last_run',Date.now().toString());
@@ -3429,7 +3529,7 @@ function initAgentsTab(){
   Object.keys(AGENT_DEFS).forEach(id=>{
     if(prefs[id]) document.getElementById('auto-'+id).checked=true;
     const r=_agentResults[id];
-    if(r){ _agentDot(id,'done'); _agentTime(id,'Mis à jour '+r.ts); _agentRes(id,_findingHtml(r.findings)); }
+    if(r){ _agentDot(id,'done'); _agentTime(id,'Mis à jour '+r.ts); _agentRes(id,(id==='create'&&r.lessons?.length)?_lessonProposalHtml(r.lessons):_findingHtml(r.findings)); }
   });
   const last=localStorage.getItem('agents_last_run');
   if(last){
