@@ -3064,10 +3064,45 @@ renderBlocks(); renderQuizEditor();
 syncFromAcademy();
 
 /* ══ TACT ROBOT (Claude AI) ══ */
-const TACT_SYSTEM=`Tu es TACT, l'assistant IA intégré au Tactic Corpus Builder — l'outil de création de contenu pédagogique pour Tactic Academy.
+const TACT_SYSTEM_BASE=`Tu es TACT, l'assistant IA intégré au Tactic Corpus Builder — l'outil de création de contenu pédagogique pour Tactic Academy.
 Tu aides les créateurs de contenu à : créer et structurer des leçons, rédiger des blocs (hook/content/tip/trap), formuler des quiz pertinents, synchroniser le corpus avec GitHub.
+Tu as accès aux résultats des 4 agents IA intégrés (Corpus, Performance, Syllabus, Recommandations) et tu peux les invoquer.
 Domaine : éducation financière (investissement, bourse, ETF, crypto, fiscalité, etc.)
-Ton ton : direct, chaleureux, expert. Réponses courtes (3-5 phrases max). HTML simple autorisé (<b>, <br>). Jamais de markdown avec *.`;
+Ton ton : direct, chaleureux, expert. Réponses courtes (3-5 phrases max). HTML simple autorisé (<b>, <br>, <em>). Jamais de markdown avec *.
+Pour déclencher un agent, utilise UNIQUEMENT la balise sur une ligne isolée : <RUN_AGENT>corpus|perf|syllabus|reco|all</RUN_AGENT>`;
+
+function _buildAgentContext(){
+  _agentLoad();
+  const ids=Object.keys(_agentResults);
+  if(!ids.length) return `\n\n— AGENTS IA : Aucune analyse lancée. Si l'utilisateur pose des questions analytiques, propose de lancer les agents avec <RUN_AGENT>all</RUN_AGENT>.`;
+  const lines=['\n\n— DONNÉES AGENTS IA (analyses les plus récentes) :'];
+  const add=(id,label)=>{
+    const r=_agentResults[id]; if(!r) return;
+    const crit=r.findings.filter(f=>f.sev==='critique').map(f=>f.text);
+    const warn=r.findings.filter(f=>f.sev==='warning').map(f=>f.text);
+    const ok=r.findings.filter(f=>f.sev==='ok').map(f=>f.text);
+    lines.push(`${label} [${r.ts}] : critiques="${crit.join(' | ')||'aucune'}" alertes="${warn.join(' | ')||'aucune'}" ok="${ok.join(' | ')||'aucun'}"`);
+  };
+  add('corpus','🔍 Corpus');
+  add('perf','📊 Performance');
+  if(_agentResults.syllabus){ add('syllabus','🔗 Syllabus'); }
+  else lines.push('🔗 Syllabus : non lancé (syllabus PDF requis dans Explorer)');
+  add('reco','💡 Recommandations');
+  try{
+    const cs=_corpusSummary();
+    lines.push(`— CORPUS : ${cs.total} leçons, ${cs.tracks} modules, niveaux=${JSON.stringify(cs.byLevel)}`);
+  }catch(e){}
+  lines.push('Pour relancer une analyse : <RUN_AGENT>corpus|perf|syllabus|reco|all</RUN_AGENT>');
+  return lines.join('\n');
+}
+
+function _buildTactSystem(){
+  const drawerOpen=isDrawerOpen();
+  if(drawerOpen) return TACT_SYSTEM_CREATE.replace('Nom module',[...new Set(getAllLessons().map(l=>l.track))].slice(0,8).join(', '));
+  return TACT_SYSTEM_BASE+_buildAgentContext();
+}
+
+const TACT_SYSTEM=TACT_SYSTEM_BASE;
 
 const TACT_SYSTEM_CREATE=`Tu es TACT, l'assistant IA intégré au Tactic Corpus Builder. Le formulaire de création de leçon est ouvert.
 Quand l'utilisateur décrit une leçon à créer, génère-la et termine TOUJOURS ta réponse par un bloc JSON spécial sur une ligne isolée :
@@ -3106,11 +3141,21 @@ function tactTyping(show){
 }
 
 function tactSuggestions(){
+  _agentLoad();
   const msgs=document.getElementById('tactMessages');
   const row=document.createElement('div');
   row.className='tact-sugs';
-  const sugs=['Créer une leçon','Structurer un bloc hook','Rédiger un bon quiz','Synchroniser avec Academy','Pousser sur GitHub'];
-  row.innerHTML=sugs.map(s=>`<button class="tact-sug" onclick="sendTact('${s}')">${s}</button>`).join('');
+  const hasData=Object.keys(_agentResults).length>0;
+  const hasCrit=hasData&&Object.values(_agentResults).flatMap(r=>r.findings||[]).some(f=>f.sev==='critique');
+  let sugs;
+  if(!hasData){
+    sugs=['Créer une leçon','Lancer l\'analyse du corpus','Quelles sont les lacunes du corpus ?','Rédiger un bon quiz','Pousser sur GitHub'];
+  } else if(hasCrit){
+    sugs=['Quels sont les problèmes critiques ?','Que dois-je faire en priorité ?','Quelles leçons sont à risque ?','Analyse la corrélation syllabus','Créer une leçon manquante'];
+  } else {
+    sugs=['Résume les analyses des agents','Que recommandes-tu ?','Quels modules améliorer ?','Créer une leçon','Pousser sur GitHub'];
+  }
+  row.innerHTML=sugs.map(s=>`<button class="tact-sug" onclick="sendTact('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
   msgs.appendChild(row);
   msgs.scrollTop=msgs.scrollHeight;
 }
@@ -3134,20 +3179,19 @@ async function sendTact(txt){
       if(btn) btn.disabled=false;
       return;
     }
-    const drawerOpen=isDrawerOpen();
-    const sysPrompt=drawerOpen ? TACT_SYSTEM_CREATE.replace('Nom module',[...new Set(getAllLessons().map(l=>l.track))].slice(0,8).join(', ')) : TACT_SYSTEM;
-    const maxTok=drawerOpen ? 1200 : 400;
+    const sysPrompt=_buildTactSystem();
+    const maxTok=isDrawerOpen()?1200:500;
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTok,system:sysPrompt,messages:_tactHistory.slice(-10)})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTok,system:sysPrompt,messages:_tactHistory.slice(-12)})
     });
     const data=await res.json();
     if(!res.ok) throw new Error(data.error?.message||'Erreur API');
     let reply=data.content?.[0]?.text||'…';
     _tactHistory.push({role:'assistant',content:reply});
     tactTyping(false);
-    // Détecter et appliquer un FILL_LESSON
+    // FILL_LESSON
     const fillMatch=reply.match(/<FILL_LESSON>([\s\S]*?)<\/FILL_LESSON>/);
     if(fillMatch){
       try{
@@ -3155,7 +3199,18 @@ async function sendTact(txt){
         applyLessonToForm(l);
         reply=reply.replace(/<FILL_LESSON>[\s\S]*?<\/FILL_LESSON>/,'')
           .trim()+'<br><br><span style="color:var(--green);font-size:.7rem;">✅ Formulaire rempli — vérifie et sauvegarde !</span>';
-      }catch(e){ /* JSON invalide, on affiche quand même */ }
+      }catch(e){}
+    }
+    // RUN_AGENT
+    const runMatch=reply.match(/<RUN_AGENT>([\s\S]*?)<\/RUN_AGENT>/);
+    if(runMatch){
+      const agId=runMatch[1].trim();
+      reply=reply.replace(/<RUN_AGENT>[\s\S]*?<\/RUN_AGENT>/,'').trim();
+      const label=agId==='all'?'tous les agents':(AGENT_DEFS[agId]?.name||agId);
+      const onclick=agId==='all'
+        ?`showTab('agents',document.getElementById('tabAgentsBtn'));setTimeout(runAllAgents,300)`
+        :`showTab('agents',document.getElementById('tabAgentsBtn'));setTimeout(()=>runAgent('${agId}'),300)`;
+      reply+=`<br><div style="margin-top:.4rem;"><button class="tact-sug" onclick="${onclick}" style="font-size:.68rem;">▶ Lancer ${label}</button></div>`;
     }
     tactAppend('bot',reply);
   }catch(e){
@@ -3424,10 +3479,20 @@ function toggleTact(){
     const msgs=document.getElementById('tactMessages');
     const hasKey=!!localStorage.getItem('tactic_claude_key');
     if(msgs.children.length===0){
-      tactAppend('bot',hasKey
-        ? 'Salut ! 👋 Je suis <b>TACT</b>. Comment puis-je t\'aider ?'
-        : 'Salut ! 👋 Je suis <b>TACT</b>. <button class="tact-sug" onclick="askTactKey()" style="display:inline;margin:0 0 0 4px;">🔑 Saisir la clé Claude</button>'
-      );
+      _agentLoad();
+      const hasData=Object.keys(_agentResults).length>0;
+      const critCount=hasData?Object.values(_agentResults).flatMap(r=>r.findings||[]).filter(f=>f.sev==='critique').length:0;
+      let welcome;
+      if(!hasKey){
+        welcome='Salut ! 👋 Je suis <b>TACT</b>, ton assistant + interface des agents IA. <button class="tact-sug" onclick="askTactKey()" style="display:inline;margin:0 0 0 4px;">🔑 Saisir la clé Claude</button>';
+      } else if(!hasData){
+        welcome='Salut ! 👋 Je suis <b>TACT</b>. Je suis connecté aux 4 agents IA mais aucune analyse n\'a encore été lancée. Lance-les depuis l\'onglet <b>Agents IA</b> pour que je puisse répondre à tes questions analytiques.';
+      } else if(critCount>0){
+        welcome=`⚠️ Attention ! Les agents ont détecté <b style="color:var(--red);">${critCount} problème(s) critique(s)</b> dans le corpus. Demande-moi les détails ou ce que tu dois faire en priorité.`;
+      } else {
+        welcome='Salut ! 👋 Je suis <b>TACT</b> et j\'ai accès aux dernières analyses des agents. Pose-moi tes questions sur le corpus, les performances ou le syllabus.';
+      }
+      tactAppend('bot',welcome);
       tactSuggestions();
     } else if(isDrawerOpen()){
       tactAppend('bot','✏️ Le formulaire est ouvert — décris ta leçon et je remplis tout !');
