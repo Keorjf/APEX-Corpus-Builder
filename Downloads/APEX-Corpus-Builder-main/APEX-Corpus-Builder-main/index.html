@@ -489,7 +489,7 @@ select option{background:var(--bg2);}
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab-btn" onclick="openExploreDrawer()">Explorer</button>
+  <button class="tab-btn" onclick="showTab('explore',this)">Explorer</button>
   <button class="tab-btn active" onclick="showTab('suggest',this)">Idées</button>
   <button class="tab-btn" onclick="showTab('export',this)">Exporter</button>
   <button class="tab-btn" onclick="showTab('stats',this)">Stats</button>
@@ -851,7 +851,7 @@ function showTab(id,btn){
   if(id==='stats') renderStats();
   if(id==='export') updateBatchInfo();
   if(id==='suggest'){ renderSuggestions(); renderModuleIdeas(); }
-  if(id==='explore') openExploreDrawer();
+  if(id==='explore'){ const sn=localStorage.getItem('syllabus_name'); if(sn&&!_syllabusUrl){ const el=document.getElementById('syllabusStatus'); if(el) el.innerHTML=`Dernier syllabus : <em>${sn}</em> — rechargez le fichier pour le consulter.`; } }
 }
 
 function openCreatePanel(){
@@ -2902,15 +2902,6 @@ function applyLessonToForm(l){
   else quizList=[{q:'',opts:['','','',''],correct:0,expl:''}];
   renderQuizEditor();
 }
-
-// Restore syllabus name hint from previous session
-(function(){
-  const sn=localStorage.getItem('syllabus_name');
-  if(sn) setTimeout(()=>{
-    const el=document.getElementById('syllabusStatus');
-    if(el) el.innerHTML=`Dernier syllabus : <em>${sn}</em> — rechargez le fichier pour le consulter.`;
-  },0);
-})();
 
 function askTactKey(){
   const k=prompt('Clé API Claude (sk-ant-…)\n\nconsole.anthropic.com → API Keys');
