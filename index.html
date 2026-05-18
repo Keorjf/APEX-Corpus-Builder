@@ -501,8 +501,27 @@ select option{background:var(--bg2);}
 
   <!-- EXPLORER -->
   <div class="section-tab" id="tab-explore">
-    <div style="display:flex;align-items:center;justify-content:center;height:200px;">
-      <button class="btn primary" style="font-size:.85rem;padding:.7rem 1.6rem;" onclick="openExploreDrawer()">Ouvrir l'explorateur</button>
+    <div style="max-width:700px;margin:2rem auto;padding:0 1rem;">
+
+      <!-- SYLLABUS GÉNÉRAL -->
+      <div class="export-box" style="margin-bottom:1.4rem;">
+        <div class="export-title">📋 Syllabus Général</div>
+        <div style="font-size:.74rem;color:var(--soft);margin-bottom:.9rem;line-height:1.6;">Charge le syllabus PDF des cours pour le consulter et l'annoter directement dans l'app. Les annotations sont sauvegardées localement.</div>
+        <input type="file" id="syllabusInput" accept=".pdf" style="display:none;" onchange="loadSyllabus(this)">
+        <div class="btn-row">
+          <button class="btn primary" onclick="document.getElementById('syllabusInput').click()">📄 Charger le syllabus</button>
+          <button class="btn" id="syllabusOpenBtn" onclick="openSyllabusModal()" style="display:none;">Ouvrir &amp; annoter →</button>
+        </div>
+        <div id="syllabusStatus" style="margin-top:.6rem;font-size:.75rem;color:var(--soft);min-height:1rem;"></div>
+      </div>
+
+      <!-- EXPLORER BUTTON -->
+      <div class="export-box">
+        <div class="export-title">🔍 Explorer les leçons</div>
+        <div style="font-size:.74rem;color:var(--soft);margin-bottom:.9rem;line-height:1.6;">Parcours le corpus par module, filtre par niveau et consulte le détail de chaque leçon.</div>
+        <button class="btn primary" style="font-size:.82rem;padding:.6rem 1.4rem;" onclick="openExploreDrawer()">Ouvrir l'explorateur</button>
+      </div>
+
     </div>
   </div>
 
@@ -595,18 +614,6 @@ select option{background:var(--bg2);}
   <div class="section-tab active" id="tab-suggest">
     <div class="editor-wrap">
       <div class="editor-hdr"><div><div class="editor-title">Idées de leçons</div><div style="font-size:.68rem;color:var(--muted);">Idées par module + import PDF</div></div></div>
-
-      <!-- SYLLABUS GÉNÉRAL -->
-      <div class="export-box" style="margin-bottom:1.2rem;">
-        <div class="export-title">📋 Syllabus Général</div>
-        <div style="font-size:.74rem;color:var(--soft);margin-bottom:.8rem;line-height:1.6;">Charge le syllabus PDF des cours pour le consulter et l'annoter directement dans l'app. Les annotations sont sauvegardées localement.</div>
-        <input type="file" id="syllabusInput" accept=".pdf" style="display:none;" onchange="loadSyllabus(this)">
-        <div class="btn-row">
-          <button class="btn primary" onclick="document.getElementById('syllabusInput').click()">📄 Charger le syllabus</button>
-          <button class="btn" id="syllabusOpenBtn" onclick="openSyllabusModal()" style="display:none;">Ouvrir &amp; annoter →</button>
-        </div>
-        <div id="syllabusStatus" style="margin-top:.6rem;font-size:.75rem;color:var(--soft);min-height:1rem;"></div>
-      </div>
 
       <!-- PDF IMPORT -->
       <div class="export-box" style="margin-bottom:1.2rem;">
