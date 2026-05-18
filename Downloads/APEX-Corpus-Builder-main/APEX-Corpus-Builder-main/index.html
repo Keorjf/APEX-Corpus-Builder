@@ -520,6 +520,24 @@ select option{background:var(--bg2);}
 .agents-summary-stat{display:flex;flex-direction:column;align-items:center;gap:.1rem;}
 .agents-summary-num{font-size:1.2rem;font-weight:700;font-family:var(--font-title);}
 .agents-summary-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+
+/* Marketing tab */
+.mkt-page{max-width:1100px;margin:0 auto;padding:.5rem 0 2rem;}
+.mkt-kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.8rem;margin-bottom:1.2rem;}
+.mkt-kpi{background:var(--bg1);border:1px solid var(--border2);border-radius:12px;padding:.8rem 1rem;display:flex;flex-direction:column;gap:.2rem;}
+.mkt-kpi-val{font-family:var(--font-title);font-size:1.3rem;color:var(--gold);}
+.mkt-kpi-lbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.mkt-kpi-sub{font-size:.65rem;color:var(--soft);}
+.mkt-tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border2);}
+.mkt-tbl{width:100%;border-collapse:collapse;font-size:.73rem;}
+.mkt-tbl th{background:var(--bg2);padding:.5rem .75rem;text-align:left;font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border2);white-space:nowrap;}
+.mkt-tbl td{padding:.45rem .75rem;border-bottom:1px solid var(--border);color:var(--txt);white-space:nowrap;}
+.mkt-tbl tr:last-child td{border-bottom:none;}
+.mkt-tbl tr:hover td{background:rgba(255,255,255,.03);}
+.mkt-pill{display:inline-block;border-radius:20px;padding:.15rem .5rem;font-size:.6rem;font-weight:700;}
+.mkt-channel{background:rgba(77,158,255,.15);color:var(--blue);border-radius:20px;padding:.12rem .45rem;font-size:.62rem;}
+.mkt-upload-hint{font-size:.7rem;color:var(--muted);line-height:1.7;margin-bottom:.8rem;}
+.mkt-upload-hint code{background:var(--bg2);padding:.1rem .3rem;border-radius:3px;font-family:var(--font-mono);font-size:.65rem;}
 </style>
 </head>
 <body>
@@ -542,6 +560,7 @@ select option{background:var(--bg2);}
   <button class="tab-btn" onclick="showTab('export',this)">Exporter</button>
   <button class="tab-btn" onclick="showTab('stats',this)">Stats</button>
   <button class="tab-btn" id="tabAgentsBtn" onclick="showTab('agents',this)">Agents IA</button>
+  <button class="tab-btn" onclick="showTab('marketing',this)">Marketing</button>
 </div>
 
 <div class="main">
@@ -852,7 +871,61 @@ select option{background:var(--bg2);}
           </div>
         </div>
 
+        <!-- Agent Marketing -->
+        <div class="agent-card" id="card-marketing" style="border-color:rgba(77,158,255,.2);">
+          <div class="agent-card-hdr">
+            <div class="agent-dot idle" id="dot-marketing"></div>
+            <span class="agent-name">📣 Agent Marketing</span>
+            <span class="agent-run-time" id="time-marketing">—</span>
+          </div>
+          <div class="agent-role">Analyse les campagnes marketing importées : ROI, canaux performants, taux de conversion, budget optimisation et corrélation avec les performances du corpus.</div>
+          <div class="agent-results" id="res-marketing"><span style="color:var(--muted);font-style:italic;">Importez des données marketing dans l'onglet Marketing.</span></div>
+          <div class="agent-footer">
+            <button class="btn primary" style="font-size:.7rem;background:var(--blue);border-color:var(--blue);" onclick="runAgent('marketing')" id="btn-marketing">▶ Analyser</button>
+            <label class="agent-auto-label"><input type="checkbox" id="auto-marketing" onchange="setAgentAuto('marketing',this.checked)"> Auto</label>
+          </div>
+        </div>
+
       </div>
+    </div>
+  </div>
+
+  <!-- MARKETING -->
+  <div class="section-tab" id="tab-marketing">
+    <div class="mkt-page">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:.8rem;">
+        <div>
+          <div style="font-family:var(--font-title);font-size:1.1rem;color:var(--gold);letter-spacing:.04em;">📣 Marketing</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:.15rem;">Analyse des performances de campagnes marketing</div>
+        </div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+          <button class="btn" id="mktAgentBtn" onclick="showTab('agents',document.querySelector('[onclick*=showTab][onclick*=agents]'));setTimeout(()=>runAgent('marketing'),300)" style="font-size:.7rem;">🤖 Lancer l'Agent Marketing</button>
+          <button class="btn danger" id="mktClearBtn" onclick="clearMarketingData()" style="display:none;font-size:.7rem;">🗑 Effacer</button>
+        </div>
+      </div>
+
+      <!-- Import -->
+      <div class="export-box" style="margin-bottom:1.2rem;">
+        <div class="export-title">📁 Importer des données</div>
+        <div class="mkt-upload-hint">
+          Fichier CSV avec colonnes (séparateur <code>,</code> ou <code>;</code>) :<br>
+          <code>Campagne</code> · <code>Canal</code> · <code>Budget</code> · <code>Portée</code> · <code>Clics</code> · <code>Conversions</code> · <code>Revenu</code> · <code>Date</code>
+        </div>
+        <input type="file" id="mktInput" accept=".csv,.tsv" style="display:none;" onchange="loadMarketingCSV(this)">
+        <div class="btn-row">
+          <button class="btn primary" onclick="document.getElementById('mktInput').click()">📂 Importer CSV</button>
+          <button class="btn" onclick="loadSampleMarketing()">Données exemple</button>
+        </div>
+        <div id="mktStatus" style="margin-top:.6rem;font-size:.75rem;color:var(--soft);min-height:1rem;"></div>
+      </div>
+
+      <!-- KPIs -->
+      <div id="mktKpis" style="display:none;margin-bottom:1.2rem;"></div>
+
+      <!-- Table -->
+      <div id="mktTable" style="display:none;"></div>
+
     </div>
   </div>
 
@@ -1014,6 +1087,7 @@ function showTab(id,btn){
   if(id==='suggest'){ renderSuggestions(); renderModuleIdeas(); }
   if(id==='explore') renderSyllabusAnnots();
   if(id==='agents') initAgentsTab();
+  if(id==='marketing') initMarketing();
 }
 
 function openCreatePanel(){
@@ -1857,11 +1931,187 @@ function renderSyllabusHistory(){
     </div>`).join('');
 }
 
+/* ══════════════════════════════════════════════
+   MARKETING — Données campagnes
+   ══════════════════════════════════════════════ */
+let _mktData=[];
+
+function _parseMktCSV(text){
+  const lines=text.trim().split(/\r?\n/);
+  if(lines.length<2) return [];
+  const sep=lines[0].includes(';')?';':',';
+  const norm=h=>h.trim().toLowerCase()
+    .replace(/campagne|campaign|nom|name/,'name')
+    .replace(/canal|channel|chaîne/,'channel')
+    .replace(/portée|portee|reach|impressions/,'reach')
+    .replace(/clics|clicks|cliques/,'clicks')
+    .replace(/conversions?/,'conversions')
+    .replace(/revenu|revenue|ca|chiffre/,'revenue')
+    .replace(/budget/,'budget')
+    .replace(/date|période|mois/,'date');
+  const headers=lines[0].split(sep).map(norm);
+  return lines.slice(1).filter(l=>l.trim()).map(line=>{
+    const vals=line.split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
+    const obj={};
+    headers.forEach((h,i)=>{ obj[h]=vals[i]||''; });
+    // normalize numbers
+    ['budget','reach','clicks','conversions','revenue'].forEach(k=>{
+      obj[k]=parseFloat((obj[k]||'0').replace(/[^\d.-]/g,''))||0;
+    });
+    return obj;
+  }).filter(r=>r.name);
+}
+
+function loadMarketingCSV(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const data=_parseMktCSV(e.target.result);
+    if(!data.length){ toast('Aucune donnée valide dans le CSV','error'); return; }
+    _mktData=data;
+    localStorage.setItem('tactic_mkt',JSON.stringify(data));
+    document.getElementById('mktStatus').innerHTML=`<span style="color:var(--green);">✓</span> ${data.length} campagne(s) chargée(s) — ${file.name}`;
+    document.getElementById('mktClearBtn').style.display='';
+    renderMarketingDashboard();
+    toast(`${data.length} campagnes importées`);
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+function loadSampleMarketing(){
+  _mktData=[
+    {name:'Newsletter Juin',channel:'Email',budget:500,reach:12000,clicks:1400,conversions:85,revenue:3200,date:'2025-06'},
+    {name:'Instagram Stories',channel:'Social',budget:800,reach:45000,clicks:2100,conversions:62,revenue:1900,date:'2025-06'},
+    {name:'Google Ads Bourse',channel:'SEA',budget:1200,reach:8500,clicks:920,conversions:110,revenue:5800,date:'2025-06'},
+    {name:'Webinaire ETF',channel:'Email',budget:200,reach:3200,clicks:890,conversions:145,revenue:4100,date:'2025-05'},
+    {name:'Facebook Retargeting',channel:'Social',budget:650,reach:28000,clicks:1100,conversions:38,revenue:1200,date:'2025-05'},
+    {name:'LinkedIn Organique',channel:'Social',budget:0,reach:6800,clicks:430,conversions:22,revenue:880,date:'2025-05'},
+    {name:'SEO Article Crypto',channel:'SEO',budget:300,reach:15000,clicks:1800,conversions:95,revenue:2800,date:'2025-04'},
+    {name:'Podcast Sponsoring',channel:'Audio',budget:900,reach:22000,clicks:650,conversions:41,revenue:1600,date:'2025-04'},
+  ];
+  localStorage.setItem('tactic_mkt',JSON.stringify(_mktData));
+  document.getElementById('mktStatus').innerHTML=`<span style="color:var(--green);">✓</span> ${_mktData.length} campagnes exemple chargées`;
+  document.getElementById('mktClearBtn').style.display='';
+  renderMarketingDashboard();
+  toast('Données exemple chargées');
+}
+
+function clearMarketingData(){
+  _mktData=[];
+  localStorage.removeItem('tactic_mkt');
+  document.getElementById('mktStatus').textContent='';
+  document.getElementById('mktClearBtn').style.display='none';
+  document.getElementById('mktKpis').style.display='none';
+  document.getElementById('mktTable').style.display='none';
+  toast('Données marketing effacées');
+}
+
+function initMarketing(){
+  try{
+    const raw=localStorage.getItem('tactic_mkt');
+    if(raw){ _mktData=JSON.parse(raw); }
+  }catch(e){}
+  if(_mktData.length){
+    document.getElementById('mktStatus').innerHTML=`<span style="color:var(--green);">✓</span> ${_mktData.length} campagne(s) en mémoire`;
+    document.getElementById('mktClearBtn').style.display='';
+    renderMarketingDashboard();
+  }
+}
+
+function _mktROI(d){ return d.budget>0?((d.revenue-d.budget)/d.budget*100):0; }
+function _mktCTR(d){ return d.reach>0?(d.clicks/d.reach*100):0; }
+function _mktCVR(d){ return d.clicks>0?(d.conversions/d.clicks*100):0; }
+function _mktCPL(d){ return d.conversions>0?(d.budget/d.conversions):0; }
+function _mktHealth(d){
+  const roi=_mktROI(d);
+  if(roi>200) return {score:90,col:'var(--green)',lbl:'Excellent'};
+  if(roi>50)  return {score:70,col:'var(--blue)',lbl:'Bon'};
+  if(roi>0)   return {score:50,col:'var(--gold)',lbl:'Moyen'};
+  return        {score:20,col:'var(--red)',lbl:'Déficit'};
+}
+
+function renderMarketingDashboard(){
+  if(!_mktData.length) return;
+  const totalBudget=_mktData.reduce((s,d)=>s+d.budget,0);
+  const totalRevenue=_mktData.reduce((s,d)=>s+d.revenue,0);
+  const totalReach=_mktData.reduce((s,d)=>s+d.reach,0);
+  const totalConv=_mktData.reduce((s,d)=>s+d.conversions,0);
+  const globalROI=totalBudget>0?((totalRevenue-totalBudget)/totalBudget*100):0;
+  const byChannel={};
+  _mktData.forEach(d=>{
+    if(!byChannel[d.channel]) byChannel[d.channel]={budget:0,revenue:0,conversions:0};
+    byChannel[d.channel].budget+=d.budget;
+    byChannel[d.channel].revenue+=d.revenue;
+    byChannel[d.channel].conversions+=d.conversions;
+  });
+  const bestChannel=Object.entries(byChannel).sort((a,b)=>(b[1].revenue-b[1].budget)-(a[1].revenue-a[1].budget))[0];
+  const bestCamp=[..._mktData].sort((a,b)=>_mktROI(b)-_mktROI(a))[0];
+  const worstCamp=[..._mktData].sort((a,b)=>_mktROI(a)-_mktROI(b))[0];
+  const fmt=n=>n>=1000?`${(n/1000).toFixed(1)}k`:n.toFixed(0);
+
+  const kpiEl=document.getElementById('mktKpis');
+  kpiEl.style.display='';
+  kpiEl.innerHTML=`<div class="mkt-kpi-grid">
+    <div class="mkt-kpi"><div class="mkt-kpi-val">${fmt(totalBudget)}€</div><div class="mkt-kpi-lbl">Budget total</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val" style="color:${globalROI>0?'var(--green)':'var(--red)'};">${globalROI.toFixed(0)}%</div><div class="mkt-kpi-lbl">ROI global</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val">${fmt(totalRevenue)}€</div><div class="mkt-kpi-lbl">Revenu total</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val">${fmt(totalReach)}</div><div class="mkt-kpi-lbl">Portée totale</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val">${totalConv}</div><div class="mkt-kpi-lbl">Conversions</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val" style="color:var(--green);">${bestChannel?bestChannel[0]:'—'}</div><div class="mkt-kpi-lbl">Meilleur canal</div><div class="mkt-kpi-sub">ROI ${bestChannel?((bestChannel[1].revenue-bestChannel[1].budget)/Math.max(bestChannel[1].budget,1)*100).toFixed(0):0}%</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val" style="color:var(--green);font-size:.85rem;">${bestCamp?.name||'—'}</div><div class="mkt-kpi-lbl">Top campagne</div><div class="mkt-kpi-sub">ROI ${_mktROI(bestCamp||{}).toFixed(0)}%</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val" style="color:var(--red);font-size:.85rem;">${worstCamp?.name||'—'}</div><div class="mkt-kpi-lbl">À optimiser</div><div class="mkt-kpi-sub">ROI ${_mktROI(worstCamp||{}).toFixed(0)}%</div></div>
+  </div>`;
+
+  const sorted=[..._mktData].sort((a,b)=>_mktROI(b)-_mktROI(a));
+  const tblEl=document.getElementById('mktTable');
+  tblEl.style.display='';
+  tblEl.innerHTML=`
+    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.5rem;">Détail des campagnes</div>
+    <div class="mkt-tbl-wrap"><table class="mkt-tbl">
+      <thead><tr>
+        <th>Campagne</th><th>Canal</th><th>Budget</th><th>Portée</th><th>Clics</th><th>Conv.</th><th>Revenu</th><th>ROI</th><th>CTR</th><th>CVR</th><th>Santé</th>
+      </tr></thead>
+      <tbody>${sorted.map(d=>{
+        const h=_mktHealth(d);
+        const roi=_mktROI(d);
+        return `<tr>
+          <td style="font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;">${d.name}</td>
+          <td><span class="mkt-channel">${d.channel||'—'}</span></td>
+          <td>${d.budget?d.budget.toLocaleString('fr-FR')+'€':'—'}</td>
+          <td>${d.reach?fmt(d.reach):'—'}</td>
+          <td>${d.clicks?fmt(d.clicks):'—'}</td>
+          <td>${d.conversions||'—'}</td>
+          <td style="color:${d.revenue>d.budget?'var(--green)':'var(--red)'};">${d.revenue?d.revenue.toLocaleString('fr-FR')+'€':'—'}</td>
+          <td style="font-weight:700;color:${roi>0?'var(--green)':'var(--red)'};">${roi.toFixed(0)}%</td>
+          <td>${_mktCTR(d).toFixed(1)}%</td>
+          <td>${_mktCVR(d).toFixed(1)}%</td>
+          <td><span class="mkt-pill" style="background:${h.col}22;color:${h.col};">${h.lbl}</span></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+}
+
 function deleteHistoryEntry(i){
   const hist=JSON.parse(localStorage.getItem('syllabus_history')||'[]');
   hist.splice(i,1);
   localStorage.setItem('syllabus_history',JSON.stringify(hist));
   renderSyllabusHistory();
+}
+
+/* ── AGENT MARKETING ── */
+async function _runMarketingAgent(){
+  if(!_mktData.length) return {findings:[{sev:'warning',text:'Aucune donnée marketing importée. Allez dans l\'onglet Marketing pour charger un CSV.'}],extra:{}};
+  const summary=_mktData.map(d=>({
+    name:d.name,channel:d.channel,budget:d.budget,revenue:d.revenue,
+    roi:Math.round(_mktROI(d)),ctr:+_mktCTR(d).toFixed(1),cvr:+_mktCVR(d).toFixed(1),conversions:d.conversions
+  }));
+  const prompt=`Tu es expert en marketing digital et acquisition. Analyse ces données de campagnes marketing et génère des findings JSON.
+Campagnes : ${JSON.stringify(summary,null,2)}
+Retourne UNIQUEMENT un tableau JSON : [{"sev":"critique|warning|ok","text":"finding concis en français"}]
+Max 8 findings. Focus : ROI négatif, canaux sous-performants, budget mal alloué, opportunités de scaling, optimisation conversion.`;
+  const findings=await _claudeAgentCall(prompt);
+  const totalROI=_mktData.reduce((s,d)=>s+_mktROI(d),0)/_mktData.length;
+  return {findings,extra:{campaigns:_mktData.length,avgROI:Math.round(totalROI)}};
 }
 
 /* ── AGENT CRÉATION ── */
@@ -3164,7 +3414,7 @@ Tu aides les créateurs de contenu à : créer et structurer des leçons, rédig
 Tu as accès aux résultats des 4 agents IA intégrés (Corpus, Performance, Syllabus, Recommandations) et tu peux les invoquer.
 Domaine : éducation financière (investissement, bourse, ETF, crypto, fiscalité, etc.)
 Ton ton : direct, chaleureux, expert. Réponses courtes (3-5 phrases max). HTML simple autorisé (<b>, <br>, <em>). Jamais de markdown avec *.
-Pour déclencher un agent, utilise UNIQUEMENT la balise sur une ligne isolée : <RUN_AGENT>corpus|perf|syllabus|reco|create|all</RUN_AGENT>
+Pour déclencher un agent, utilise UNIQUEMENT la balise sur une ligne isolée : <RUN_AGENT>corpus|perf|syllabus|reco|create|marketing|all</RUN_AGENT>
 L'Agent Création génère des leçons complètes prêtes à importer. Si l'utilisateur demande de créer des leçons automatiquement ou de combler les lacunes, utilise <RUN_AGENT>create</RUN_AGENT>.`;
 
 function _buildAgentContext(){
@@ -3191,7 +3441,9 @@ function _buildAgentContext(){
   if(_agentResults.create?.lessons?.length){
     lines.push(`🛠️ Création : ${_agentResults.create.lessons.length} leçon(s) générée(s) prêtes à importer : ${_agentResults.create.lessons.map(l=>l.name).join(', ')}`);
   }
-  lines.push('Pour relancer une analyse : <RUN_AGENT>corpus|perf|syllabus|reco|create|all</RUN_AGENT>');
+  if(_agentResults.marketing){ add('marketing','📣 Marketing'); }
+  else if(_mktData.length) lines.push('📣 Marketing : données chargées ('+_mktData.length+' campagnes) — agent non lancé');
+  lines.push('Pour relancer une analyse : <RUN_AGENT>corpus|perf|syllabus|reco|create|marketing|all</RUN_AGENT>');
   return lines.join('\n');
 }
 
@@ -3341,6 +3593,7 @@ function applyLessonToForm(l){
 }
 
 initSyllabus();
+initMarketing();
 
 /* ══════════════════════════════════════════════
    AGENTS IA — Analyse continue du corpus
@@ -3350,7 +3603,8 @@ const AGENT_DEFS={
   perf:  {id:'perf',   name:'Agent Performance'},
   syllabus:{id:'syllabus',name:'Agent Syllabus'},
   reco:  {id:'reco',   name:'Agent Recommandations'},
-  create:{id:'create', name:'Agent Création'}
+  create:   {id:'create',    name:'Agent Création'},
+  marketing:{id:'marketing', name:'Agent Marketing'}
 };
 let _agentResults={};
 let _agentAutoTimer=null;
@@ -3420,7 +3674,8 @@ async function runAgent(id){
     else if(id==='perf')    { const r=await _runPerfAgent();    findings=r.findings; extra=r.extra; }
     else if(id==='syllabus'){ const r=await _runSyllabusAgent();findings=r.findings; extra=r.extra; }
     else if(id==='reco')    { const r=await _runRecoAgent();    findings=r.findings; extra=r.extra; }
-    else if(id==='create')  { const r=await _runCreationAgent();findings=r.findings; extra=r.extra; lessons=r.lessons||[]; }
+    else if(id==='create')    { const r=await _runCreationAgent();findings=r.findings; extra=r.extra; lessons=r.lessons||[]; }
+    else if(id==='marketing') { const r=await _runMarketingAgent();findings=r.findings; extra=r.extra; }
     const ts=_now2();
     _agentDot(id,'done');
     _agentTime(id,'Mis à jour '+ts);
@@ -3438,7 +3693,7 @@ async function runAgent(id){
 async function runAllAgents(){
   const btn=document.getElementById('agentsRunAllBtn');
   btn.disabled=true; btn.textContent='⏳ Analyse en cours…';
-  for(const id of ['corpus','perf','syllabus','reco','create']) await runAgent(id);
+  for(const id of ['corpus','perf','syllabus','reco','create','marketing']) await runAgent(id);
   btn.disabled=false; btn.textContent='▶ Lancer tous les agents';
   document.getElementById('agentsLastRun').textContent='Dernière analyse : '+_now2();
   localStorage.setItem('agents_last_run',Date.now().toString());
