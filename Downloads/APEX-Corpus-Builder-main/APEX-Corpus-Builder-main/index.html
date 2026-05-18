@@ -485,6 +485,41 @@ select option{background:var(--bg2);}
 .syllabus-hist-annot{font-size:.68rem;color:var(--txt);border-top:1px solid var(--border);padding-top:.3rem;margin-top:.3rem;line-height:1.5;}
 .syllabus-hist-del{background:none;border:none;color:var(--red);font-size:.6rem;cursor:pointer;margin-top:.25rem;opacity:.6;padding:0;display:block;}
 .syllabus-hist-del:hover{opacity:1;}
+/* ── AGENTS IA ── */
+.agents-page{max-width:1100px;margin:0 auto;padding:.5rem 0 2rem;}
+.agents-topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+.agents-title{font-family:var(--font-title);font-size:1.1rem;color:var(--gold);letter-spacing:.04em;}
+.agents-subtitle{font-size:.72rem;color:var(--muted);margin-top:.15rem;}
+.agents-global-status{font-size:.68rem;color:var(--muted);font-family:var(--font-mono);}
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;}
+.agent-card{background:var(--bg1);border:1px solid var(--border2);border-radius:14px;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.55rem;transition:.2s;}
+.agent-card:hover{border-color:rgba(255,205,13,.25);}
+.agent-card-hdr{display:flex;align-items:center;gap:.5rem;}
+.agent-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;transition:.3s;}
+.agent-dot.idle{background:var(--muted);}
+.agent-dot.running{background:var(--gold);animation:agentPulse 1.2s ease-in-out infinite;}
+.agent-dot.done{background:var(--green);}
+.agent-dot.error{background:var(--red);}
+@keyframes agentPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.7);}}
+.agent-name{font-size:.82rem;font-weight:700;color:var(--txt);}
+.agent-run-time{font-size:.6rem;color:var(--muted);margin-left:auto;font-family:var(--font-mono);}
+.agent-role{font-size:.7rem;color:var(--soft);line-height:1.5;}
+.agent-results{background:var(--bg2);border-radius:8px;padding:.6rem .75rem;font-size:.71rem;color:var(--txt);line-height:1.6;min-height:56px;flex:1;overflow-y:auto;max-height:200px;}
+.agent-results::-webkit-scrollbar{width:3px;}.agent-results::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.agent-finding{display:flex;gap:.4rem;margin-bottom:.3rem;align-items:flex-start;}
+.agent-finding-icon{flex-shrink:0;margin-top:.05rem;}
+.agent-footer{display:flex;align-items:center;gap:.5rem;margin-top:.1rem;}
+.agent-auto-label{display:flex;align-items:center;gap:.3rem;font-size:.65rem;color:var(--muted);cursor:pointer;margin-left:auto;}
+.agent-auto-label input{accent-color:var(--gold);cursor:pointer;}
+.agents-run-all-btn{background:linear-gradient(135deg,var(--gold),#ffaa00);color:#000;border:none;border-radius:10px;padding:.55rem 1.2rem;font-family:var(--font-body);font-size:.78rem;font-weight:700;cursor:pointer;transition:.15s;letter-spacing:.03em;}
+.agents-run-all-btn:hover{opacity:.88;}
+.agents-run-all-btn:disabled{opacity:.45;cursor:not-allowed;}
+.agent-badge{background:var(--red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.52rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin-left:.3rem;}
+.tab-btn .agent-badge{vertical-align:middle;}
+.agents-summary-bar{background:var(--bg1);border:1px solid var(--border2);border-radius:10px;padding:.65rem 1rem;margin-bottom:1rem;display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;}
+.agents-summary-stat{display:flex;flex-direction:column;align-items:center;gap:.1rem;}
+.agents-summary-num{font-size:1.2rem;font-weight:700;font-family:var(--font-title);}
+.agents-summary-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
 </style>
 </head>
 <body>
@@ -506,6 +541,7 @@ select option{background:var(--bg2);}
   <button class="tab-btn active" onclick="showTab('suggest',this)">Idées</button>
   <button class="tab-btn" onclick="showTab('export',this)">Exporter</button>
   <button class="tab-btn" onclick="showTab('stats',this)">Stats</button>
+  <button class="tab-btn" id="tabAgentsBtn" onclick="showTab('agents',this)">Agents IA</button>
 </div>
 
 <div class="main">
@@ -716,6 +752,95 @@ select option{background:var(--bg2);}
     </div>
   </div>
 
+  <!-- AGENTS IA -->
+  <div class="section-tab" id="tab-agents">
+    <div class="agents-page">
+
+      <div class="agents-topbar">
+        <div>
+          <div class="agents-title">🤖 Agents IA</div>
+          <div class="agents-subtitle">Analyse continue du corpus, des performances et de la corrélation syllabus</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;">
+          <span class="agents-global-status" id="agentsLastRun">Aucune analyse lancée</span>
+          <button class="agents-run-all-btn" id="agentsRunAllBtn" onclick="runAllAgents()">▶ Lancer tous les agents</button>
+        </div>
+      </div>
+
+      <!-- Summary bar -->
+      <div class="agents-summary-bar" id="agentsSummaryBar" style="display:none;">
+        <div class="agents-summary-stat"><span class="agents-summary-num" id="sum-critiques" style="color:var(--red);">0</span><span class="agents-summary-lbl">Critiques</span></div>
+        <div class="agents-summary-stat"><span class="agents-summary-num" id="sum-warnings" style="color:var(--gold);">0</span><span class="agents-summary-lbl">Alertes</span></div>
+        <div class="agents-summary-stat"><span class="agents-summary-num" id="sum-ok" style="color:var(--green);">0</span><span class="agents-summary-lbl">OK</span></div>
+        <div class="agents-summary-stat" style="margin-left:auto;"><span class="agents-summary-num" id="sum-coverage" style="color:var(--blue);">—</span><span class="agents-summary-lbl">Couverture syllabus</span></div>
+      </div>
+
+      <div class="agents-grid">
+
+        <!-- Agent Corpus -->
+        <div class="agent-card" id="card-corpus">
+          <div class="agent-card-hdr">
+            <div class="agent-dot idle" id="dot-corpus"></div>
+            <span class="agent-name">🔍 Agent Corpus</span>
+            <span class="agent-run-time" id="time-corpus">—</span>
+          </div>
+          <div class="agent-role">Analyse la cohérence et la qualité structurelle du corpus : distribution niveaux/modules, équilibres, tags, lacunes de couverture.</div>
+          <div class="agent-results" id="res-corpus"><span style="color:var(--muted);font-style:italic;">En attente…</span></div>
+          <div class="agent-footer">
+            <button class="btn primary" style="font-size:.7rem;" onclick="runAgent('corpus')" id="btn-corpus">▶ Lancer</button>
+            <label class="agent-auto-label"><input type="checkbox" id="auto-corpus" onchange="setAgentAuto('corpus',this.checked)"> Auto</label>
+          </div>
+        </div>
+
+        <!-- Agent Performance -->
+        <div class="agent-card" id="card-perf">
+          <div class="agent-card-hdr">
+            <div class="agent-dot idle" id="dot-perf"></div>
+            <span class="agent-name">📊 Agent Performance</span>
+            <span class="agent-run-time" id="time-perf">—</span>
+          </div>
+          <div class="agent-role">Analyse les KPIs de chaque leçon (taux quiz, engagement, temps, santé), identifie les leçons à risque et les patterns de décrochage.</div>
+          <div class="agent-results" id="res-perf"><span style="color:var(--muted);font-style:italic;">En attente…</span></div>
+          <div class="agent-footer">
+            <button class="btn primary" style="font-size:.7rem;" onclick="runAgent('perf')" id="btn-perf">▶ Lancer</button>
+            <label class="agent-auto-label"><input type="checkbox" id="auto-perf" onchange="setAgentAuto('perf',this.checked)"> Auto</label>
+          </div>
+        </div>
+
+        <!-- Agent Syllabus -->
+        <div class="agent-card" id="card-syllabus">
+          <div class="agent-card-hdr">
+            <div class="agent-dot idle" id="dot-syllabus"></div>
+            <span class="agent-name">🔗 Agent Syllabus</span>
+            <span class="agent-run-time" id="time-syllabus">—</span>
+          </div>
+          <div class="agent-role">Corrèle le corpus avec le syllabus PDF chargé. Identifie les objectifs couverts, les lacunes critiques et les thèmes surdimensionnés.</div>
+          <div class="agent-results" id="res-syllabus"><span style="color:var(--muted);font-style:italic;">Chargez un syllabus dans l'onglet Explorer pour activer cet agent.</span></div>
+          <div class="agent-footer">
+            <button class="btn primary" style="font-size:.7rem;" onclick="runAgent('syllabus')" id="btn-syllabus">▶ Lancer</button>
+            <label class="agent-auto-label"><input type="checkbox" id="auto-syllabus" onchange="setAgentAuto('syllabus',this.checked)"> Auto</label>
+          </div>
+        </div>
+
+        <!-- Agent Recommandations -->
+        <div class="agent-card" id="card-reco">
+          <div class="agent-card-hdr">
+            <div class="agent-dot idle" id="dot-reco"></div>
+            <span class="agent-name">💡 Agent Recommandations</span>
+            <span class="agent-run-time" id="time-reco">—</span>
+          </div>
+          <div class="agent-role">Synthèse des 3 autres agents. Génère un plan d'action priorisé avec des actions concrètes pour améliorer le corpus cette semaine.</div>
+          <div class="agent-results" id="res-reco"><span style="color:var(--muted);font-style:italic;">Lance d'abord les autres agents.</span></div>
+          <div class="agent-footer">
+            <button class="btn primary" style="font-size:.7rem;" onclick="runAgent('reco')" id="btn-reco">▶ Lancer</button>
+            <label class="agent-auto-label"><input type="checkbox" id="auto-reco" onchange="setAgentAuto('reco',this.checked)"> Auto</label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </div>
 </div>
 
@@ -873,6 +998,7 @@ function showTab(id,btn){
   if(id==='export') updateBatchInfo();
   if(id==='suggest'){ renderSuggestions(); renderModuleIdeas(); }
   if(id==='explore') renderSyllabusAnnots();
+  if(id==='agents') initAgentsTab();
 }
 
 function openCreatePanel(){
@@ -3061,6 +3187,228 @@ function applyLessonToForm(l){
 }
 
 initSyllabus();
+
+/* ══════════════════════════════════════════════
+   AGENTS IA — Analyse continue du corpus
+   ══════════════════════════════════════════════ */
+const AGENT_DEFS={
+  corpus:{id:'corpus',name:'Agent Corpus'},
+  perf:  {id:'perf',  name:'Agent Performance'},
+  syllabus:{id:'syllabus',name:'Agent Syllabus'},
+  reco:  {id:'reco',  name:'Agent Recommandations'}
+};
+let _agentResults={};
+let _agentAutoTimer=null;
+
+function _agentStore(id,data){
+  _agentResults[id]=data;
+  try{ localStorage.setItem('agent_results',JSON.stringify(_agentResults)); }catch(e){}
+}
+function _agentLoad(){
+  try{
+    const raw=localStorage.getItem('agent_results');
+    if(raw) _agentResults=JSON.parse(raw);
+  }catch(e){}
+}
+function _agentDot(id,state){ const d=document.getElementById('dot-'+id); if(d){ d.className='agent-dot '+state; } }
+function _agentTime(id,ts){ const el=document.getElementById('time-'+id); if(el) el.textContent=ts||'—'; }
+function _agentRes(id,html){ const el=document.getElementById('res-'+id); if(el) el.innerHTML=html; }
+function _agentBtn(id,disabled){ const b=document.getElementById('btn-'+id); if(b){ b.disabled=disabled; b.textContent=disabled?'⏳ Analyse…':'▶ Lancer'; } }
+
+function _findingHtml(findings){
+  if(!findings||!findings.length) return '<span style="color:var(--muted);font-style:italic;">Aucun résultat</span>';
+  return findings.map(f=>{
+    const icon=f.sev==='critique'?'🔴':f.sev==='warning'?'🟡':'🟢';
+    return `<div class="agent-finding"><span class="agent-finding-icon">${icon}</span><span>${f.text}</span></div>`;
+  }).join('');
+}
+
+function _now2(){ return new Date().toLocaleString('fr-FR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }
+
+/* ── Build corpus summary for prompts ── */
+function _corpusSummary(){
+  const all=getAllLessons();
+  const tracks=[...new Set(all.map(l=>l.track))];
+  const byLevel={};
+  all.forEach(l=>{ byLevel[l.level]=(byLevel[l.level]||0)+1; });
+  const byTrack={};
+  all.forEach(l=>{ byTrack[l.track]=(byTrack[l.track]||0)+1; });
+  return {
+    total:all.length,
+    tracks:tracks.length,
+    byLevel,
+    byTrack,
+    sample:all.slice(0,20).map(l=>({name:l.name,level:l.level,track:l.track,tag:l.tag}))
+  };
+}
+
+function _perfSummary(){
+  const all=getAllLessons();
+  return all.map(l=>{
+    const k=mockKpis(l.id);
+    return {name:l.name,level:l.level,track:l.track,health:Math.round(calcHealth(k)),
+      quiz:k.quizScore,engagement:k.engagement,completion:k.completion,dropoff:k.dropoff};
+  }).sort((a,b)=>a.health-b.health);
+}
+
+/* ── Agent runners ── */
+async function runAgent(id){
+  if(!localStorage.getItem('tactic_claude_key')){ toast('Clé Claude requise','error'); return; }
+  _agentDot(id,'running');
+  _agentBtn(id,true);
+  _agentRes(id,'<span style="color:var(--gold);">⏳ Analyse en cours…</span>');
+  try{
+    let findings=[];
+    let extra={};
+    if(id==='corpus') { const r=await _runCorpusAgent(); findings=r.findings; extra=r.extra; }
+    else if(id==='perf') { const r=await _runPerfAgent(); findings=r.findings; extra=r.extra; }
+    else if(id==='syllabus') { const r=await _runSyllabusAgent(); findings=r.findings; extra=r.extra; }
+    else if(id==='reco') { const r=await _runRecoAgent(); findings=r.findings; extra=r.extra; }
+    const ts=_now2();
+    _agentDot(id,'done');
+    _agentTime(id,'Mis à jour '+ts);
+    _agentRes(id,_findingHtml(findings));
+    _agentStore(id,{findings,extra,ts});
+    _updateAgentBadge();
+    _updateSummaryBar();
+  }catch(e){
+    _agentDot(id,'error');
+    _agentRes(id,`<span style="color:var(--red);">Erreur : ${e.message}</span>`);
+  }
+  _agentBtn(id,false);
+}
+
+async function runAllAgents(){
+  const btn=document.getElementById('agentsRunAllBtn');
+  btn.disabled=true; btn.textContent='⏳ Analyse en cours…';
+  for(const id of ['corpus','perf','syllabus','reco']) await runAgent(id);
+  btn.disabled=false; btn.textContent='▶ Lancer tous les agents';
+  document.getElementById('agentsLastRun').textContent='Dernière analyse : '+_now2();
+  localStorage.setItem('agents_last_run',Date.now().toString());
+}
+
+async function _claudeAgentCall(prompt,pdfBase64){
+  const content=[];
+  if(pdfBase64) content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:pdfBase64}});
+  content.push({type:'text',text:prompt});
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:claudeHeaders(),
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,
+      messages:[{role:'user',content}]})
+  });
+  const data=await res.json();
+  const raw=data.content?.[0]?.text||'[]';
+  const m=raw.match(/\[[\s\S]*\]/);
+  if(!m) throw new Error('Format JSON invalide');
+  return JSON.parse(m[0]);
+}
+
+async function _runCorpusAgent(){
+  const cs=_corpusSummary();
+  const prompt=`Tu es un expert en ingénierie pédagogique. Analyse ce corpus e-learning et génère une liste de findings JSON.
+Corpus : ${JSON.stringify(cs,null,2)}
+Retourne UNIQUEMENT un tableau JSON : [{"sev":"critique|warning|ok","text":"finding concis en français"}]
+Max 8 findings. Priorité : déséquilibres de niveaux, modules trop petits/grands, tags manquants, lacunes thématiques.`;
+  const findings=await _claudeAgentCall(prompt);
+  return {findings,extra:{total:cs.total,tracks:cs.tracks}};
+}
+
+async function _runPerfAgent(){
+  const ps=_perfSummary();
+  const bottom10=ps.slice(0,10);
+  const avg=Math.round(ps.reduce((s,l)=>s+l.health,0)/Math.max(ps.length,1));
+  const prompt=`Tu es un expert en analytics e-learning. Analyse ces KPIs de leçons et génère des findings JSON.
+Score santé moyen : ${avg}/100
+Leçons les plus à risque : ${JSON.stringify(bottom10,null,2)}
+Retourne UNIQUEMENT un tableau JSON : [{"sev":"critique|warning|ok","text":"finding concis en français"}]
+Max 8 findings. Focus sur patterns de décrochage, quiz trop difficiles, engagement faible.`;
+  const findings=await _claudeAgentCall(prompt);
+  const critiques=ps.filter(l=>l.health<50).length;
+  return {findings,extra:{avg,critiques,total:ps.length}};
+}
+
+async function _runSyllabusAgent(){
+  if(!_syllabusUrl){ return {findings:[{sev:'warning',text:'Aucun syllabus chargé. Allez dans Explorer pour en charger un.'}],extra:{}}; }
+  const rec=await _sDBLoad();
+  if(!rec) return {findings:[{sev:'warning',text:'Syllabus introuvable en mémoire. Rechargez-le dans Explorer.'}],extra:{}};
+  const buf=rec.data;
+  const base64=btoa(String.fromCharCode(...new Uint8Array(buf)));
+  const cs=_corpusSummary();
+  const prompt=`Tu es un expert en ingénierie pédagogique. Compare ce syllabus PDF avec le corpus de leçons suivant et génère des findings de corrélation.
+Corpus (${cs.total} leçons, ${cs.tracks} modules) : ${JSON.stringify(cs.sample,null,2)}
+Analyse le syllabus et retourne UNIQUEMENT un tableau JSON :
+[{"sev":"critique|warning|ok","text":"finding de corrélation concis en français"}]
+Max 8 findings. Focus : objectifs du syllabus non couverts, thèmes surdimensionnés, alignement niveau/contenu.`;
+  const findings=await _claudeAgentCall(prompt,base64);
+  return {findings,extra:{syllabusName:_syllabusName}};
+}
+
+async function _runRecoAgent(){
+  const corpus=_agentResults.corpus?.findings||[];
+  const perf=_agentResults.perf?.findings||[];
+  const syllabus=_agentResults.syllabus?.findings||[];
+  const allFindings=[...corpus,...perf,...syllabus].filter(f=>f.sev!=='ok').map(f=>f.text);
+  if(!allFindings.length) return {findings:[{sev:'ok',text:'Aucun problème critique détecté. Lancez d\'abord les autres agents.'}],extra:{}};
+  const prompt=`Tu es un expert en stratégie pédagogique. Sur la base de ces problèmes identifiés dans un corpus e-learning, génère un plan d'action priorisé.
+Problèmes : ${JSON.stringify(allFindings,null,2)}
+Retourne UNIQUEMENT un tableau JSON de recommandations concrètes :
+[{"sev":"critique|warning|ok","text":"Action concrète et immédiate en français (commence par un verbe d'action)"}]
+Max 6 recommandations, du plus urgent au moins urgent.`;
+  const findings=await _claudeAgentCall(prompt);
+  return {findings,extra:{}};
+}
+
+/* ── Auto mode ── */
+function setAgentAuto(id,enabled){
+  const prefs=JSON.parse(localStorage.getItem('agent_auto')||'{}');
+  prefs[id]=enabled;
+  localStorage.setItem('agent_auto',JSON.stringify(prefs));
+}
+function _getAutoPrefs(){ try{return JSON.parse(localStorage.getItem('agent_auto')||'{}')}catch(e){return {};} }
+
+/* ── Init agents tab ── */
+function initAgentsTab(){
+  _agentLoad();
+  const prefs=_getAutoPrefs();
+  Object.keys(AGENT_DEFS).forEach(id=>{
+    if(prefs[id]) document.getElementById('auto-'+id).checked=true;
+    const r=_agentResults[id];
+    if(r){ _agentDot(id,'done'); _agentTime(id,'Mis à jour '+r.ts); _agentRes(id,_findingHtml(r.findings)); }
+  });
+  const last=localStorage.getItem('agents_last_run');
+  if(last){
+    const elapsed=(Date.now()-parseInt(last))/60000;
+    document.getElementById('agentsLastRun').textContent='Dernière analyse : '+new Date(parseInt(last)).toLocaleString('fr-FR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'});
+    if(elapsed>60){
+      const autoIds=Object.keys(prefs).filter(id=>prefs[id]);
+      if(autoIds.length){ setTimeout(()=>{ autoIds.forEach(id=>runAgent(id)); },1500); }
+    }
+  }
+  _updateSummaryBar();
+}
+
+function _updateAgentBadge(){
+  const all=Object.values(_agentResults);
+  const critiques=all.flatMap(r=>r.findings||[]).filter(f=>f.sev==='critique').length;
+  const btn=document.getElementById('tabAgentsBtn');
+  if(!btn) return;
+  const existing=btn.querySelector('.agent-badge');
+  if(existing) existing.remove();
+  if(critiques>0){ const b=document.createElement('span'); b.className='agent-badge'; b.textContent=critiques; btn.appendChild(b); }
+}
+
+function _updateSummaryBar(){
+  const all=Object.values(_agentResults);
+  if(!all.length) return;
+  const findings=all.flatMap(r=>r.findings||[]);
+  document.getElementById('sum-critiques').textContent=findings.filter(f=>f.sev==='critique').length;
+  document.getElementById('sum-warnings').textContent=findings.filter(f=>f.sev==='warning').length;
+  document.getElementById('sum-ok').textContent=findings.filter(f=>f.sev==='ok').length;
+  const sv=_agentResults.syllabus;
+  document.getElementById('sum-coverage').textContent=sv?'Chargé':'—';
+  document.getElementById('agentsSummaryBar').style.display='';
+}
 
 function askTactKey(){
   const k=prompt('Clé API Claude (sk-ant-…)\n\nconsole.anthropic.com → API Keys');
