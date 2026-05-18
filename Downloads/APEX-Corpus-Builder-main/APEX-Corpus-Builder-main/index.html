@@ -538,6 +538,11 @@ select option{background:var(--bg2);}
 .mkt-channel{background:rgba(77,158,255,.15);color:var(--blue);border-radius:20px;padding:.12rem .45rem;font-size:.62rem;}
 .mkt-upload-hint{font-size:.7rem;color:var(--muted);line-height:1.7;margin-bottom:.8rem;}
 .mkt-upload-hint code{background:var(--bg2);padding:.1rem .3rem;border-radius:3px;font-family:var(--font-mono);font-size:.65rem;}
+.mkt-charts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1rem;margin-bottom:1.2rem;}
+.mkt-chart-card{background:var(--bg1);border:1px solid var(--border2);border-radius:12px;padding:.85rem 1rem;}
+.mkt-chart-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.65rem;}
+.mkt-tbl-toggle{background:none;border:none;color:var(--muted);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:flex;align-items:center;gap:.3rem;padding:.3rem 0;transition:.15s;}
+.mkt-tbl-toggle:hover{color:var(--soft);}
 </style>
 </head>
 <body>
@@ -2030,6 +2035,26 @@ function _mktHealth(d){
   return        {score:20,col:'var(--red)',lbl:'Déficit'};
 }
 
+function _mktChartSVG(data,valFn,fmtFn,colorFn){
+  const sorted=[...data].sort((a,b)=>valFn(b)-valFn(a));
+  const maxV=Math.max(...sorted.map(d=>Math.abs(valFn(d))),1);
+  const BH=20,GAP=7,LW=112,BW=158,VW=62,W=LW+BW+VW;
+  const H=sorted.length*(BH+GAP)-GAP+4;
+  const rows=sorted.map((d,i)=>{
+    const v=valFn(d);
+    const bw=Math.max(Math.abs(v)/maxV*BW,3);
+    const col=colorFn(d,v);
+    const y=i*(BH+GAP)+2;
+    const nm=d.name.length>17?d.name.slice(0,16)+'…':d.name;
+    return `<g>
+      <text x="${LW-5}" y="${y+BH/2+3.5}" text-anchor="end" fill="rgba(255,255,255,.5)" font-size="9.5" font-family="Nunito,sans-serif">${nm}</text>
+      <rect x="${LW}" y="${y}" width="${bw}" height="${BH}" rx="3" fill="${col}" opacity=".85"/>
+      <text x="${LW+bw+5}" y="${y+BH/2+3.5}" fill="${col}" font-size="9.5" font-family="Nunito,sans-serif" font-weight="700">${fmtFn(v)}</text>
+    </g>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;overflow:visible;">${rows}</svg>`;
+}
+
 function renderMarketingDashboard(){
   if(!_mktData.length) return;
   const totalBudget=_mktData.reduce((s,d)=>s+d.budget,0);
@@ -2040,55 +2065,75 @@ function renderMarketingDashboard(){
   const byChannel={};
   _mktData.forEach(d=>{
     if(!byChannel[d.channel]) byChannel[d.channel]={budget:0,revenue:0,conversions:0};
-    byChannel[d.channel].budget+=d.budget;
-    byChannel[d.channel].revenue+=d.revenue;
-    byChannel[d.channel].conversions+=d.conversions;
+    byChannel[d.channel].budget+=d.budget; byChannel[d.channel].revenue+=d.revenue; byChannel[d.channel].conversions+=d.conversions;
   });
   const bestChannel=Object.entries(byChannel).sort((a,b)=>(b[1].revenue-b[1].budget)-(a[1].revenue-a[1].budget))[0];
   const bestCamp=[..._mktData].sort((a,b)=>_mktROI(b)-_mktROI(a))[0];
   const worstCamp=[..._mktData].sort((a,b)=>_mktROI(a)-_mktROI(b))[0];
-  const fmt=n=>n>=1000?`${(n/1000).toFixed(1)}k`:n.toFixed(0);
+  const fmtK=n=>n>=1000?`${(n/1000).toFixed(1)}k`:String(Math.round(n));
+  const fmtE=n=>n>=1000?`${(n/1000).toFixed(1)}k€`:`${Math.round(n)}€`;
 
+  // KPI summary row
   const kpiEl=document.getElementById('mktKpis');
   kpiEl.style.display='';
   kpiEl.innerHTML=`<div class="mkt-kpi-grid">
-    <div class="mkt-kpi"><div class="mkt-kpi-val">${fmt(totalBudget)}€</div><div class="mkt-kpi-lbl">Budget total</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val">${fmtE(totalBudget)}</div><div class="mkt-kpi-lbl">Budget total</div></div>
     <div class="mkt-kpi"><div class="mkt-kpi-val" style="color:${globalROI>0?'var(--green)':'var(--red)'};">${globalROI.toFixed(0)}%</div><div class="mkt-kpi-lbl">ROI global</div></div>
-    <div class="mkt-kpi"><div class="mkt-kpi-val">${fmt(totalRevenue)}€</div><div class="mkt-kpi-lbl">Revenu total</div></div>
-    <div class="mkt-kpi"><div class="mkt-kpi-val">${fmt(totalReach)}</div><div class="mkt-kpi-lbl">Portée totale</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val">${fmtE(totalRevenue)}</div><div class="mkt-kpi-lbl">Revenu total</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val">${fmtK(totalReach)}</div><div class="mkt-kpi-lbl">Portée totale</div></div>
     <div class="mkt-kpi"><div class="mkt-kpi-val">${totalConv}</div><div class="mkt-kpi-lbl">Conversions</div></div>
     <div class="mkt-kpi"><div class="mkt-kpi-val" style="color:var(--green);">${bestChannel?bestChannel[0]:'—'}</div><div class="mkt-kpi-lbl">Meilleur canal</div><div class="mkt-kpi-sub">ROI ${bestChannel?((bestChannel[1].revenue-bestChannel[1].budget)/Math.max(bestChannel[1].budget,1)*100).toFixed(0):0}%</div></div>
-    <div class="mkt-kpi"><div class="mkt-kpi-val" style="color:var(--green);font-size:.85rem;">${bestCamp?.name||'—'}</div><div class="mkt-kpi-lbl">Top campagne</div><div class="mkt-kpi-sub">ROI ${_mktROI(bestCamp||{}).toFixed(0)}%</div></div>
-    <div class="mkt-kpi"><div class="mkt-kpi-val" style="color:var(--red);font-size:.85rem;">${worstCamp?.name||'—'}</div><div class="mkt-kpi-lbl">À optimiser</div><div class="mkt-kpi-sub">ROI ${_mktROI(worstCamp||{}).toFixed(0)}%</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val" style="color:var(--green);font-size:.78rem;">${bestCamp?.name||'—'}</div><div class="mkt-kpi-lbl">Top campagne</div><div class="mkt-kpi-sub">ROI ${_mktROI(bestCamp||{}).toFixed(0)}%</div></div>
+    <div class="mkt-kpi"><div class="mkt-kpi-val" style="color:var(--red);font-size:.78rem;">${worstCamp?.name||'—'}</div><div class="mkt-kpi-lbl">À optimiser</div><div class="mkt-kpi-sub">ROI ${_mktROI(worstCamp||{}).toFixed(0)}%</div></div>
   </div>`;
 
+  // Charts
+  const roiCol=(d,v)=>v>=200?'var(--green)':v>=50?'var(--blue)':v>=0?'var(--gold)':'var(--red)';
+  const cvCol=(d,v)=>v>=10?'var(--green)':v>=5?'var(--blue)':v>=2?'var(--gold)':'var(--red)';
+  const ctrCol=(d,v)=>v>=15?'var(--green)':v>=8?'var(--blue)':v>=3?'var(--gold)':'var(--red)';
+  const charts=[
+    {title:'ROI par campagne (%)',    val:d=>_mktROI(d),   fmt:v=>v.toFixed(0)+'%',      col:roiCol},
+    {title:'Revenu par campagne',     val:d=>d.revenue,    fmt:v=>fmtE(v),               col:()=>'var(--gold)'},
+    {title:'Taux de conversion (CVR)',val:d=>_mktCVR(d),   fmt:v=>v.toFixed(1)+'%',      col:cvCol},
+    {title:'Taux de clic (CTR)',      val:d=>_mktCTR(d),   fmt:v=>v.toFixed(1)+'%',      col:ctrCol},
+    {title:'Conversions',             val:d=>d.conversions,fmt:v=>String(Math.round(v)), col:()=>'var(--purple)'},
+    {title:'Budget investi',          val:d=>d.budget,     fmt:v=>fmtE(v),               col:()=>'rgba(167,139,250,.7)'},
+  ];
+  const chartsHtml=`<div class="mkt-charts-grid">${charts.map(c=>`
+    <div class="mkt-chart-card">
+      <div class="mkt-chart-title">${c.title}</div>
+      ${_mktChartSVG(_mktData,c.val,c.fmt,c.col)}
+    </div>`).join('')}</div>`;
+
+  // Table (collapsible)
   const sorted=[..._mktData].sort((a,b)=>_mktROI(b)-_mktROI(a));
+  const tblHtml=`<div class="mkt-tbl-wrap"><table class="mkt-tbl">
+    <thead><tr><th>Campagne</th><th>Canal</th><th>Budget</th><th>Portée</th><th>Clics</th><th>Conv.</th><th>Revenu</th><th>ROI</th><th>CTR</th><th>CVR</th><th>Santé</th></tr></thead>
+    <tbody>${sorted.map(d=>{
+      const h=_mktHealth(d); const roi=_mktROI(d);
+      return `<tr>
+        <td style="font-weight:600;">${d.name}</td>
+        <td><span class="mkt-channel">${d.channel||'—'}</span></td>
+        <td>${d.budget?fmtE(d.budget):'—'}</td>
+        <td>${d.reach?fmtK(d.reach):'—'}</td>
+        <td>${d.clicks?fmtK(d.clicks):'—'}</td>
+        <td>${d.conversions||'—'}</td>
+        <td style="color:${d.revenue>d.budget?'var(--green)':'var(--red)'};">${d.revenue?fmtE(d.revenue):'—'}</td>
+        <td style="font-weight:700;color:${roi>0?'var(--green)':'var(--red)'};">${roi.toFixed(0)}%</td>
+        <td>${_mktCTR(d).toFixed(1)}%</td>
+        <td>${_mktCVR(d).toFixed(1)}%</td>
+        <td><span class="mkt-pill" style="background:${h.col}22;color:${h.col};">${h.lbl}</span></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+
   const tblEl=document.getElementById('mktTable');
   tblEl.style.display='';
-  tblEl.innerHTML=`
-    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.5rem;">Détail des campagnes</div>
-    <div class="mkt-tbl-wrap"><table class="mkt-tbl">
-      <thead><tr>
-        <th>Campagne</th><th>Canal</th><th>Budget</th><th>Portée</th><th>Clics</th><th>Conv.</th><th>Revenu</th><th>ROI</th><th>CTR</th><th>CVR</th><th>Santé</th>
-      </tr></thead>
-      <tbody>${sorted.map(d=>{
-        const h=_mktHealth(d);
-        const roi=_mktROI(d);
-        return `<tr>
-          <td style="font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;">${d.name}</td>
-          <td><span class="mkt-channel">${d.channel||'—'}</span></td>
-          <td>${d.budget?d.budget.toLocaleString('fr-FR')+'€':'—'}</td>
-          <td>${d.reach?fmt(d.reach):'—'}</td>
-          <td>${d.clicks?fmt(d.clicks):'—'}</td>
-          <td>${d.conversions||'—'}</td>
-          <td style="color:${d.revenue>d.budget?'var(--green)':'var(--red)'};">${d.revenue?d.revenue.toLocaleString('fr-FR')+'€':'—'}</td>
-          <td style="font-weight:700;color:${roi>0?'var(--green)':'var(--red)'};">${roi.toFixed(0)}%</td>
-          <td>${_mktCTR(d).toFixed(1)}%</td>
-          <td>${_mktCVR(d).toFixed(1)}%</td>
-          <td><span class="mkt-pill" style="background:${h.col}22;color:${h.col};">${h.lbl}</span></td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table></div>`;
+  tblEl.innerHTML=chartsHtml+
+    `<button class="mkt-tbl-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none';this.querySelector('span').textContent=this.nextElementSibling.style.display===''?'▾':'▸';">
+      <span>▸</span> Tableau détaillé
+    </button>
+    <div style="display:none;margin-top:.5rem;">${tblHtml}</div>`;
 }
 
 function deleteHistoryEntry(i){
