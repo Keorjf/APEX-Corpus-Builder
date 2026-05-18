@@ -474,6 +474,17 @@ select option{background:var(--bg2);}
 .syllabus-annot-del:hover{opacity:1;}
 .syllabus-ov.fullscreen{padding:0;}
 .syllabus-ov.fullscreen .syllabus-modal{max-width:100%;width:100%;height:100vh;border-radius:0;border:none;}
+.syllabus-confirm-box{background:var(--bg2);border:1px solid var(--red);border-radius:10px;padding:.7rem .9rem;margin-top:.7rem;font-size:.74rem;color:var(--soft);line-height:1.5;}
+.syllabus-confirm-box strong{color:var(--red);}
+.syllabus-hist-sep{border-top:1px solid var(--border);margin-top:.5rem;padding-top:.4rem;}
+.syllabus-hist-toggle{background:none;border:none;color:var(--muted);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;cursor:pointer;display:flex;align-items:center;gap:.3rem;width:100%;padding:.15rem 0;transition:.15s;}
+.syllabus-hist-toggle:hover{color:var(--soft);}
+.syllabus-hist-item{background:var(--bg3);border-radius:8px;padding:.5rem .65rem;margin-bottom:.4rem;border-left:3px solid rgba(255,255,255,.12);}
+.syllabus-hist-name{font-size:.68rem;font-weight:700;color:var(--soft);}
+.syllabus-hist-date{font-size:.58rem;color:var(--muted);margin-bottom:.3rem;}
+.syllabus-hist-annot{font-size:.68rem;color:var(--txt);border-top:1px solid var(--border);padding-top:.3rem;margin-top:.3rem;line-height:1.5;}
+.syllabus-hist-del{background:none;border:none;color:var(--red);font-size:.6rem;cursor:pointer;margin-top:.25rem;opacity:.6;padding:0;display:block;}
+.syllabus-hist-del:hover{opacity:1;}
 </style>
 </head>
 <body>
@@ -513,8 +524,16 @@ select option{background:var(--bg2);}
         <div class="btn-row">
           <button class="btn primary" onclick="document.getElementById('syllabusInput').click()">📄 Charger le syllabus</button>
           <button class="btn" id="syllabusOpenBtn" onclick="openSyllabusModal()" style="display:none;">Ouvrir &amp; annoter →</button>
+          <button class="btn danger" id="syllabusDeleteBtn" onclick="confirmDeleteSyllabus()" style="display:none;" title="Supprimer le syllabus">🗑</button>
         </div>
         <div id="syllabusStatus" style="margin-top:.6rem;font-size:.75rem;color:var(--soft);min-height:1rem;"></div>
+        <div id="syllabusConfirm" class="syllabus-confirm-box" style="display:none;">
+          <strong>Supprimer le syllabus ?</strong><br>Le fichier sera effacé de la mémoire. Vos annotations seront <em>archivées dans l'historique</em> et resteront accessibles.
+          <div class="btn-row" style="margin-top:.6rem;">
+            <button class="btn danger" style="font-size:.68rem;" onclick="deleteSyllabus()">Confirmer la suppression</button>
+            <button class="btn" style="font-size:.68rem;" onclick="cancelDeleteSyllabus()">Annuler</button>
+          </div>
+        </div>
       </div>
 
       <!-- EXPLORER BUTTON -->
@@ -853,7 +872,7 @@ function showTab(id,btn){
   if(id==='stats') renderStats();
   if(id==='export') updateBatchInfo();
   if(id==='suggest'){ renderSuggestions(); renderModuleIdeas(); }
-  if(id==='explore'){ const sn=localStorage.getItem('syllabus_name'); if(sn&&!_syllabusUrl){ const el=document.getElementById('syllabusStatus'); if(el) el.innerHTML=`Dernier syllabus : <em>${sn}</em> — rechargez le fichier pour le consulter.`; } }
+  if(id==='explore') renderSyllabusAnnots();
 }
 
 function openCreatePanel(){
@@ -1509,18 +1528,91 @@ function importPdfLessons(){
 let _syllabusUrl=null;
 let _syllabusName='';
 
-function loadSyllabus(input){
+// IndexedDB helpers
+function _sDB(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open('tactic_syllabus',1);
+    r.onupgradeneeded=e=>e.target.result.createObjectStore('pdfs');
+    r.onsuccess=e=>res(e.target.result);
+    r.onerror=e=>rej(e.target.error);
+  });
+}
+async function _sDBSave(file){
+  const db=await _sDB();
+  const buf=await file.arrayBuffer();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction('pdfs','readwrite');
+    tx.objectStore('pdfs').put({name:file.name,size:file.size,data:buf},  'current');
+    tx.oncomplete=res; tx.onerror=e=>rej(e.target.error);
+  });
+}
+async function _sDBLoad(){
+  const db=await _sDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction('pdfs','readonly');
+    const r=tx.objectStore('pdfs').get('current');
+    r.onsuccess=e=>res(e.target.result||null);
+    r.onerror=e=>rej(e.target.error);
+  });
+}
+async function _sDBDelete(){
+  const db=await _sDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction('pdfs','readwrite');
+    tx.objectStore('pdfs').delete('current');
+    tx.oncomplete=res; tx.onerror=e=>rej(e.target.error);
+  });
+}
+
+function _esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function _now(){return new Date().toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+
+function _archiveAnnots(name){
+  const annots=JSON.parse(localStorage.getItem('syllabus_annotations')||'[]');
+  if(!annots.length) return;
+  const hist=JSON.parse(localStorage.getItem('syllabus_history')||'[]');
+  hist.unshift({name:name||'Syllabus',date:_now(),annotations:annots});
+  localStorage.setItem('syllabus_history',JSON.stringify(hist));
+  localStorage.removeItem('syllabus_annotations');
+}
+
+function _syllabusUI(name,kb,msg,color){
+  document.getElementById('syllabusStatus').innerHTML=
+    `<span style="color:${color||'var(--green)'};">✓</span> ${name} · ${kb} Ko`+
+    (msg?` <span style="color:var(--muted);font-size:.65rem;">· ${msg}</span>`:'');
+  document.getElementById('syllabusOpenBtn').style.display='';
+  document.getElementById('syllabusDeleteBtn').style.display='';
+  document.getElementById('syllabusFname').textContent=name;
+  localStorage.setItem('syllabus_name',name);
+}
+
+async function initSyllabus(){
+  try{
+    const rec=await _sDBLoad();
+    if(!rec) return;
+    const blob=new Blob([rec.data],{type:'application/pdf'});
+    _syllabusUrl=URL.createObjectURL(blob);
+    _syllabusName=rec.name;
+    _syllabusUI(rec.name,(rec.size/1024).toFixed(0),'restauré depuis la mémoire');
+  }catch(e){}
+}
+
+async function loadSyllabus(input){
   const file=input.files[0]; if(!file) return;
+  if(_syllabusName) _archiveAnnots(_syllabusName);
   if(_syllabusUrl) URL.revokeObjectURL(_syllabusUrl);
   _syllabusUrl=URL.createObjectURL(file);
   _syllabusName=file.name;
   const kb=(file.size/1024).toFixed(0);
-  document.getElementById('syllabusStatus').innerHTML=`<span style="color:var(--green);">✓</span> ${file.name} · ${kb} Ko`;
-  document.getElementById('syllabusOpenBtn').style.display='';
-  document.getElementById('syllabusFname').textContent=file.name;
-  localStorage.setItem('syllabus_name',file.name);
+  _syllabusUI(file.name,kb,'sauvegarde…','var(--gold)');
   if(!document.getElementById('syllabusOv').classList.contains('hidden'))
     document.getElementById('syllabusPdfFrame').src=_syllabusUrl;
+  try{
+    await _sDBSave(file);
+    _syllabusUI(file.name,kb,'sauvegardé automatiquement');
+  }catch(e){
+    _syllabusUI(file.name,kb,'sauvegarde indisponible','var(--gold)');
+  }
 }
 
 function openSyllabusModal(){
@@ -1546,11 +1638,32 @@ function toggleSyllabusFullscreen(){
   btn.style.color=isFs?'var(--gold)':'';
 }
 
+function confirmDeleteSyllabus(){
+  document.getElementById('syllabusConfirm').style.display='';
+}
+function cancelDeleteSyllabus(){
+  document.getElementById('syllabusConfirm').style.display='none';
+}
+async function deleteSyllabus(){
+  _archiveAnnots(_syllabusName);
+  if(_syllabusUrl) URL.revokeObjectURL(_syllabusUrl);
+  _syllabusUrl=null; _syllabusName='';
+  try{await _sDBDelete();}catch(e){}
+  localStorage.removeItem('syllabus_name');
+  document.getElementById('syllabusStatus').innerHTML='<span style="color:var(--muted);">Syllabus supprimé — annotations archivées dans l\'historique.</span>';
+  document.getElementById('syllabusOpenBtn').style.display='none';
+  document.getElementById('syllabusDeleteBtn').style.display='none';
+  document.getElementById('syllabusConfirm').style.display='none';
+  document.getElementById('syllabusFname').textContent='';
+  closeSyllabusModal();
+  toast('Syllabus supprimé — annotations archivées');
+}
+
 function addSyllabusAnnot(){
   const ta=document.getElementById('syllabusAnnotInput');
   const text=ta.value.trim(); if(!text) return;
   const annots=JSON.parse(localStorage.getItem('syllabus_annotations')||'[]');
-  annots.unshift({text,date:new Date().toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})});
+  annots.unshift({text,date:_now()});
   localStorage.setItem('syllabus_annotations',JSON.stringify(annots));
   ta.value='';
   renderSyllabusAnnots();
@@ -1566,18 +1679,48 @@ function deleteSyllabusAnnot(i){
 function renderSyllabusAnnots(){
   const annots=JSON.parse(localStorage.getItem('syllabus_annotations')||'[]');
   const el=document.getElementById('syllabusAnnotList');
-  if(!annots.length){
-    el.innerHTML='<div style="font-size:.7rem;color:var(--muted);text-align:center;padding:1.5rem 0;">Aucune annotation</div>';
+  el.innerHTML=annots.length
+    ?annots.map((a,i)=>`
+      <div class="syllabus-annot-item">
+        <div class="syllabus-annot-text">${_esc(a.text)}</div>
+        <div class="syllabus-annot-foot">
+          <span class="syllabus-annot-date">${a.date}</span>
+          <button class="syllabus-annot-del" onclick="deleteSyllabusAnnot(${i})">✕</button>
+        </div>
+      </div>`).join('')
+    :'<div style="font-size:.7rem;color:var(--muted);text-align:center;padding:1rem 0;">Aucune annotation</div>';
+}
+
+function toggleSyllabusHistory(){
+  const el=document.getElementById('syllabusHistContent');
+  const arr=document.getElementById('syllabusHistArrow');
+  const open=el.style.display==='none';
+  el.style.display=open?'':'none';
+  arr.textContent=open?'▾':'▸';
+  if(open) renderSyllabusHistory();
+}
+
+function renderSyllabusHistory(){
+  const hist=JSON.parse(localStorage.getItem('syllabus_history')||'[]');
+  const el=document.getElementById('syllabusHistContent');
+  if(!hist.length){
+    el.innerHTML='<div style="font-size:.68rem;color:var(--muted);padding:.4rem 0;">Aucun historique</div>';
     return;
   }
-  el.innerHTML=annots.map((a,i)=>`
-    <div class="syllabus-annot-item">
-      <div class="syllabus-annot-text">${a.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div>
-      <div class="syllabus-annot-foot">
-        <span class="syllabus-annot-date">${a.date}</span>
-        <button class="syllabus-annot-del" onclick="deleteSyllabusAnnot(${i})" title="Supprimer">✕</button>
-      </div>
+  el.innerHTML=hist.map((h,hi)=>`
+    <div class="syllabus-hist-item">
+      <div class="syllabus-hist-name">📄 ${_esc(h.name)}</div>
+      <div class="syllabus-hist-date">${h.date} · ${h.annotations.length} annotation(s)</div>
+      ${h.annotations.map(a=>`<div class="syllabus-hist-annot"><span style="color:var(--gold);">›</span> ${_esc(a.text)}<span style="font-size:.58rem;color:var(--muted);display:block;">${a.date}</span></div>`).join('')}
+      <button class="syllabus-hist-del" onclick="deleteHistoryEntry(${hi})">✕ Supprimer cet historique</button>
     </div>`).join('');
+}
+
+function deleteHistoryEntry(i){
+  const hist=JSON.parse(localStorage.getItem('syllabus_history')||'[]');
+  hist.splice(i,1);
+  localStorage.setItem('syllabus_history',JSON.stringify(hist));
+  renderSyllabusHistory();
 }
 
 function useSuggestion(name,lv,track,tag){
@@ -2917,6 +3060,8 @@ function applyLessonToForm(l){
   renderQuizEditor();
 }
 
+initSyllabus();
+
 function askTactKey(){
   const k=prompt('Clé API Claude (sk-ant-…)\n\nconsole.anthropic.com → API Keys');
   if(k){ localStorage.setItem('tactic_claude_key',k); toast('Clé Claude sauvegardée'); }
@@ -3026,6 +3171,12 @@ function toggleTact(){
         <textarea class="syllabus-annot-ta" id="syllabusAnnotInput" placeholder="Ajouter une note…"></textarea>
         <button class="btn primary" style="font-size:.7rem;width:100%;padding:.35rem;" onclick="addSyllabusAnnot()">+ Ajouter</button>
         <div class="syllabus-annot-list" id="syllabusAnnotList"></div>
+        <div class="syllabus-hist-sep">
+          <button class="syllabus-hist-toggle" onclick="toggleSyllabusHistory()">
+            <span id="syllabusHistArrow">▸</span> Historique
+          </button>
+          <div id="syllabusHistContent" style="display:none;max-height:220px;overflow-y:auto;margin-top:.3rem;"></div>
+        </div>
       </div>
     </div>
   </div>
