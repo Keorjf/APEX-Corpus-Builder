@@ -1047,6 +1047,16 @@ select option{background:var(--bg2);}
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
+window.onerror=function(msg,src,line,col,err){
+  var b=document.createElement('div');
+  b.style.cssText='position:fixed;top:0;left:0;right:0;background:#FF3B5C;color:#fff;padding:10px 14px;font-family:monospace;font-size:11px;z-index:99999;white-space:pre-wrap;';
+  b.textContent='JS ERROR: '+msg+'\nLine: '+line+' Col: '+col+'\nFile: '+src;
+  document.body?document.body.prepend(b):(document.addEventListener('DOMContentLoaded',function(){document.body.prepend(b);}));
+  return false;
+};
+</script>
+
+<script>
 /* ══════════════════════════
    DONNÉES — chargées dynamiquement depuis Tactic Academy
 ══════════════════════════ */
