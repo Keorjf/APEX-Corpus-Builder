@@ -1047,16 +1047,6 @@ select option{background:var(--bg2);}
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
-window.onerror=function(msg,src,line,col,err){
-  var b=document.createElement('div');
-  b.style.cssText='position:fixed;top:0;left:0;right:0;background:#FF3B5C;color:#fff;padding:10px 14px;font-family:monospace;font-size:11px;z-index:99999;white-space:pre-wrap;';
-  b.textContent='JS ERROR: '+msg+'\nLine: '+line+' Col: '+col+'\nFile: '+src;
-  document.body?document.body.prepend(b):(document.addEventListener('DOMContentLoaded',function(){document.body.prepend(b);}));
-  return false;
-};
-</script>
-
-<script>
 /* ══════════════════════════
    DONNÉES — chargées dynamiquement depuis Tactic Academy
 ══════════════════════════ */
@@ -3849,7 +3839,7 @@ function _buildAuditHTML(review){
     +'<div style="background:linear-gradient(135deg,rgba(77,158,255,.07),rgba(167,139,250,.07));border:1px solid rgba(77,158,255,.18);border-radius:11px;padding:1.1rem;margin-bottom:1.2rem;page-break-inside:avoid;"><div style="font-size:.76rem;font-weight:800;color:#4D9EFF;margin-bottom:.55rem;">🤖 Synth\xe8se de Conformit\xe9 — TACT</div><div style="font-size:.8rem;line-height:1.7;">'+(review||'<em style="color:#8bbccc;">Analyse de conformit\xe9 en cours…</em>')+'</div></div>\n'
     +agentSecs
     +mktH
-    +'<div style="text-align:center;padding:1.1rem;color:rgba(160,220,235,.3);font-size:.6rem;border-top:1px solid rgba(255,255,255,.06);margin-top:.9rem;">Audit g\xe9n\xe9r\xe9 automatiquement par TACT · Tactic Academy Corpus Builder · '+dateStr+'</div>\n</div>\n</body>\n</html>';
+    +'<div style="text-align:center;padding:1.1rem;color:rgba(160,220,235,.3);font-size:.6rem;border-top:1px solid rgba(255,255,255,.06);margin-top:.9rem;">Audit g\xe9n\xe9r\xe9 automatiquement par TACT \xb7 Tactic Academy Corpus Builder \xb7 '+dateStr+'</div>\n</div>\n</body>\n</html>';
 }
 
 /* ── Preview / Download ── */
