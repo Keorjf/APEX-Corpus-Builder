@@ -543,18 +543,6 @@ select option{background:var(--bg2);}
 .mkt-chart-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.65rem;}
 .mkt-tbl-toggle{background:none;border:none;color:var(--muted);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:flex;align-items:center;gap:.3rem;padding:.3rem 0;transition:.15s;}
 .mkt-tbl-toggle:hover{color:var(--soft);}
-
-/* ── AUDIT JOURNALIER ── */
-.audit-banner{display:none;background:linear-gradient(90deg,rgba(77,158,255,.06),rgba(167,139,250,.04));border-bottom:1px solid rgba(77,158,255,.18);padding:.42rem 1.2rem;align-items:center;gap:.65rem;font-size:.72rem;}
-.audit-banner.show{display:flex;}
-.audit-banner-txt{flex:1;font-weight:600;color:var(--blue);}
-.audit-banner-btns{display:flex;gap:.35rem;flex-wrap:wrap;}
-.audit-banner-btn{padding:.22rem .58rem;font-size:.62rem;font-weight:700;border-radius:5px;border:1px solid rgba(77,158,255,.28);background:rgba(77,158,255,.09);color:var(--blue);cursor:pointer;white-space:nowrap;transition:.12s;}
-.audit-banner-btn:hover{background:rgba(77,158,255,.2);}
-.audit-banner-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;padding:.1rem .25rem;margin-left:.15rem;flex-shrink:0;}
-.audit-tab-badge{display:inline-block;background:var(--blue);color:#fff;font-size:.46rem;font-weight:800;border-radius:8px;padding:.04rem .28rem;margin-left:.22rem;vertical-align:middle;}
-.agent-instr-box{font-size:.69rem;background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.17);border-radius:6px;padding:.32rem .55rem;margin:.35rem 0 .05rem;color:#C4B5FD;display:none;line-height:1.4;}
-.audit-action-bar{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border);}
 </style>
 </head>
 <body>
@@ -568,18 +556,6 @@ select option{background:var(--bg2);}
     <button id="importTopBtn" onclick="document.getElementById('importOv').classList.remove('hidden')" style="padding:.28rem .75rem;font-family:var(--font-mono);font-size:.6rem;font-weight:700;background:var(--gold);color:#000;border:none;border-radius:6px;cursor:pointer;letter-spacing:.04em;white-space:nowrap;transition:.15s;">Importer leçons</button>
     <button class="help-btn" onclick="toggleHelp()" title="Aide">?</button>
   </div>
-</div>
-
-<!-- AUDIT BANNER -->
-<div class="audit-banner" id="auditBanner">
-  <span style="font-size:.88rem;flex-shrink:0;">📋</span>
-  <span class="audit-banner-txt" id="auditBannerTxt">Audit journalier disponible</span>
-  <div class="audit-banner-btns">
-    <button class="audit-banner-btn" onclick="previewAudit()">📄 Voir</button>
-    <button class="audit-banner-btn" onclick="downloadAudit()">⬇️ PDF</button>
-    <button class="audit-banner-btn" onclick="showTab('agents',document.getElementById('tabAgentsBtn'))">→ Agents</button>
-  </div>
-  <button class="audit-banner-close" onclick="this.parentElement.classList.remove('show')" title="Fermer">✕</button>
 </div>
 
 <!-- TABS -->
@@ -787,7 +763,6 @@ select option{background:var(--bg2);}
     <div style="max-width:1100px;margin:0 auto;padding:.2rem 0 2rem;">
       <div class="demo-banner" style="display:flex;align-items:center;justify-content:space-between;gap:.8rem;">
         <span>Données simulées — connecte Supabase pour les vraies analytics en temps réel.</span>
-        <button class="btn" onclick="runAuditIA()" style="font-size:.62rem;flex-shrink:0;">Audit IA</button>
       </div>
       <div class="dash-section-hdr"><span class="dash-section-title">Vue Primaire</span></div>
       <div class="overview-kpis" id="analyticsOverview"></div>
@@ -812,8 +787,6 @@ select option{background:var(--bg2);}
         <div style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;">
           <span class="agents-global-status" id="agentsLastRun">Aucune analyse lancée</span>
           <button class="agents-run-all-btn" id="agentsRunAllBtn" onclick="runAllAgents()">▶ Lancer tous les agents</button>
-          <button class="btn" style="font-size:.7rem;border-color:rgba(77,158,255,.4);color:var(--blue);" onclick="_runDailyAudit()">📊 Audit complet</button>
-          <button class="btn" id="auditPreviewBtn" style="font-size:.7rem;display:none;" onclick="previewAudit()">📋 Voir l'audit</button>
         </div>
       </div>
 
@@ -834,7 +807,6 @@ select option{background:var(--bg2);}
             <span class="agent-name">🔍 Agent Corpus</span>
             <span class="agent-run-time" id="time-corpus">—</span>
           </div>
-          <div class="agent-instr-box" id="instr-corpus"></div>
           <div class="agent-role">Analyse la cohérence et la qualité structurelle du corpus : distribution niveaux/modules, équilibres, tags, lacunes de couverture.</div>
           <div class="agent-results" id="res-corpus"><span style="color:var(--muted);font-style:italic;">En attente…</span></div>
           <div class="agent-footer">
@@ -850,7 +822,6 @@ select option{background:var(--bg2);}
             <span class="agent-name">📊 Agent Performance</span>
             <span class="agent-run-time" id="time-perf">—</span>
           </div>
-          <div class="agent-instr-box" id="instr-perf"></div>
           <div class="agent-role">Analyse les KPIs de chaque leçon (taux quiz, engagement, temps, santé), identifie les leçons à risque et les patterns de décrochage.</div>
           <div class="agent-results" id="res-perf"><span style="color:var(--muted);font-style:italic;">En attente…</span></div>
           <div class="agent-footer">
@@ -866,7 +837,6 @@ select option{background:var(--bg2);}
             <span class="agent-name">🔗 Agent Syllabus</span>
             <span class="agent-run-time" id="time-syllabus">—</span>
           </div>
-          <div class="agent-instr-box" id="instr-syllabus"></div>
           <div class="agent-role">Corrèle le corpus avec le syllabus PDF chargé. Identifie les objectifs couverts, les lacunes critiques et les thèmes surdimensionnés.</div>
           <div class="agent-results" id="res-syllabus"><span style="color:var(--muted);font-style:italic;">Chargez un syllabus dans l'onglet Explorer pour activer cet agent.</span></div>
           <div class="agent-footer">
@@ -882,7 +852,6 @@ select option{background:var(--bg2);}
             <span class="agent-name">💡 Agent Recommandations</span>
             <span class="agent-run-time" id="time-reco">—</span>
           </div>
-          <div class="agent-instr-box" id="instr-reco"></div>
           <div class="agent-role">Synthèse des 3 autres agents. Génère un plan d'action priorisé avec des actions concrètes pour améliorer le corpus cette semaine.</div>
           <div class="agent-results" id="res-reco"><span style="color:var(--muted);font-style:italic;">Lance d'abord les autres agents.</span></div>
           <div class="agent-footer">
@@ -898,7 +867,6 @@ select option{background:var(--bg2);}
             <span class="agent-name">🛠️ Agent Création</span>
             <span class="agent-run-time" id="time-create">—</span>
           </div>
-          <div class="agent-instr-box" id="instr-create"></div>
           <div class="agent-role">Génère automatiquement des leçons complètes (blocs + quiz) pour combler les lacunes identifiées par les autres agents. Prêtes à importer en un clic.</div>
           <div class="agent-results" id="res-create"><span style="color:var(--muted);font-style:italic;">Lance d'abord les agents Corpus, Syllabus et Recommandations.</span></div>
           <div class="agent-footer">
@@ -914,7 +882,6 @@ select option{background:var(--bg2);}
             <span class="agent-name">📣 Agent Marketing</span>
             <span class="agent-run-time" id="time-marketing">—</span>
           </div>
-          <div class="agent-instr-box" id="instr-marketing"></div>
           <div class="agent-role">Analyse les campagnes marketing importées : ROI, canaux performants, taux de conversion, budget optimisation et corrélation avec les performances du corpus.</div>
           <div class="agent-results" id="res-marketing"><span style="color:var(--muted);font-style:italic;">Importez des données marketing dans l'onglet Marketing.</span></div>
           <div class="agent-footer">
@@ -1046,20 +1013,6 @@ select option{background:var(--bg2);}
 
 <div class="toast-wrap" id="toastWrap"></div>
 
-<div id="__jsErr" style="display:none;position:fixed;top:0;left:0;right:0;background:#FF3B5C;color:#fff;padding:.5rem 1rem;font-size:.75rem;z-index:99999;font-family:monospace;white-space:pre-wrap;max-height:40vh;overflow-y:auto;"></div>
-<script>
-window.onerror=function(msg,src,line,col){
-  var d=document.getElementById('__jsErr');
-  if(d){d.style.display='block';d.textContent+='[L'+line+':C'+col+'] '+msg+'\n';}
-  return false;
-};
-window.addEventListener('load',function(){
-  if(!window.showTab){
-    var d=document.getElementById('__jsErr');
-    if(d){d.style.display='block';d.textContent+='>>> showTab UNDEFINED after load — script failed to parse\n';}
-  }
-});
-</script>
 
 <script>
 /* ══════════════════════════
@@ -2200,7 +2153,7 @@ async function _runMarketingAgent(){
   const prompt=`Tu es expert en marketing digital et acquisition. Analyse ces données de campagnes marketing et génère des findings JSON.
 Campagnes : ${JSON.stringify(summary,null,2)}
 Retourne UNIQUEMENT un tableau JSON : [{"sev":"critique|warning|ok","text":"finding concis en français"}]
-Max 8 findings. Focus : ROI négatif, canaux sous-performants, budget mal alloué, opportunités de scaling, optimisation conversion.`+_getAgentInstruction('marketing');
+Max 8 findings. Focus : ROI négatif, canaux sous-performants, budget mal alloué, opportunités de scaling, optimisation conversion.`;
   const findings=await _claudeAgentCall(prompt);
   const totalROI=_mktData.reduce((s,d)=>s+_mktROI(d),0)/_mktData.length;
   return {findings,extra:{campaigns:_mktData.length,avgROI:Math.round(totalROI)}};
@@ -2218,12 +2171,11 @@ async function _runCreationAgent(){
   };
   const cs=_corpusSummary();
   const existing=getAllLessons().slice(0,40).map(l=>l.name);
-  const instr=_getAgentInstruction('create');
   const prompt=`Tu es expert en ingénierie pédagogique et éducation financière. Génère 3 leçons TACTIC complètes pour combler ces lacunes du corpus.
 
 Lacunes identifiées : ${JSON.stringify(allGaps,null,2)}
 Modules existants : ${Object.keys(cs.byTrack).join(', ')}
-Leçons déjà présentes (ne pas dupliquer) : ${existing.join(', ')}${instr}
+Leçons déjà présentes (ne pas dupliquer) : ${existing.join(', ')}
 
 Retourne UNIQUEMENT un tableau JSON de 3 leçons :
 [{"name":"Titre","emoji":"📊","level":"Débutant|Intermédiaire|Avancé|Expert","track":"Module","tag":"Base|Stratégie|Pratique|Analyse","duration":"2 min","coins":100,"blocks":[{"type":"hook","emo":"💥","text":"<strong>Accroche</strong>"},{"type":"content","text":"Contenu.<br><strong>Point clé</strong> : détail."},{"type":"tip","text":"Conseil."}],"quiz":{"q":"Question ?","opts":["A","B","C","D"],"correct":0,"expl":"Explication."}}]`;
@@ -2631,28 +2583,6 @@ function renderHeatTable(ld){
   return `<table class="heat-tbl"><thead><tr><th>Leçon</th><th>Flesch</th><th>Bloom</th><th>Ton</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-function runAuditIA(){
-  const all=getAllLessons();
-  const ld=all.map(l=>{ const k=mockKpis(l.id); return {...l,k,health:calcHealth(k),tags:alertTags(k)}; });
-  const alerts=ld.filter(x=>x.health<65);
-  const crit=alerts.filter(l=>l.health<30).length;
-  const avgH=Math.round(ld.reduce((s,x)=>s+x.health,0)/Math.max(ld.length,1));
-  const avgErr=Math.round(ld.reduce((s,l)=>s+l.k.errorRate,0)/Math.max(ld.length,1));
-  const worst=alerts[0];
-  alert([
-    `APEX Audit IA — ${new Date().toLocaleDateString('fr-FR')} ${new Date().toLocaleTimeString('fr-FR')}`,
-    ``,
-    `Corpus : ${all.length} leçons`,
-    `Score santé moyen : ${avgH}/100`,
-    `Alertes actives : ${alerts.length}${crit>0?` dont ${crit} critiques`:''}`,
-    `Taux d'erreur quiz moyen : ${avgErr}%`,
-    ``,
-    `Recommandations :`,
-    avgErr>40?'  · Réduire la difficulté des quiz (erreur moy. '+avgErr+'% > seuil 40%)':avgErr<15?'  · Augmenter la difficulté (erreur moy. '+avgErr+'% trop faible)':'  · Calibration quiz correcte',
-    crit>0?`  · Traiter en priorité les ${crit} leçons en état critique`:'  · Aucune leçon en état critique',
-    worst?`  · Leçon la plus urgente : "${worst.name.slice(0,50)}" (score ${worst.health})`:'',
-  ].filter(Boolean).join('\n'));
-}
 
 function setAnalyticsView(v){ _analyticsView=v; renderStats(); }
 
@@ -3508,15 +3438,7 @@ Tu as accès aux résultats des 6 agents IA intégrés (Corpus, Performance, Syl
 Domaine : éducation financière (investissement, bourse, ETF, crypto, fiscalité, etc.)
 Ton ton : direct, chaleureux, expert. Réponses courtes (3-5 phrases max). HTML simple autorisé (<b>, <br>, <em>). Jamais de markdown avec *.
 Pour déclencher un agent : <RUN_AGENT>corpus|perf|syllabus|reco|create|marketing|all</RUN_AGENT> (sur une ligne isolée).
-L'Agent Création génère des leçons complètes prêtes à importer. Si l'utilisateur demande de créer des leçons ou combler des lacunes, utilise <RUN_AGENT>create</RUN_AGENT>.
-
-RÔLE ADDITIONNEL — Agent de Conformité et Cohérence :
-Tu supervises la cohérence globale du corpus, l'alignement de tous les agents et la qualité de l'audit journalier.
-Quand tu identifies qu'un agent doit ajuster son analyse ou sa priorité, tu peux lui envoyer une instruction de pilotage en utilisant (une par ligne) : <AGENT_INSTRUCTION>agentId:instruction précise en français</AGENT_INSTRUCTION>
-Agents disponibles : corpus, perf, syllabus, reco, create, marketing.
-N'émets une instruction que si tu as un motif concret (problème détecté, incohérence, priorité à recadrer).
-Exemple : <AGENT_INSTRUCTION>create:Prioritiser les leçons de niveau Expert sur les Dérivés, sujet manquant dans le corpus</AGENT_INSTRUCTION>
-L'audit journalier se lance automatiquement à 8h et tu notifies quand il est prêt (maximum 9h).`;
+L'Agent Création génère des leçons complètes prêtes à importer. Si l'utilisateur demande de créer des leçons ou combler des lacunes, utilise <RUN_AGENT>create</RUN_AGENT>.`;
 
 function _buildAgentContext(){
   _agentLoad();
@@ -3664,12 +3586,6 @@ async function sendTact(txt){
         :`showTab('agents',document.getElementById('tabAgentsBtn'));setTimeout(()=>runAgent('${agId}'),300)`;
       reply+=`<br><div style="margin-top:.4rem;"><button class="tact-sug" onclick="${onclick}" style="font-size:.68rem;">▶ Lancer ${label}</button></div>`;
     }
-    // AGENT_INSTRUCTION (conformité)
-    if(reply.includes('<AGENT_INSTRUCTION>')){
-      const n=_parseAgentInstructions(reply);
-      reply=reply.replace(/<AGENT_INSTRUCTION>[\s\S]*?<\/AGENT_INSTRUCTION>/g,'').trim();
-      if(n>0) reply+='<br><span style="font-size:.68rem;color:#C4B5FD;">🎯 '+n+' instruction(s) de conformité transmise(s) aux agents.</span>';
-    }
     tactAppend('bot',reply);
   }catch(e){
     tactTyping(false);
@@ -3701,288 +3617,10 @@ function applyLessonToForm(l){
 
 initSyllabus();
 initMarketing();
-setTimeout(_initDailyScheduler,800);
 
-/* ══════════════════════════════════════════════
-   AUDIT JOURNALIER
-   ══════════════════════════════════════════════ */
-let _auditRunning=false;
 
-/* ── Data freshness check ── */
-function _checkDataFreshness(){
-  _agentLoad();
-  const w=[];
-  try{ const cs=_corpusSummary(); if(!cs||!cs.total) w.push('Corpus vide — aucun cours charg\xe9'); }catch(e){}
-  if(!_mktData||!_mktData.length) w.push('Marketing — aucune donn\xe9e de campagne');
-  if(!_syllabusUrl) w.push('Syllabus PDF non charg\xe9 (onglet Explorer)');
-  const today=new Date().toDateString();
-  Object.keys(AGENT_DEFS).forEach(id=>{
-    const ts=localStorage.getItem('agent_ts_'+id);
-    if(!ts) w.push(AGENT_DEFS[id].name+' — jamais ex\xe9cut\xe9');
-    else if(new Date(parseInt(ts)).toDateString()!==today){
-      const d=new Date(parseInt(ts)).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
-      w.push(AGENT_DEFS[id].name+' — donn\xe9es du '+d);
-    }
-  });
-  return w;
-}
 
-/* ── Banner helpers ── */
-function _showAuditBanner(msg,ready=true){
-  const b=document.getElementById('auditBanner'),t=document.getElementById('auditBannerTxt');
-  if(!b) return;
-  if(t) t.textContent=msg;
-  b.classList.add('show');
-  const pb=document.getElementById('auditPreviewBtn');
-  if(pb&&ready) pb.style.display='';
-  if(ready){
-    const tab=document.getElementById('tabAgentsBtn');
-    if(tab&&!tab.querySelector('.audit-tab-badge')){
-      const bd=document.createElement('span'); bd.className='audit-tab-badge'; bd.textContent='📋'; tab.appendChild(bd);
-    }
-  }
-}
 
-/* ── Parse AGENT_INSTRUCTION tags from any TACT reply ── */
-function _parseAgentInstructions(text){
-  const matches=[...text.matchAll(/<AGENT_INSTRUCTION>([\s\S]*?)<\/AGENT_INSTRUCTION>/g)];
-  if(!matches.length) return 0;
-  const all=JSON.parse(localStorage.getItem('agent_instructions')||'{}');
-  let count=0;
-  matches.forEach(m=>{
-    const colon=m[1].indexOf(':'); if(colon<1) return;
-    const id=m[1].slice(0,colon).trim();
-    const instr=m[1].slice(colon+1).trim();
-    if(!AGENT_DEFS[id]) return;
-    all[id]={text:instr,ts:new Date().toISOString()};
-    const el=document.getElementById('instr-'+id);
-    if(el){ el.textContent='🎯 '+instr; el.style.display=''; }
-    count++;
-  });
-  localStorage.setItem('agent_instructions',JSON.stringify(all));
-  return count;
-}
-
-function _getAgentInstruction(id){
-  try{
-    const all=JSON.parse(localStorage.getItem('agent_instructions')||'{}');
-    return all[id]?.text?'\n\n📌 INSTRUCTION TACT (conformit\xe9) : '+all[id].text:'';
-  }catch(e){ return ''; }
-}
-
-function _loadAgentInstructions(){
-  try{
-    const all=JSON.parse(localStorage.getItem('agent_instructions')||'{}');
-    Object.keys(all).forEach(id=>{
-      const el=document.getElementById('instr-'+id);
-      if(el&&all[id]?.text){ el.textContent='🎯 '+all[id].text; el.style.display=''; }
-    });
-  }catch(e){}
-}
-
-/* ── SVG bar chart for audit HTML (self-contained, no CSS deps) ── */
-function _auditBar(items){
-  if(!items||!items.length) return '<em style="color:#8bbccc;font-size:.75rem;">Aucune donn\xe9e</em>';
-  const maxV=Math.max(...items.map(d=>Math.abs(d.v)),1);
-  const LW=128,BW=175,VW=80,BH=17,GAP=5;
-  const H=items.length*(BH+GAP)-GAP+4;
-  const rows=items.map((d,i)=>{
-    const bw=Math.max(Math.abs(d.v)/maxV*BW,3);
-    const y=i*(BH+GAP)+2;
-    const nm=d.label.length>18?d.label.slice(0,17)+'…':d.label;
-    const c=d.col||'#4D9EFF';
-    return '<g>'
-      +'<text x="'+(LW-5)+'" y="'+(y+BH/2+4)+'" text-anchor="end" fill="#8bbccc" font-size="9.5" font-family="Arial,sans-serif">'+nm+'</text>'
-      +'<rect x="'+LW+'" y="'+y+'" width="'+bw+'" height="'+BH+'" rx="3" fill="'+c+'" opacity=".85"/>'
-      +'<text x="'+(LW+bw+5)+'" y="'+(y+BH/2+4)+'" fill="'+c+'" font-size="9.5" font-family="Arial,sans-serif" font-weight="700">'+d.fmt+'</text>'
-      +'</g>';
-  }).join('');
-  return '<svg viewBox="0 0 '+(LW+BW+VW)+' '+H+'" width="100%" style="display:block;overflow:visible;">'+rows+'</svg>';
-}
-
-/* ── Build full audit HTML document ── */
-function _buildAuditHTML(review){
-  _agentLoad();
-  review=review||localStorage.getItem('audit_review')||'';
-  const now=new Date();
-  const dateStr=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const timeStr=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-  let cs,ps,avgH;
-  try{ cs=_corpusSummary(); ps=_perfSummary(); avgH=Math.round(ps.reduce((s,l)=>s+l.health,0)/Math.max(ps.length,1)); }
-  catch(e){ cs={total:0,tracks:0,byLevel:{},byTrack:{}}; ps=[]; avgH=0; }
-  const allF=Object.values(_agentResults).flatMap(r=>r.findings||[]);
-  const nCrit=allF.filter(f=>f.sev==='critique').length;
-  const nWarn=allF.filter(f=>f.sev==='warning').length;
-  const nOk=allF.filter(f=>f.sev==='ok').length;
-  const sCol=nCrit>3?'#FF3B5C':nCrit>0?'#FFCD0D':'#00E87A';
-  const sLbl=nCrit>3?'NON CONFORME':nCrit>0?'À SURVEILLER':'CONFORME';
-
-  const lvlItems=Object.entries(cs.byLevel||{}).map(([k,v])=>({label:k,v,fmt:v+'',col:'#4D9EFF'}));
-  const trkItems=Object.entries(cs.byTrack||{}).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>({label:k,v,fmt:v+'',col:'#A78BFA'}));
-  const psSort=[...ps].sort((a,b)=>b.health-a.health);
-  const top8=psSort.slice(0,8).map(l=>({label:l.name,v:l.health,fmt:l.health+'/100',col:'#00E87A'}));
-  const bot8=[...ps].sort((a,b)=>a.health-b.health).slice(0,8).map(l=>({label:l.name,v:l.health,fmt:l.health+'/100',col:l.health<40?'#FF3B5C':'#FFCD0D'}));
-
-  const instrAll=JSON.parse(localStorage.getItem('agent_instructions')||'{}');
-  const agentSecs=Object.keys(AGENT_DEFS).map(id=>{
-    const def=AGENT_DEFS[id]; const r=_agentResults[id];
-    const instr=instrAll[id]?.text;
-    const instrH=instr?'<div style="font-size:.74rem;background:rgba(167,139,250,.1);border-left:3px solid #A78BFA;padding:.32rem .6rem;margin-bottom:.55rem;border-radius:0 5px 5px 0;color:#C4B5FD;">🎯 <b>Instruction TACT :</b> '+instr+'</div>':'';
-    const fH=r?(r.findings||[]).map(f=>'<div style="font-size:.78rem;padding:.28rem .5rem;border-radius:5px;margin-bottom:.2rem;'+(f.sev==='critique'?'background:rgba(255,59,92,.07);border-left:2px solid #FF3B5C;':f.sev==='warning'?'background:rgba(255,205,13,.05);border-left:2px solid #FFCD0D;':'background:rgba(0,232,122,.05);border-left:2px solid #00E87A;')+'">'+( f.sev==='critique'?'🔴':f.sev==='warning'?'🟡':'🟢')+' '+f.text+'</div>').join(''):'<em style="color:#8bbccc;font-size:.76rem;">Agent non exécuté</em>';
-    const lesH=(id==='create'&&r?.lessons?.length)?'<div style="font-size:.73rem;border-left:2px solid #00E87A;padding:.28rem .5rem;margin-top:.4rem;background:rgba(0,232,122,.05);">✅ '+r.lessons.length+' leçon(s) générée(s) : '+r.lessons.map(l=>(l.emoji||'📖')+' '+l.name).join(', ')+'</div>':'';
-    return '<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.95rem;margin-bottom:.7rem;page-break-inside:avoid;"><div style="font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#FFCD0D;margin-bottom:.55rem;padding-bottom:.35rem;border-bottom:1px solid rgba(255,205,13,.14);">'+def.name+(r?' <span style="font-weight:400;color:#8bbccc;font-size:.6rem;">'+r.ts+'</span>':' <span style="font-weight:400;color:#8bbccc;font-size:.6rem;">Non exécuté</span>')+'</div>'+instrH+fH+lesH+'</div>';
-  }).join('');
-
-  let mktH='';
-  if(_mktData&&_mktData.length){
-    const roiIt=[..._mktData].sort((a,b)=>_mktROI(b)-_mktROI(a)).map(d=>({label:d.name,v:_mktROI(d),fmt:_mktROI(d).toFixed(0)+'%',col:_mktROI(d)>100?'#00E87A':_mktROI(d)>0?'#FFCD0D':'#FF3B5C'}));
-    const revIt=[..._mktData].sort((a,b)=>b.revenue-a.revenue).map(d=>({label:d.name,v:d.revenue,fmt:'€'+Math.round(d.revenue).toLocaleString('fr-FR'),col:'#FFCD0D'}));
-    const mktF=_agentResults.marketing?((_agentResults.marketing.findings||[]).map(f=>'<div style="font-size:.78rem;padding:.28rem .5rem;border-radius:5px;margin-bottom:.2rem;'+(f.sev==='critique'?'background:rgba(255,59,92,.07);border-left:2px solid #FF3B5C;':f.sev==='warning'?'background:rgba(255,205,13,.05);border-left:2px solid #FFCD0D;':'background:rgba(0,232,122,.05);border-left:2px solid #00E87A;')+'">'+( f.sev==='critique'?'🔴':f.sev==='warning'?'🟡':'🟢')+' '+f.text+'</div>').join('')):'<em style="color:#8bbccc;font-size:.76rem;">Agent Marketing non exécuté</em>';
-    mktH='<div style="background:rgba(31,72,90,.4);border:1px solid rgba(77,158,255,.15);border-radius:10px;padding:.95rem;margin-bottom:.7rem;page-break-inside:avoid;"><div style="font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#4D9EFF;margin-bottom:.55rem;padding-bottom:.35rem;border-bottom:1px solid rgba(77,158,255,.14);">📣 Marketing — '+_mktData.length+' campagne(s)'+(_agentResults.marketing?' \xb7 '+_agentResults.marketing.ts:'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.65rem;"><div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#8bbccc;margin-bottom:.3rem;">ROI par campagne</div>'+_auditBar(roiIt)+'</div><div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#8bbccc;margin-bottom:.3rem;">Revenu par campagne</div>'+_auditBar(revIt)+'</div></div>'+mktF+'</div>';
-  }
-
-  var _h='<!DOCTYPE html>\n<html lang="fr">\n<head>\n<meta charset="UTF-8">\n<title>Audit APEX — '+dateStr+'</title>\n<style>\n@page{margin:18mm 14mm;size:A4;}*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Arial,sans-serif;background:#0F2E3D;color:#E8F8FA;padding:1.5rem;}@media print{body{background:#fff;color:#111;padding:0;}.no-print{display:none;}}.doc{max-width:860px;margin:0 auto;}</style>\n</head>\n<body>\n<div class="doc">\n';
-  _h+='<div class="no-print" style="background:rgba(31,72,90,.8);border-radius:10px;padding:.7rem 1rem;margin-bottom:1.5rem;display:flex;gap:.5rem;align-items:center;"><button onclick="window.print()" style="padding:.36rem .85rem;font-size:.74rem;font-weight:700;border-radius:7px;border:1px solid rgba(77,158,255,.4);background:rgba(77,158,255,.15);color:#4D9EFF;cursor:pointer;">🖨️ Imprimer / Enregistrer en PDF</button><span style="font-size:.67rem;color:rgba(160,220,235,.5);">Dans la fen\xeatre d\'impression → s\xe9lectionner "Enregistrer en PDF"</span></div>\n';
-  _h+='<div style="background:linear-gradient(135deg,#1F485A,#20556A);border-radius:13px;padding:1.6rem 2rem;margin-bottom:1.4rem;border:1px solid rgba(255,255,255,.1);">';
-  _h+='<div style="font-size:1rem;font-weight:800;color:#FFCD0D;letter-spacing:.07em;margin-bottom:.18rem;">APEX \xb7 TACTIC ACADEMY</div>';
-  _h+='<div style="font-size:1.25rem;font-weight:800;color:#E8F8FA;margin-bottom:.12rem;">Audit Journalier du Corpus</div>';
-  _h+='<div style="font-size:.78rem;color:rgba(160,220,235,.65);">'+dateStr+' — g\xe9n\xe9r\xe9 \xe0 '+timeStr+' par TACT</div>';
-  _h+='<div style="display:inline-block;margin-top:.75rem;padding:.25rem .8rem;border-radius:18px;font-size:.68rem;font-weight:800;letter-spacing:.08em;background:'+sCol+'22;color:'+sCol+';border:1px solid '+sCol+'44;">'+sLbl+'</div></div>\n';
-  _h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.4rem;">';
-  _h+='<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:#FFCD0D;">'+cs.total+'</div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Le\xe7ons</div></div>';
-  _h+='<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:'+(avgH>70?'#00E87A':avgH>50?'#FFCD0D':'#FF3B5C')+';">'+avgH+'<span style="font-size:.85rem;">/100</span></div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Score Moyen</div></div>';
-  _h+='<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:'+(nCrit>0?'#FF3B5C':'#00E87A')+';">'+nCrit+'</div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Critiques</div></div>';
-  _h+='<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:#FFCD0D;">'+nWarn+'</div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Alertes</div></div>';
-  _h+='</div>\n';
-  _h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.4rem;">';
-  _h+='<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Distribution par niveau</div>'+_auditBar(lvlItems)+'</div>';
-  _h+='<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Top modules</div>'+_auditBar(trkItems)+'</div>';
-  _h+='<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Meilleures le\xe7ons</div>'+_auditBar(top8)+'</div>';
-  _h+='<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Le\xe7ons \xe0 risque</div>'+_auditBar(bot8)+'</div>';
-  _h+='</div>\n';
-  _h+='<div style="background:linear-gradient(135deg,rgba(77,158,255,.07),rgba(167,139,250,.07));border:1px solid rgba(77,158,255,.18);border-radius:11px;padding:1.1rem;margin-bottom:1.2rem;page-break-inside:avoid;">';
-  _h+='<div style="font-size:.76rem;font-weight:800;color:#4D9EFF;margin-bottom:.55rem;">🤖 Synth\xe8se de Conformit\xe9 — TACT</div>';
-  _h+='<div style="font-size:.8rem;line-height:1.7;">'+(review||'<em style="color:#8bbccc;">Analyse de conformit\xe9 en cours…</em>')+'</div></div>\n';
-  _h+=agentSecs;
-  _h+=mktH;
-  _h+='<div style="text-align:center;padding:1.1rem;color:rgba(160,220,235,.3);font-size:.6rem;border-top:1px solid rgba(255,255,255,.06);margin-top:.9rem;">Audit g\xe9n\xe9r\xe9 automatiquement par TACT \xb7 Tactic Academy Corpus Builder \xb7 ';
-  _h+=dateStr;
-  _h+='</div>\n</div>\n</body>\n</html>';
-  return _h;
-}
-
-/* ── Preview / Download ── */
-function previewAudit(){
-  const html=localStorage.getItem('audit_html')||_buildAuditHTML();
-  const w=window.open('','_blank','width=1060,height=920');
-  if(!w){ toast('Autorisez les popups pour afficher l\'audit','error'); return; }
-  w.document.open(); w.document.write(html); w.document.close();
-}
-
-function downloadAudit(){
-  const html=localStorage.getItem('audit_html')||_buildAuditHTML();
-  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url; a.download='audit-apex-'+new Date().toISOString().split('T')[0]+'.html';
-  a.click(); URL.revokeObjectURL(url);
-  toast('Audit t\xe9l\xe9charg\xe9 — ouvrez dans le navigateur et imprimez en PDF');
-}
-
-/* ── TACT compliance review (Claude API call) ── */
-async function _tactComplianceReview(){
-  const k=localStorage.getItem('tactic_claude_key');
-  if(!k) return 'Cl\xe9 API requise pour la revue de conformit\xe9.';
-  _agentLoad();
-  const lines=[];
-  Object.keys(AGENT_DEFS).forEach(id=>{
-    const r=_agentResults[id]; if(!r) return;
-    const c=r.findings.filter(f=>f.sev==='critique').map(f=>f.text);
-    const w=r.findings.filter(f=>f.sev==='warning').map(f=>f.text);
-    lines.push(AGENT_DEFS[id].name+' : critiques=['+(c.join(' | ')||'aucune')+'] alertes=['+(w.join(' | ')||'aucune')+']');
-  });
-  let cs; try{ cs=_corpusSummary(); }catch(e){ cs={total:0,tracks:0}; }
-  const ps=_perfSummary();
-  const avgH=Math.round(ps.reduce((s,l)=>s+l.health,0)/Math.max(ps.length,1));
-  const prompt='Tu es TACT, agent de conformit\xe9 et coh\xe9rence p\xe9dagogique de Tactic Academy.\n'
-    +'Rapport d\'audit du '+new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+' :\n'
-    +'CORPUS : '+cs.total+' le\xe7ons \xb7 '+cs.tracks+' modules \xb7 score sant\xe9 moyen '+avgH+'/100\n'
-    +'MARKETING : '+((_mktData||[]).length)+' campagne(s) \xb7 SYLLABUS : '+(_syllabusName||'non charg\xe9')+'\n'
-    +'FINDINGS :\n'+(lines.join('\n')||'Aucun agent ex\xe9cut\xe9.')+'\n\n'
-    +'R\xe9ponds en 2 parties (HTML simple, <b> et <br> autoris\xe9s) :\n'
-    +'1. SYNTH\xc8SE (3 phrases max) : \xe9tat global, point le plus critique, priorit\xe9 imm\xe9diate.\n'
-    +'2. Pour chaque agent n\xe9cessitant une correction, \xe9met une instruction sur sa propre ligne : <AGENT_INSTRUCTION>agentId:instruction pr\xe9cise</AGENT_INSTRUCTION>\n'
-    +'Agents : corpus, perf, syllabus, reco, create, marketing. N\'\xe9met une instruction que si n\xe9cessaire.\n'
-    +'Commence directement par la synth\xe8se sans titre.';
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:700,messages:[{role:'user',content:prompt}]})
-    });
-    const data=await res.json();
-    if(!res.ok) throw new Error(data.error?.message||'API error');
-    const text=data.content?.[0]?.text||'';
-    _parseAgentInstructions(text);
-    return text.replace(/<AGENT_INSTRUCTION>[\s\S]*?<\/AGENT_INSTRUCTION>/g,'').trim();
-  }catch(e){ return 'Revue indisponible : '+e.message; }
-}
-
-/* ── Run full daily audit ── */
-async function _runDailyAudit(){
-  if(_auditRunning){ toast('Audit d\xe9j\xe0 en cours...','error'); return; }
-  if(!localStorage.getItem('tactic_claude_key')){ toast('Cl\xe9 Claude requise pour l\'audit','error'); return; }
-  _auditRunning=true;
-  localStorage.setItem('audit_date',new Date().toDateString());
-  const panel=document.getElementById('tactPanel');
-  if(panel&&!panel.classList.contains('open')) toggleTact();
-  const fw=_checkDataFreshness();
-  if(fw.length){
-    tactAppend('bot','⚠️ <b>Données incomplètes pour l\'audit :</b><br>'+fw.map(w=>'• '+w).join('<br>')+'<br><br>Analyse lancée avec les données disponibles.');
-  } else {
-    tactAppend('bot','📊 <b>Audit journalier lanc\xe9.</b> Ex\xe9cution des 6 agents en cours...');
-  }
-  _showAuditBanner('Audit en cours...',false);
-  try{
-    await runAllAgents();
-    tactAppend('bot','✅ Agents termin\xe9s. Synth\xe8se de conformit\xe9 TACT en cours...');
-    const review=await _tactComplianceReview();
-    localStorage.setItem('audit_review',review);
-    localStorage.setItem('audit_ts',new Date().toISOString());
-    const html=_buildAuditHTML(review);
-    localStorage.setItem('audit_html',html);
-    _loadAgentInstructions();
-    const tStr=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-    const dStr=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-    tactAppend('bot','📋 <b>Audit journalier pr\xeat</b> — '+dStr+' \xe0 '+tStr+'<br><br>'+review+'<br><br><div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;"><button class="tact-sug" onclick="previewAudit()">📄 Voir l\'audit</button><button class="tact-sug" onclick="downloadAudit()">T\xe9l\xe9charger PDF</button></div>');
-    _showAuditBanner('Audit '+dStr+' — '+tStr,true);
-  }catch(e){
-    tactAppend('bot','Audit \xe9chou\xe9 : '+e.message);
-    _showAuditBanner('Audit \xe9chou\xe9 — voir TACT',false);
-  }
-  _auditRunning=false;
-}
-
-/* ── Daily scheduler ── */
-function _checkDailySchedule(){
-  if(!localStorage.getItem('tactic_claude_key')) return;
-  const now=new Date();
-  if(now.getHours()>=8 && localStorage.getItem('audit_date')!==now.toDateString() && !_auditRunning){
-    _runDailyAudit();
-  }
-}
-
-function _initDailyScheduler(){
-  const today=new Date().toDateString();
-  if(localStorage.getItem('audit_date')===today && localStorage.getItem('audit_html')){
-    const ts=localStorage.getItem('audit_ts');
-    const tStr=ts?new Date(ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
-    _showAuditBanner('📋 Audit d\'aujourd\'hui disponible'+(tStr?' ('+tStr+')':''),true);
-    _loadAgentInstructions();
-  }
-  _checkDailySchedule();
-  setInterval(_checkDailySchedule,60000);
-}
 
 /* ══════════════════════════════════════════════
    AGENTS IA — Analyse continue du corpus
@@ -4113,7 +3751,7 @@ async function _runCorpusAgent(){
   const prompt=`Tu es un expert en ingénierie pédagogique. Analyse ce corpus e-learning et génère une liste de findings JSON.
 Corpus : ${JSON.stringify(cs,null,2)}
 Retourne UNIQUEMENT un tableau JSON : [{"sev":"critique|warning|ok","text":"finding concis en français"}]
-Max 8 findings. Priorité : déséquilibres de niveaux, modules trop petits/grands, tags manquants, lacunes thématiques.`+_getAgentInstruction('corpus');
+Max 8 findings. Priorité : déséquilibres de niveaux, modules trop petits/grands, tags manquants, lacunes thématiques.`;
   const findings=await _claudeAgentCall(prompt);
   return {findings,extra:{total:cs.total,tracks:cs.tracks}};
 }
@@ -4126,7 +3764,7 @@ async function _runPerfAgent(){
 Score santé moyen : ${avg}/100
 Leçons les plus à risque : ${JSON.stringify(bottom10,null,2)}
 Retourne UNIQUEMENT un tableau JSON : [{"sev":"critique|warning|ok","text":"finding concis en français"}]
-Max 8 findings. Focus sur patterns de décrochage, quiz trop difficiles, engagement faible.`+_getAgentInstruction('perf');
+Max 8 findings. Focus sur patterns de décrochage, quiz trop difficiles, engagement faible.`;
   const findings=await _claudeAgentCall(prompt);
   const critiques=ps.filter(l=>l.health<50).length;
   return {findings,extra:{avg,critiques,total:ps.length}};
@@ -4143,7 +3781,7 @@ async function _runSyllabusAgent(){
 Corpus (${cs.total} leçons, ${cs.tracks} modules) : ${JSON.stringify(cs.sample,null,2)}
 Analyse le syllabus et retourne UNIQUEMENT un tableau JSON :
 [{"sev":"critique|warning|ok","text":"finding de corrélation concis en français"}]
-Max 8 findings. Focus : objectifs du syllabus non couverts, thèmes surdimensionnés, alignement niveau/contenu.`+_getAgentInstruction('syllabus');
+Max 8 findings. Focus : objectifs du syllabus non couverts, thèmes surdimensionnés, alignement niveau/contenu.`;
   const findings=await _claudeAgentCall(prompt,base64);
   return {findings,extra:{syllabusName:_syllabusName}};
 }
@@ -4158,7 +3796,7 @@ async function _runRecoAgent(){
 Problèmes : ${JSON.stringify(allFindings,null,2)}
 Retourne UNIQUEMENT un tableau JSON de recommandations concrètes :
 [{"sev":"critique|warning|ok","text":"Action concrète et immédiate en français (commence par un verbe d'action)"}]
-Max 6 recommandations, du plus urgent au moins urgent.`+_getAgentInstruction('reco');
+Max 6 recommandations, du plus urgent au moins urgent.`;
   const findings=await _claudeAgentCall(prompt);
   return {findings,extra:{}};
 }
@@ -4174,7 +3812,6 @@ function _getAutoPrefs(){ try{return JSON.parse(localStorage.getItem('agent_auto
 /* ── Init agents tab ── */
 function initAgentsTab(){
   _agentLoad();
-  _loadAgentInstructions();
   const prefs=_getAutoPrefs();
   Object.keys(AGENT_DEFS).forEach(id=>{
     if(prefs[id]) document.getElementById('auto-'+id).checked=true;
