@@ -3865,7 +3865,9 @@ function _buildAuditHTML(review){
   _h+='<div style="font-size:.8rem;line-height:1.7;">'+(review||'<em style="color:#8bbccc;">Analyse de conformit\xe9 en cours…</em>')+'</div></div>\n';
   _h+=agentSecs;
   _h+=mktH;
-  _h+='<div style="text-align:center;padding:1.1rem;color:rgba(160,220,235,.3);font-size:.6rem;border-top:1px solid rgba(255,255,255,.06);margin-top:.9rem;">Audit g\xe9n\xe9r\xe9 automatiquement par TACT \xb7 Tactic Academy Corpus Builder \xb7 '+dateStr+'</div>\n</div>\n</body>\n</html>';
+  _h+='<div style="text-align:center;padding:1.1rem;color:rgba(160,220,235,.3);font-size:.6rem;border-top:1px solid rgba(255,255,255,.06);margin-top:.9rem;">Audit g\xe9n\xe9r\xe9 automatiquement par TACT \xb7 Tactic Academy Corpus Builder \xb7 ';
+  _h+=dateStr;
+  _h+='</div>\n</div>\n</body>\n</html>';
   return _h;
 }
 
