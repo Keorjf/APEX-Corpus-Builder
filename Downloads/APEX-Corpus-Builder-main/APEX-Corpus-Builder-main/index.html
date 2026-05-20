@@ -1047,16 +1047,6 @@ select option{background:var(--bg2);}
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
-window.onerror=function(msg,src,line,col,err){
-  var b=document.createElement('div');
-  b.style.cssText='position:fixed;top:0;left:0;right:0;background:#FF3B5C;color:#fff;padding:10px 14px;font-family:monospace;font-size:11px;z-index:99999;white-space:pre-wrap;';
-  b.textContent='JS ERROR: '+msg+'\nLine: '+line+' Col: '+col;
-  document.body?document.body.prepend(b):(document.addEventListener('DOMContentLoaded',function(){document.body.prepend(b);}));
-  return false;
-};
-</script>
-
-<script>
 /* ══════════════════════════
    DONNÉES — chargées dynamiquement depuis Tactic Academy
 ══════════════════════════ */
@@ -3699,7 +3689,7 @@ initMarketing();
 setTimeout(_initDailyScheduler,800);
 
 /* ══════════════════════════════════════════════
-   AUDIT JOURNALIER — Planificateur & Générateur
+   AUDIT JOURNALIER
    ══════════════════════════════════════════════ */
 let _auditRunning=false;
 
@@ -3707,16 +3697,16 @@ let _auditRunning=false;
 function _checkDataFreshness(){
   _agentLoad();
   const w=[];
-  try{ const cs=_corpusSummary(); if(!cs||!cs.total) w.push('Corpus vide — aucun cours chargé'); }catch(e){}
-  if(!_mktData||!_mktData.length) w.push('Marketing — aucune donnée de campagne');
-  if(!_syllabusUrl) w.push('Syllabus PDF non chargé (onglet Explorer)');
+  try{ const cs=_corpusSummary(); if(!cs||!cs.total) w.push('Corpus vide — aucun cours charg\xe9'); }catch(e){}
+  if(!_mktData||!_mktData.length) w.push('Marketing — aucune donn\xe9e de campagne');
+  if(!_syllabusUrl) w.push('Syllabus PDF non charg\xe9 (onglet Explorer)');
   const today=new Date().toDateString();
   Object.keys(AGENT_DEFS).forEach(id=>{
     const ts=localStorage.getItem('agent_ts_'+id);
-    if(!ts) w.push(AGENT_DEFS[id].name+' — jamais exécuté');
+    if(!ts) w.push(AGENT_DEFS[id].name+' — jamais ex\xe9cut\xe9');
     else if(new Date(parseInt(ts)).toDateString()!==today){
       const d=new Date(parseInt(ts)).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
-      w.push(AGENT_DEFS[id].name+' — données du '+d);
+      w.push(AGENT_DEFS[id].name+' — donn\xe9es du '+d);
     }
   });
   return w;
@@ -3761,7 +3751,7 @@ function _parseAgentInstructions(text){
 function _getAgentInstruction(id){
   try{
     const all=JSON.parse(localStorage.getItem('agent_instructions')||'{}');
-    return all[id]?.text?'\n\n📌 INSTRUCTION TACT (conformité) : '+all[id].text:'';
+    return all[id]?.text?'\n\n📌 INSTRUCTION TACT (conformit\xe9) : '+all[id].text:'';
   }catch(e){ return ''; }
 }
 
@@ -3777,7 +3767,7 @@ function _loadAgentInstructions(){
 
 /* ── SVG bar chart for audit HTML (self-contained, no CSS deps) ── */
 function _auditBar(items){
-  if(!items||!items.length) return '<em style="color:#8bbccc;font-size:.75rem;">Aucune donnée</em>';
+  if(!items||!items.length) return '<em style="color:#8bbccc;font-size:.75rem;">Aucune donn\xe9e</em>';
   const maxV=Math.max(...items.map(d=>Math.abs(d.v)),1);
   const LW=128,BW=175,VW=80,BH=17,GAP=5;
   const H=items.length*(BH+GAP)-GAP+4;
@@ -3785,7 +3775,12 @@ function _auditBar(items){
     const bw=Math.max(Math.abs(d.v)/maxV*BW,3);
     const y=i*(BH+GAP)+2;
     const nm=d.label.length>18?d.label.slice(0,17)+'…':d.label;
-    return `<g><text x="${LW-5}" y="${y+BH/2+4}" text-anchor="end" fill="#8bbccc" font-size="9.5" font-family="Arial,sans-serif">${nm}</text><rect x="${LW}" y="${y}" width="${bw}" height="${BH}" rx="3" fill="${d.col||'#4D9EFF'}" opacity=".85"/><text x="${LW+bw+5}" y="${y+BH/2+4}" fill="${d.col||'#4D9EFF'}" font-size="9.5" font-family="Arial,sans-serif" font-weight="700">${d.fmt}</text></g>`;
+    const c=d.col||'#4D9EFF';
+    return '<g>'
+      +'<text x="'+(LW-5)+'" y="'+(y+BH/2+4)+'" text-anchor="end" fill="#8bbccc" font-size="9.5" font-family="Arial,sans-serif">'+nm+'</text>'
+      +'<rect x="'+LW+'" y="'+y+'" width="'+bw+'" height="'+BH+'" rx="3" fill="'+c+'" opacity=".85"/>'
+      +'<text x="'+(LW+bw+5)+'" y="'+(y+BH/2+4)+'" fill="'+c+'" font-size="9.5" font-family="Arial,sans-serif" font-weight="700">'+d.fmt+'</text>'
+      +'</g>';
   }).join('');
   return '<svg viewBox="0 0 '+(LW+BW+VW)+' '+H+'" width="100%" style="display:block;overflow:visible;">'+rows+'</svg>';
 }
@@ -3831,25 +3826,32 @@ function _buildAuditHTML(review){
     mktH='<div style="background:rgba(31,72,90,.4);border:1px solid rgba(77,158,255,.15);border-radius:10px;padding:.95rem;margin-bottom:.7rem;page-break-inside:avoid;"><div style="font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#4D9EFF;margin-bottom:.55rem;padding-bottom:.35rem;border-bottom:1px solid rgba(77,158,255,.14);">📣 Marketing — '+_mktData.length+' campagne(s)'+(_agentResults.marketing?' \xb7 '+_agentResults.marketing.ts:'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.65rem;"><div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#8bbccc;margin-bottom:.3rem;">ROI par campagne</div>'+_auditBar(roiIt)+'</div><div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:#8bbccc;margin-bottom:.3rem;">Revenu par campagne</div>'+_auditBar(revIt)+'</div></div>'+mktF+'</div>';
   }
 
-  return '<!DOCTYPE html>\n<html lang="fr">\n<head>\n<meta charset="UTF-8">\n<title>Audit APEX — '+dateStr+'</title>\n<style>\n@page{margin:18mm 14mm;size:A4;}*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Arial,sans-serif;background:#0F2E3D;color:#E8F8FA;padding:1.5rem;}@media print{body{background:#fff;color:#111;padding:0;}.no-print{display:none;}}.doc{max-width:860px;margin:0 auto;}</style>\n</head>\n<body>\n<div class="doc">\n'
-    +'<div class="no-print" style="background:rgba(31,72,90,.8);border-radius:10px;padding:.7rem 1rem;margin-bottom:1.5rem;display:flex;gap:.5rem;align-items:center;"><button onclick="window.print()" style="padding:.36rem .85rem;font-size:.74rem;font-weight:700;border-radius:7px;border:1px solid rgba(77,158,255,.4);background:rgba(77,158,255,.15);color:#4D9EFF;cursor:pointer;">🖨️ Imprimer / Enregistrer en PDF</button><span style="font-size:.67rem;color:rgba(160,220,235,.5);">Dans la fenêtre d\'impression → sélectionner "Enregistrer en PDF"</span></div>\n'
-    +'<div style="background:linear-gradient(135deg,#1F485A,#20556A);border-radius:13px;padding:1.6rem 2rem;margin-bottom:1.4rem;border:1px solid rgba(255,255,255,.1);"><div style="font-size:1rem;font-weight:800;color:#FFCD0D;letter-spacing:.07em;margin-bottom:.18rem;">APEX \xb7 TACTIC ACADEMY</div><div style="font-size:1.25rem;font-weight:800;color:#E8F8FA;margin-bottom:.12rem;">Audit Journalier du Corpus</div><div style="font-size:.78rem;color:rgba(160,220,235,.65);">'+dateStr+' — g\xe9n\xe9r\xe9 \xe0 '+timeStr+' par TACT</div><div style="display:inline-block;margin-top:.75rem;padding:.25rem .8rem;border-radius:18px;font-size:.68rem;font-weight:800;letter-spacing:.08em;background:'+sCol+'22;color:'+sCol+';border:1px solid '+sCol+'44;">'+sLbl+'</div></div>\n'
-    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.4rem;">'
-    +'<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:#FFCD0D;">'+cs.total+'</div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Le\xe7ons</div></div>'
-    +'<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:'+(avgH>70?'#00E87A':avgH>50?'#FFCD0D':'#FF3B5C')+';">'+avgH+'<span style="font-size:.85rem;">/100</span></div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Score Moyen</div></div>'
-    +'<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:'+(nCrit>0?'#FF3B5C':'#00E87A')+';">'+nCrit+'</div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Critiques</div></div>'
-    +'<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:#FFCD0D;">'+nWarn+'</div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Alertes</div></div>'
-    +'</div>\n'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.4rem;">'
-    +'<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Distribution par niveau</div>'+_auditBar(lvlItems)+'</div>'
-    +'<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Top modules</div>'+_auditBar(trkItems)+'</div>'
-    +'<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Meilleures le\xe7ons</div>'+_auditBar(top8)+'</div>'
-    +'<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Le\xe7ons \xe0 risque</div>'+_auditBar(bot8)+'</div>'
-    +'</div>\n'
-    +'<div style="background:linear-gradient(135deg,rgba(77,158,255,.07),rgba(167,139,250,.07));border:1px solid rgba(77,158,255,.18);border-radius:11px;padding:1.1rem;margin-bottom:1.2rem;page-break-inside:avoid;"><div style="font-size:.76rem;font-weight:800;color:#4D9EFF;margin-bottom:.55rem;">🤖 Synth\xe8se de Conformit\xe9 — TACT</div><div style="font-size:.8rem;line-height:1.7;">'+(review||'<em style="color:#8bbccc;">Analyse de conformit\xe9 en cours…</em>')+'</div></div>\n'
-    +agentSecs
-    +mktH
-    +'<div style="text-align:center;padding:1.1rem;color:rgba(160,220,235,.3);font-size:.6rem;border-top:1px solid rgba(255,255,255,.06);margin-top:.9rem;">Audit g\xe9n\xe9r\xe9 automatiquement par TACT \xb7 Tactic Academy Corpus Builder \xb7 '+dateStr+'</div>\n</div>\n</body>\n</html>';
+  var _h='<!DOCTYPE html>\n<html lang="fr">\n<head>\n<meta charset="UTF-8">\n<title>Audit APEX — '+dateStr+'</title>\n<style>\n@page{margin:18mm 14mm;size:A4;}*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Arial,sans-serif;background:#0F2E3D;color:#E8F8FA;padding:1.5rem;}@media print{body{background:#fff;color:#111;padding:0;}.no-print{display:none;}}.doc{max-width:860px;margin:0 auto;}</style>\n</head>\n<body>\n<div class="doc">\n';
+  _h+='<div class="no-print" style="background:rgba(31,72,90,.8);border-radius:10px;padding:.7rem 1rem;margin-bottom:1.5rem;display:flex;gap:.5rem;align-items:center;"><button onclick="window.print()" style="padding:.36rem .85rem;font-size:.74rem;font-weight:700;border-radius:7px;border:1px solid rgba(77,158,255,.4);background:rgba(77,158,255,.15);color:#4D9EFF;cursor:pointer;">🖨️ Imprimer / Enregistrer en PDF</button><span style="font-size:.67rem;color:rgba(160,220,235,.5);">Dans la fen\xeatre d\'impression → s\xe9lectionner "Enregistrer en PDF"</span></div>\n';
+  _h+='<div style="background:linear-gradient(135deg,#1F485A,#20556A);border-radius:13px;padding:1.6rem 2rem;margin-bottom:1.4rem;border:1px solid rgba(255,255,255,.1);">';
+  _h+='<div style="font-size:1rem;font-weight:800;color:#FFCD0D;letter-spacing:.07em;margin-bottom:.18rem;">APEX \xb7 TACTIC ACADEMY</div>';
+  _h+='<div style="font-size:1.25rem;font-weight:800;color:#E8F8FA;margin-bottom:.12rem;">Audit Journalier du Corpus</div>';
+  _h+='<div style="font-size:.78rem;color:rgba(160,220,235,.65);">'+dateStr+' — g\xe9n\xe9r\xe9 \xe0 '+timeStr+' par TACT</div>';
+  _h+='<div style="display:inline-block;margin-top:.75rem;padding:.25rem .8rem;border-radius:18px;font-size:.68rem;font-weight:800;letter-spacing:.08em;background:'+sCol+'22;color:'+sCol+';border:1px solid '+sCol+'44;">'+sLbl+'</div></div>\n';
+  _h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.4rem;">';
+  _h+='<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:#FFCD0D;">'+cs.total+'</div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Le\xe7ons</div></div>';
+  _h+='<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:'+(avgH>70?'#00E87A':avgH>50?'#FFCD0D':'#FF3B5C')+';">'+avgH+'<span style="font-size:.85rem;">/100</span></div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Score Moyen</div></div>';
+  _h+='<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:'+(nCrit>0?'#FF3B5C':'#00E87A')+';">'+nCrit+'</div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Critiques</div></div>';
+  _h+='<div style="background:rgba(31,72,90,.55);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.85rem;text-align:center;"><div style="font-size:1.75rem;font-weight:800;color:#FFCD0D;">'+nWarn+'</div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-top:.22rem;">Alertes</div></div>';
+  _h+='</div>\n';
+  _h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.4rem;">';
+  _h+='<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Distribution par niveau</div>'+_auditBar(lvlItems)+'</div>';
+  _h+='<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Top modules</div>'+_auditBar(trkItems)+'</div>';
+  _h+='<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Meilleures le\xe7ons</div>'+_auditBar(top8)+'</div>';
+  _h+='<div style="background:rgba(31,72,90,.4);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:.85rem;"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;color:rgba(160,220,235,.5);margin-bottom:.45rem;">Le\xe7ons \xe0 risque</div>'+_auditBar(bot8)+'</div>';
+  _h+='</div>\n';
+  _h+='<div style="background:linear-gradient(135deg,rgba(77,158,255,.07),rgba(167,139,250,.07));border:1px solid rgba(77,158,255,.18);border-radius:11px;padding:1.1rem;margin-bottom:1.2rem;page-break-inside:avoid;">';
+  _h+='<div style="font-size:.76rem;font-weight:800;color:#4D9EFF;margin-bottom:.55rem;">🤖 Synth\xe8se de Conformit\xe9 — TACT</div>';
+  _h+='<div style="font-size:.8rem;line-height:1.7;">'+(review||'<em style="color:#8bbccc;">Analyse de conformit\xe9 en cours…</em>')+'</div></div>\n';
+  _h+=agentSecs;
+  _h+=mktH;
+  _h+='<div style="text-align:center;padding:1.1rem;color:rgba(160,220,235,.3);font-size:.6rem;border-top:1px solid rgba(255,255,255,.06);margin-top:.9rem;">Audit g\xe9n\xe9r\xe9 automatiquement par TACT \xb7 Tactic Academy Corpus Builder \xb7 '+dateStr+'</div>\n</div>\n</body>\n</html>';
+  return _h;
 }
 
 /* ── Preview / Download ── */
@@ -3867,34 +3869,34 @@ function downloadAudit(){
   const a=document.createElement('a');
   a.href=url; a.download='audit-apex-'+new Date().toISOString().split('T')[0]+'.html';
   a.click(); URL.revokeObjectURL(url);
-  toast('Audit téléchargé — ouvrez dans le navigateur et imprimez en PDF');
+  toast('Audit t\xe9l\xe9charg\xe9 — ouvrez dans le navigateur et imprimez en PDF');
 }
 
 /* ── TACT compliance review (Claude API call) ── */
 async function _tactComplianceReview(){
   const k=localStorage.getItem('tactic_claude_key');
-  if(!k) return 'Clé API requise pour la revue de conformité.';
+  if(!k) return 'Cl\xe9 API requise pour la revue de conformit\xe9.';
   _agentLoad();
   const lines=[];
   Object.keys(AGENT_DEFS).forEach(id=>{
     const r=_agentResults[id]; if(!r) return;
     const c=r.findings.filter(f=>f.sev==='critique').map(f=>f.text);
     const w=r.findings.filter(f=>f.sev==='warning').map(f=>f.text);
-    lines.push(AGENT_DEFS[id].name+' : critiques=['+( c.join(' | ')||'aucune')+'] alertes=['+(w.join(' | ')||'aucune')+']');
+    lines.push(AGENT_DEFS[id].name+' : critiques=['+(c.join(' | ')||'aucune')+'] alertes=['+(w.join(' | ')||'aucune')+']');
   });
   let cs; try{ cs=_corpusSummary(); }catch(e){ cs={total:0,tracks:0}; }
   const ps=_perfSummary();
   const avgH=Math.round(ps.reduce((s,l)=>s+l.health,0)/Math.max(ps.length,1));
-  const prompt='Tu es TACT, agent de conformité et cohérence pédagogique de Tactic Academy.\n'
+  const prompt='Tu es TACT, agent de conformit\xe9 et coh\xe9rence p\xe9dagogique de Tactic Academy.\n'
     +'Rapport d\'audit du '+new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+' :\n'
-    +'CORPUS : '+cs.total+' leçons \xb7 '+cs.tracks+' modules \xb7 score santé moyen '+avgH+'/100\n'
-    +'MARKETING : '+((_mktData||[]).length)+' campagne(s) \xb7 SYLLABUS : '+(_syllabusName||'non chargé')+'\n'
-    +'FINDINGS :\n'+(lines.join('\n')||'Aucun agent exécuté.')+'\n\n'
-    +'Réponds en 2 parties (HTML simple, <b> et <br> autorisés) :\n'
-    +'1. SYNTHÈSE (3 phrases max) : état global, point le plus critique, priorité immédiate.\n'
-    +'2. Pour chaque agent nécessitant une correction, émet une instruction sur sa propre ligne : <AGENT_INSTRUCTION>agentId:instruction précise</AGENT_INSTRUCTION>\n'
-    +'Agents : corpus, perf, syllabus, reco, create, marketing. N\'émet une instruction que si nécessaire.\n'
-    +'Commence directement par la synthèse sans titre.';
+    +'CORPUS : '+cs.total+' le\xe7ons \xb7 '+cs.tracks+' modules \xb7 score sant\xe9 moyen '+avgH+'/100\n'
+    +'MARKETING : '+((_mktData||[]).length)+' campagne(s) \xb7 SYLLABUS : '+(_syllabusName||'non charg\xe9')+'\n'
+    +'FINDINGS :\n'+(lines.join('\n')||'Aucun agent ex\xe9cut\xe9.')+'\n\n'
+    +'R\xe9ponds en 2 parties (HTML simple, <b> et <br> autoris\xe9s) :\n'
+    +'1. SYNTH\xc8SE (3 phrases max) : \xe9tat global, point le plus critique, priorit\xe9 imm\xe9diate.\n'
+    +'2. Pour chaque agent n\xe9cessitant une correction, \xe9met une instruction sur sa propre ligne : <AGENT_INSTRUCTION>agentId:instruction pr\xe9cise</AGENT_INSTRUCTION>\n'
+    +'Agents : corpus, perf, syllabus, reco, create, marketing. N\'émet une instruction que si n\xe9cessaire.\n'
+    +'Commence directement par la synth\xe8se sans titre.';
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
@@ -3911,8 +3913,8 @@ async function _tactComplianceReview(){
 
 /* ── Run full daily audit ── */
 async function _runDailyAudit(){
-  if(_auditRunning){ toast('Audit déjà en cours…','error'); return; }
-  if(!localStorage.getItem('tactic_claude_key')){ toast('Clé Claude requise pour l\'audit','error'); return; }
+  if(_auditRunning){ toast('Audit d\xe9j\xe0 en cours...','error'); return; }
+  if(!localStorage.getItem('tactic_claude_key')){ toast('Cl\xe9 Claude requise pour l\'audit','error'); return; }
   _auditRunning=true;
   localStorage.setItem('audit_date',new Date().toDateString());
   const panel=document.getElementById('tactPanel');
@@ -3921,12 +3923,12 @@ async function _runDailyAudit(){
   if(fw.length){
     tactAppend('bot','⚠️ <b>Données incomplètes pour l\'audit :</b><br>'+fw.map(w=>'• '+w).join('<br>')+'<br><br>Analyse lancée avec les données disponibles.');
   } else {
-    tactAppend('bot','📊 <b>Audit journalier lancé.</b> Exécution des 6 agents en cours…');
+    tactAppend('bot','📊 <b>Audit journalier lanc\xe9.</b> Ex\xe9cution des 6 agents en cours...');
   }
-  _showAuditBanner('⏳ Audit en cours…',false);
+  _showAuditBanner('Audit en cours...',false);
   try{
     await runAllAgents();
-    tactAppend('bot','✅ Agents terminés. Synthèse de conformité TACT en cours…');
+    tactAppend('bot','✅ Agents termin\xe9s. Synth\xe8se de conformit\xe9 TACT en cours...');
     const review=await _tactComplianceReview();
     localStorage.setItem('audit_review',review);
     localStorage.setItem('audit_ts',new Date().toISOString());
@@ -3935,11 +3937,11 @@ async function _runDailyAudit(){
     _loadAgentInstructions();
     const tStr=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
     const dStr=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-    tactAppend('bot','📋 <b>Audit journalier prêt</b> — '+dStr+' à '+tStr+'<br><br>'+review+'<br><br><div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;"><button class="tact-sug" onclick="previewAudit()">📄 Voir l\'audit</button><button class="tact-sug" onclick="downloadAudit()">⬇️ Télécharger PDF</button></div>');
-    _showAuditBanner('📋 Audit '+dStr+' — '+tStr,true);
+    tactAppend('bot','📋 <b>Audit journalier pr\xeat</b> — '+dStr+' \xe0 '+tStr+'<br><br>'+review+'<br><br><div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;"><button class="tact-sug" onclick="previewAudit()">📄 Voir l\'audit</button><button class="tact-sug" onclick="downloadAudit()">T\xe9l\xe9charger PDF</button></div>');
+    _showAuditBanner('Audit '+dStr+' — '+tStr,true);
   }catch(e){
-    tactAppend('bot','❌ Audit échoué : '+e.message);
-    _showAuditBanner('❌ Audit échoué — voir TACT',false);
+    tactAppend('bot','Audit \xe9chou\xe9 : '+e.message);
+    _showAuditBanner('Audit \xe9chou\xe9 — voir TACT',false);
   }
   _auditRunning=false;
 }
