@@ -184,10 +184,13 @@ select option{background:var(--bg2);}
 .ress-tag{font-size:.6rem;background:rgba(77,158,255,.12);color:var(--blue);padding:.05rem .32rem;border-radius:5px;white-space:nowrap;}
 .ress-icon-btn{background:none;border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;font-size:.65rem;padding:.12rem .38rem;transition:.12s;}
 .ress-icon-btn:hover{border-color:var(--blue);color:var(--blue);}
-.ress-input{width:100%;padding:.38rem .6rem;background:var(--bg3,#15394d);border:1px solid var(--border);border-radius:6px;color:var(--txt);font-size:.76rem;}
+.ress-input{width:100%;padding:.38rem .6rem;background:var(--bg3,#15394d);border:1px solid var(--border);border-radius:6px;color:var(--txt);font-size:.76rem;box-sizing:border-box;}
 .ress-input:focus{outline:none;border-color:var(--blue);}
 .ress-search{padding:.35rem .6rem;background:var(--bg3,#15394d);border:1px solid var(--border);border-radius:6px;color:var(--txt);font-size:.74rem;}
 .ress-search:focus{outline:none;border-color:var(--blue);}
+.ress-type-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.28rem;padding:.6rem .2rem;background:var(--bg3,#15394d);border:1px solid var(--border);border-radius:9px;color:var(--txt);cursor:pointer;font-size:.68rem;font-weight:600;width:100%;transition:.15s;line-height:1.2;}
+.ress-type-btn:hover{border-color:var(--blue);background:rgba(77,158,255,.1);color:var(--blue);}
+.ress-type-btn .ress-type-icon{font-size:1.25rem;}
 .code-preview{background:#000;border:1px solid var(--border);border-radius:9px;padding:.9rem;font-family:var(--font-mono);font-size:.68rem;color:#aaa;overflow:auto;max-height:300px;white-space:pre;line-height:1.7;}
 
 /* HELP OVERLAY */
@@ -710,50 +713,82 @@ select option{background:var(--bg2);}
       <div class="export-box" style="margin-bottom:1.2rem;" id="ressourcesBox">
         <div class="export-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.55rem;">
           <span>Base de Ressources</span>
-          <button class="btn" style="font-size:.65rem;padding:.2rem .55rem;" onclick="toggleRessourceForm()">+ Ajouter</button>
+          <button class="btn" style="font-size:.65rem;padding:.2rem .55rem;" onclick="toggleRessourcePicker()">+ Ajouter</button>
         </div>
-        <div style="font-size:.74rem;color:var(--soft);margin-bottom:.75rem;line-height:1.5;">Classe et annote tes ressources pédagogiques : articles, idées, références, outils.</div>
+        <div style="font-size:.74rem;color:var(--soft);margin-bottom:.75rem;line-height:1.5;">Classe et annote tes ressources : fichiers PC, liens, vidéos, images, articles, idées.</div>
 
         <!-- Search + Filter -->
         <div style="display:flex;gap:.4rem;margin-bottom:.6rem;">
           <input class="ress-search" id="ressSearch" type="text" placeholder="🔍 Rechercher…" style="flex:1;min-width:0;" oninput="renderRessources()">
           <select class="ress-search" id="ressFilter" onchange="renderRessources()" style="width:130px;flex-shrink:0;">
             <option value="">Tous</option>
+            <option value="fichier">📁 Fichier</option>
+            <option value="image">🖼️ Image</option>
+            <option value="youtube">🎬 YouTube</option>
+            <option value="audio">🎵 Audio</option>
+            <option value="lien">🔗 Lien</option>
             <option value="article">📰 Article</option>
             <option value="livre">📚 Livre</option>
-            <option value="vidéo">🎬 Vidéo</option>
             <option value="idée">💡 Idée</option>
-            <option value="outil">🔧 Outil</option>
             <option value="concept">🧩 Concept</option>
-            <option value="autre">📎 Autre</option>
+            <option value="outil">🔧 Outil</option>
           </select>
         </div>
 
         <!-- Liste -->
         <div id="ressListContainer" style="display:flex;flex-direction:column;gap:.38rem;min-height:1.5rem;"></div>
 
-        <!-- Formulaire (masqué par défaut) -->
-        <div id="ressForm" style="display:none;margin-top:.8rem;padding:.7rem;background:rgba(77,158,255,.04);border:1px solid rgba(77,158,255,.2);border-radius:8px;">
-          <div style="font-size:.67rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;" id="ressFormTitle">Nouvelle ressource</div>
-          <input type="hidden" id="ressEditId">
-          <div style="display:flex;flex-direction:column;gap:.4rem;">
-            <input class="ress-input" id="ressTitle" type="text" placeholder="Titre *">
-            <input class="ress-input" id="ressUrl" type="text" placeholder="URL (optionnel)">
-            <div style="display:flex;gap:.4rem;">
-              <select class="ress-input" id="ressType" style="flex:1;">
-                <option value="article">📰 Article</option>
-                <option value="livre">📚 Livre</option>
-                <option value="vidéo">🎬 Vidéo</option>
-                <option value="idée">💡 Idée</option>
-                <option value="outil">🔧 Outil</option>
-                <option value="concept">🧩 Concept</option>
-                <option value="autre">📎 Autre</option>
-              </select>
-              <input class="ress-input" id="ressTags" type="text" placeholder="Tags : finance, bourse…" style="flex:2;">
-            </div>
-            <textarea class="ress-input" id="ressNote" placeholder="Notes, annotation, résumé…" rows="3" style="resize:vertical;font-family:inherit;"></textarea>
+        <!-- Picker de type -->
+        <div id="ressTypePicker" style="display:none;margin-top:.85rem;padding:.75rem;background:rgba(0,0,0,.18);border-radius:9px;border:1px solid var(--border);">
+          <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:.55rem;">Que souhaitez-vous ajouter ?</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.42rem;">
+            <button class="ress-type-btn" onclick="openRessForm('fichier')"><span class="ress-type-icon">📁</span><span>Fichier PC</span></button>
+            <button class="ress-type-btn" onclick="openRessForm('image')"><span class="ress-type-icon">🖼️</span><span>Image</span></button>
+            <button class="ress-type-btn" onclick="openRessForm('audio')"><span class="ress-type-icon">🎵</span><span>Audio</span></button>
+            <button class="ress-type-btn" onclick="openRessForm('youtube')"><span class="ress-type-icon">🎬</span><span>YouTube</span></button>
+            <button class="ress-type-btn" onclick="openRessForm('lien')"><span class="ress-type-icon">🔗</span><span>Lien URL</span></button>
+            <button class="ress-type-btn" onclick="openRessForm('article')"><span class="ress-type-icon">📰</span><span>Article</span></button>
+            <button class="ress-type-btn" onclick="openRessForm('livre')"><span class="ress-type-icon">📚</span><span>Livre</span></button>
+            <button class="ress-type-btn" onclick="openRessForm('idée')"><span class="ress-type-icon">💡</span><span>Idée</span></button>
+            <button class="ress-type-btn" onclick="openRessForm('concept')"><span class="ress-type-icon">🧩</span><span>Concept</span></button>
           </div>
-          <div class="btn-row" style="margin-top:.5rem;">
+        </div>
+
+        <!-- Formulaire adaptatif -->
+        <div id="ressForm" style="display:none;margin-top:.8rem;padding:.75rem;background:rgba(77,158,255,.04);border:1px solid rgba(77,158,255,.2);border-radius:8px;">
+          <div style="font-size:.67rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:.55rem;" id="ressFormTitle">Nouvelle ressource</div>
+          <input type="hidden" id="ressEditId">
+          <input type="hidden" id="ressSourceType">
+          <div style="display:flex;flex-direction:column;gap:.42rem;">
+
+            <!-- Fichier / Image / Audio — zone d'upload -->
+            <div id="ressFileRow" style="display:none;">
+              <input type="file" id="ressFileInput" style="display:none;" onchange="handleRessFile(this)">
+              <div style="display:flex;align-items:center;gap:.5rem;">
+                <button class="btn" style="font-size:.73rem;flex-shrink:0;" onclick="document.getElementById('ressFileInput').click()">📂 Choisir un fichier</button>
+                <span id="ressFileName" style="font-size:.72rem;color:var(--soft);font-style:italic;">Aucun fichier sélectionné</span>
+              </div>
+              <!-- Prévisualisation image -->
+              <div id="ressImgPreviewWrap" style="display:none;margin-top:.45rem;">
+                <img id="ressImgPreviewEl" style="max-height:120px;border-radius:6px;border:1px solid var(--border);object-fit:cover;" alt="">
+              </div>
+            </div>
+
+            <!-- URL (lien / article / youtube) -->
+            <div id="ressUrlRow" style="display:none;">
+              <input class="ress-input" id="ressUrl" type="text" placeholder="URL" oninput="onRessUrlChange(this.value)">
+              <!-- Prévisualisation YouTube -->
+              <div id="ressYtPreview" style="display:none;margin-top:.45rem;display:flex;gap:.6rem;align-items:center;">
+                <img id="ressYtThumb" style="width:100px;border-radius:5px;border:1px solid var(--border);" alt="">
+                <span id="ressYtLabel" style="font-size:.72rem;color:var(--soft);"></span>
+              </div>
+            </div>
+
+            <input class="ress-input" id="ressTitle" type="text" placeholder="Titre *">
+            <input class="ress-input" id="ressTags" type="text" placeholder="Tags : finance, bourse… (séparés par virgules)">
+            <textarea class="ress-input" id="ressNote" placeholder="Notes, annotation, résumé…" rows="3" style="resize:vertical;font-family:inherit;line-height:1.5;"></textarea>
+          </div>
+          <div class="btn-row" style="margin-top:.55rem;">
             <button class="btn primary" onclick="saveRessource()" style="font-size:.74rem;">Enregistrer</button>
             <button class="btn" onclick="cancelRessourceForm()" style="font-size:.74rem;">Annuler</button>
           </div>
@@ -1800,10 +1835,17 @@ function importPdfLessons(){
    BASE DE RESSOURCES
    ══════════════════════════════════════════════ */
 const RESS_KEY='apex_ressources';
-const RESS_ICONS={article:'📰',livre:'📚','vid\xe9o':'🎬','id\xe9e':'💡',outil:'🔧',concept:'🧩',autre:'📎'};
+const RESS_ICONS={fichier:'📁',image:'🖼️',audio:'🎵',youtube:'🎬',lien:'🔗',article:'📰',livre:'📚','id\xe9e':'💡',concept:'🧩',outil:'🔧',autre:'📎'};
+const RESS_LABELS={fichier:'Fichier PC',image:'Image',audio:'Audio',youtube:'YouTube',lien:'Lien URL',article:'Article',livre:'Livre','id\xe9e':'Id\xe9e',concept:'Concept',outil:'Outil',autre:'Autre'};
+let _ressFileData=null; // {name,size,type,data?} stocké temporairement
 
 function _ressLoad(){ try{ return JSON.parse(localStorage.getItem(RESS_KEY)||'[]'); }catch(e){ return []; } }
 function _ressSave(d){ localStorage.setItem(RESS_KEY,JSON.stringify(d)); }
+
+function _ytId(url){
+  const m=(url||'').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+  return m?m[1]:null;
+}
 
 function renderRessources(){
   const data=_ressLoad();
@@ -1816,14 +1858,25 @@ function renderRessources(){
   });
   const c=document.getElementById('ressListContainer'); if(!c) return;
   if(!list.length){
-    c.innerHTML='<div style="text-align:center;padding:.9rem 0;font-size:.73rem;color:var(--muted);">'+(q||f?'Aucun r\xe9sultat pour ce filtre.':'Aucune ressource — cliquez sur <b>+ Ajouter</b> pour commencer.')+'</div>';
+    c.innerHTML='<div style="text-align:center;padding:.9rem 0;font-size:.73rem;color:var(--muted);">'+(q||f?'Aucun r\xe9sultat.':'Aucune ressource — cliquez sur <b>+ Ajouter</b> pour commencer.')+'</div>';
     return;
   }
   c.innerHTML=list.map(r=>{
     const icon=RESS_ICONS[r.type]||'📎';
     const tagsHtml=(r.tags||[]).filter(Boolean).map(t=>`<span class="ress-tag">${t.trim()}</span>`).join('');
     const noteHtml=r.note?`<div style="font-size:.71rem;color:var(--soft);margin-top:.22rem;line-height:1.45;white-space:pre-wrap;">${r.note.slice(0,220)}${r.note.length>220?'…':''}</div>`:'';
-    const urlHtml=r.url?`<div style="margin-top:.18rem;"><a href="${r.url.replace(/"/g,'&quot;')}" target="_blank" rel="noopener" style="font-size:.67rem;color:var(--blue);word-break:break-all;">${r.url.slice(0,70)}${r.url.length>70?'…':''}</a></div>`:'';
+    // Media preview
+    let mediaHtml='';
+    if(r.type==='youtube'&&r.url){
+      const vid=_ytId(r.url);
+      if(vid) mediaHtml=`<div style="margin-top:.3rem;"><img src="https://img.youtube.com/vi/${vid}/mqdefault.jpg" style="width:100%;max-width:220px;border-radius:5px;border:1px solid var(--border);" loading="lazy"></div>`;
+    } else if(r.type==='image'&&r.fileData){
+      mediaHtml=`<div style="margin-top:.3rem;"><img src="${r.fileData}" style="max-height:100px;border-radius:5px;border:1px solid var(--border);object-fit:cover;" loading="lazy"></div>`;
+    } else if(r.url&&r.type!=='youtube'){
+      mediaHtml=`<div style="margin-top:.18rem;"><a href="${r.url.replace(/"/g,'&quot;')}" target="_blank" rel="noopener" style="font-size:.67rem;color:var(--blue);word-break:break-all;">${r.url.slice(0,70)}${r.url.length>70?'…':''}</a></div>`;
+    } else if(r.fileInfo){
+      mediaHtml=`<div style="font-size:.68rem;color:var(--soft);margin-top:.15rem;">📎 ${r.fileInfo.name} — ${(r.fileInfo.size/1024).toFixed(0)} Ko</div>`;
+    }
     return `<div class="ress-card">
       <div style="display:flex;align-items:flex-start;gap:.5rem;">
         <span style="font-size:.95rem;flex-shrink:0;margin-top:.05rem;">${icon}</span>
@@ -1832,7 +1885,7 @@ function renderRessources(){
             <span style="font-size:.78rem;font-weight:700;color:var(--txt);">${r.title}</span>
             ${tagsHtml}
           </div>
-          ${urlHtml}${noteHtml}
+          ${mediaHtml}${noteHtml}
         </div>
         <div style="display:flex;gap:.2rem;flex-shrink:0;">
           <button class="ress-icon-btn" onclick="editRessource('${r.id}')">✏️</button>
@@ -1843,51 +1896,114 @@ function renderRessources(){
   }).join('');
 }
 
-function toggleRessourceForm(){
-  const f=document.getElementById('ressForm'); if(!f) return;
-  if(f.style.display==='none'||!f.style.display){
-    f.style.display='block';
-    document.getElementById('ressFormTitle').textContent='Nouvelle ressource';
-    document.getElementById('ressEditId').value='';
-    ['ressTitle','ressUrl','ressTags','ressNote'].forEach(id=>{ document.getElementById(id).value=''; });
-    document.getElementById('ressType').value='article';
-    document.getElementById('ressTitle').focus();
-  } else { f.style.display='none'; }
+function toggleRessourcePicker(){
+  const picker=document.getElementById('ressTypePicker');
+  const form=document.getElementById('ressForm');
+  if(picker.style.display==='none'||!picker.style.display){
+    picker.style.display='block'; form.style.display='none';
+    picker.scrollIntoView({behavior:'smooth',block:'nearest'});
+  } else { picker.style.display='none'; }
 }
 
-function cancelRessourceForm(){ document.getElementById('ressForm').style.display='none'; }
+function openRessForm(sourceType){
+  document.getElementById('ressTypePicker').style.display='none';
+  const form=document.getElementById('ressForm'); form.style.display='block';
+  // Reset
+  document.getElementById('ressEditId').value='';
+  document.getElementById('ressSourceType').value=sourceType;
+  ['ressTitle','ressTags','ressNote'].forEach(id=>{ document.getElementById(id).value=''; });
+  document.getElementById('ressFormTitle').textContent=(RESS_ICONS[sourceType]||'📎')+' '+( RESS_LABELS[sourceType]||'Ressource');
+  _ressFileData=null;
+  // Champ URL
+  const urlRow=document.getElementById('ressUrlRow');
+  const urlInput=document.getElementById('ressUrl');
+  urlInput.value='';
+  const needsUrl=['lien','youtube','article','livre'].includes(sourceType);
+  urlRow.style.display=needsUrl?'block':'none';
+  urlInput.placeholder=sourceType==='youtube'?'URL YouTube (ex: https://youtu.be/…)':'URL';
+  // Champ fichier
+  const fileRow=document.getElementById('ressFileRow');
+  fileRow.style.display=['fichier','image','audio'].includes(sourceType)?'flex':'none';
+  document.getElementById('ressFileName').textContent='Aucun fichier s\xe9lectionn\xe9';
+  document.getElementById('ressImgPreviewWrap').style.display='none';
+  // Accept selon type
+  const fi=document.getElementById('ressFileInput');
+  if(sourceType==='image') fi.accept='image/*';
+  else if(sourceType==='audio') fi.accept='audio/*';
+  else fi.accept='*/*';
+  // YouTube preview
+  document.getElementById('ressYtPreview').style.display='none';
+  document.getElementById('ressTitle').focus();
+  form.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function onRessUrlChange(url){
+  const vid=_ytId(url);
+  const prev=document.getElementById('ressYtPreview');
+  if(vid){
+    document.getElementById('ressYtThumb').src='https://img.youtube.com/vi/'+vid+'/mqdefault.jpg';
+    document.getElementById('ressYtLabel').textContent='ID: '+vid;
+    prev.style.display='flex';
+  } else { prev.style.display='none'; }
+}
+
+function handleRessFile(input){
+  const file=input.files[0]; if(!file) return;
+  document.getElementById('ressFileName').textContent=file.name+' ('+( file.size/1024).toFixed(0)+' Ko)';
+  if(!document.getElementById('ressTitle').value) document.getElementById('ressTitle').value=file.name.replace(/\.[^.]+$/,'');
+  const srcType=document.getElementById('ressSourceType').value;
+  if(srcType==='image'&&file.size<600000){
+    const rd=new FileReader();
+    rd.onload=e=>{ _ressFileData={name:file.name,size:file.size,type:file.type,data:e.target.result}; const img=document.getElementById('ressImgPreviewEl'); img.src=e.target.result; document.getElementById('ressImgPreviewWrap').style.display='block'; };
+    rd.readAsDataURL(file);
+  } else {
+    _ressFileData={name:file.name,size:file.size,type:file.type};
+    if(srcType==='image') toast('Image trop grande pour la pr\xe9visualisation (&gt;600 Ko)','error');
+  }
+}
+
+function cancelRessourceForm(){
+  document.getElementById('ressForm').style.display='none';
+  document.getElementById('ressTypePicker').style.display='none';
+  _ressFileData=null;
+}
 
 function saveRessource(){
   const title=document.getElementById('ressTitle').value.trim();
   if(!title){ toast('Titre requis','error'); return; }
   const editId=document.getElementById('ressEditId').value;
+  const srcType=document.getElementById('ressSourceType').value;
   const data=_ressLoad();
+  const prev=editId?data.find(r=>r.id===editId):{};
   const entry={
     id:editId||('r'+Date.now()),
     title,
-    url:document.getElementById('ressUrl').value.trim(),
-    type:document.getElementById('ressType').value,
+    type:srcType||prev?.type||'autre',
+    url:(['lien','youtube','article','livre'].includes(srcType)?document.getElementById('ressUrl').value.trim():prev?.url||''),
     tags:document.getElementById('ressTags').value.split(',').map(t=>t.trim()).filter(Boolean),
     note:document.getElementById('ressNote').value.trim(),
-    createdAt:editId?((data.find(r=>r.id===editId)||{}).createdAt||new Date().toISOString()):new Date().toISOString()
+    createdAt:editId?(prev?.createdAt||new Date().toISOString()):new Date().toISOString(),
+    fileInfo:_ressFileData?{name:_ressFileData.name,size:_ressFileData.size,type:_ressFileData.type}:(prev?.fileInfo||null),
+    fileData:(_ressFileData?.data)||prev?.fileData||null
   };
   if(editId){ const i=data.findIndex(r=>r.id===editId); if(i>=0) data[i]=entry; else data.push(entry); }
   else { data.unshift(entry); }
-  _ressSave(data); renderRessources(); cancelRessourceForm();
+  try{ _ressSave(data); }catch(e){ toast('Stockage plein — essayez une image moins lourde','error'); return; }
+  renderRessources(); cancelRessourceForm();
   toast(editId?'Ressource mise \xe0 jour':'Ressource ajout\xe9e');
 }
 
 function editRessource(id){
   const r=_ressLoad().find(x=>x.id===id); if(!r) return;
-  const f=document.getElementById('ressForm'); f.style.display='block';
-  document.getElementById('ressFormTitle').textContent='Modifier la ressource';
+  openRessForm(r.type||'autre');
   document.getElementById('ressEditId').value=id;
+  document.getElementById('ressFormTitle').textContent='Modifier : '+r.title.slice(0,30);
   document.getElementById('ressTitle').value=r.title;
-  document.getElementById('ressUrl').value=r.url||'';
-  document.getElementById('ressType').value=r.type||'article';
   document.getElementById('ressTags').value=(r.tags||[]).join(', ');
   document.getElementById('ressNote').value=r.note||'';
-  f.scrollIntoView({behavior:'smooth',block:'nearest'});
+  if(r.url){ document.getElementById('ressUrl').value=r.url; onRessUrlChange(r.url); document.getElementById('ressUrlRow').style.display='block'; }
+  if(r.fileInfo){ document.getElementById('ressFileName').textContent=r.fileInfo.name+' ('+(r.fileInfo.size/1024).toFixed(0)+' Ko)'; }
+  if(r.fileData&&r.type==='image'){ const img=document.getElementById('ressImgPreviewEl'); img.src=r.fileData; document.getElementById('ressImgPreviewWrap').style.display='block'; }
 }
 
 function deleteRessource(id){
