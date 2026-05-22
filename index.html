@@ -704,7 +704,7 @@ select option{background:var(--bg2);}
   <!-- SUGGEST -->
   <div class="section-tab active" id="tab-suggest">
     <div class="editor-wrap">
-      <div class="editor-hdr"><div><div class="editor-title">Idées de leçons</div><div style="font-size:.68rem;color:var(--muted);">Idées par module + import PDF</div></div></div>
+      <div class="editor-hdr"><div><div class="editor-title">Idées de leçons</div><div style="font-size:.68rem;color:var(--muted);">Base de ressources + idées par module</div></div></div>
 
       <!-- BASE DE RESSOURCES -->
       <div class="export-box" style="margin-bottom:1.2rem;" id="ressourcesBox">
@@ -716,8 +716,8 @@ select option{background:var(--bg2);}
 
         <!-- Search + Filter -->
         <div style="display:flex;gap:.4rem;margin-bottom:.6rem;">
-          <input class="ress-search" id="ressSearch" type="text" placeholder="🔍 Rechercher…" style="flex:1;" oninput="renderRessources()">
-          <select class="ress-search" id="ressFilter" onchange="renderRessources()" style="flex-shrink:0;">
+          <input class="ress-search" id="ressSearch" type="text" placeholder="🔍 Rechercher…" style="flex:1;min-width:0;" oninput="renderRessources()">
+          <select class="ress-search" id="ressFilter" onchange="renderRessources()" style="width:130px;flex-shrink:0;">
             <option value="">Tous</option>
             <option value="article">📰 Article</option>
             <option value="livre">📚 Livre</option>
