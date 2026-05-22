@@ -178,6 +178,16 @@ select option{background:var(--bg2);}
 /* EXPORT */
 .export-box{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:.9rem;margin-bottom:.8rem;}
 .export-title{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;}
+/* ── Base de ressources ── */
+.ress-card{background:var(--bg3,#15394d);border:1px solid var(--border);border-radius:8px;padding:.6rem .75rem;transition:.15s;}
+.ress-card:hover{border-color:rgba(77,158,255,.35);}
+.ress-tag{font-size:.6rem;background:rgba(77,158,255,.12);color:var(--blue);padding:.05rem .32rem;border-radius:5px;white-space:nowrap;}
+.ress-icon-btn{background:none;border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;font-size:.65rem;padding:.12rem .38rem;transition:.12s;}
+.ress-icon-btn:hover{border-color:var(--blue);color:var(--blue);}
+.ress-input{width:100%;padding:.38rem .6rem;background:var(--bg3,#15394d);border:1px solid var(--border);border-radius:6px;color:var(--txt);font-size:.76rem;}
+.ress-input:focus{outline:none;border-color:var(--blue);}
+.ress-search{padding:.35rem .6rem;background:var(--bg3,#15394d);border:1px solid var(--border);border-radius:6px;color:var(--txt);font-size:.74rem;}
+.ress-search:focus{outline:none;border-color:var(--blue);}
 .code-preview{background:#000;border:1px solid var(--border);border-radius:9px;padding:.9rem;font-family:var(--font-mono);font-size:.68rem;color:#aaa;overflow:auto;max-height:300px;white-space:pre;line-height:1.7;}
 
 /* HELP OVERLAY */
@@ -696,16 +706,58 @@ select option{background:var(--bg2);}
     <div class="editor-wrap">
       <div class="editor-hdr"><div><div class="editor-title">Idées de leçons</div><div style="font-size:.68rem;color:var(--muted);">Idées par module + import PDF</div></div></div>
 
-      <!-- PDF IMPORT -->
-      <div class="export-box" style="margin-bottom:1.2rem;">
-        <div class="export-title">Importer depuis un PDF</div>
-        <div style="font-size:.74rem;color:var(--soft);margin-bottom:.8rem;line-height:1.6;">Charge un PDF (cours, document, support) — Claude extrait les leçons et les ajoute au module de ton choix.</div>
-        <input type="file" id="pdfInput" accept=".pdf" style="display:none;" onchange="handlePdfImport(this)">
-        <div class="btn-row">
-          <button class="btn primary" onclick="document.getElementById('pdfInput').click()">Choisir un PDF</button>
+      <!-- BASE DE RESSOURCES -->
+      <div class="export-box" style="margin-bottom:1.2rem;" id="ressourcesBox">
+        <div class="export-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.55rem;">
+          <span>Base de Ressources</span>
+          <button class="btn" style="font-size:.65rem;padding:.2rem .55rem;" onclick="toggleRessourceForm()">+ Ajouter</button>
         </div>
-        <div id="pdfStatus" style="margin-top:.6rem;font-size:.76rem;color:var(--soft);min-height:1rem;"></div>
-        <div id="pdfModuleSelect" style="display:none;margin-top:.8rem;"></div>
+        <div style="font-size:.74rem;color:var(--soft);margin-bottom:.75rem;line-height:1.5;">Classe et annote tes ressources pédagogiques : articles, idées, références, outils.</div>
+
+        <!-- Search + Filter -->
+        <div style="display:flex;gap:.4rem;margin-bottom:.6rem;">
+          <input class="ress-search" id="ressSearch" type="text" placeholder="🔍 Rechercher…" style="flex:1;" oninput="renderRessources()">
+          <select class="ress-search" id="ressFilter" onchange="renderRessources()" style="flex-shrink:0;">
+            <option value="">Tous</option>
+            <option value="article">📰 Article</option>
+            <option value="livre">📚 Livre</option>
+            <option value="vidéo">🎬 Vidéo</option>
+            <option value="idée">💡 Idée</option>
+            <option value="outil">🔧 Outil</option>
+            <option value="concept">🧩 Concept</option>
+            <option value="autre">📎 Autre</option>
+          </select>
+        </div>
+
+        <!-- Liste -->
+        <div id="ressListContainer" style="display:flex;flex-direction:column;gap:.38rem;min-height:1.5rem;"></div>
+
+        <!-- Formulaire (masqué par défaut) -->
+        <div id="ressForm" style="display:none;margin-top:.8rem;padding:.7rem;background:rgba(77,158,255,.04);border:1px solid rgba(77,158,255,.2);border-radius:8px;">
+          <div style="font-size:.67rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;" id="ressFormTitle">Nouvelle ressource</div>
+          <input type="hidden" id="ressEditId">
+          <div style="display:flex;flex-direction:column;gap:.4rem;">
+            <input class="ress-input" id="ressTitle" type="text" placeholder="Titre *">
+            <input class="ress-input" id="ressUrl" type="text" placeholder="URL (optionnel)">
+            <div style="display:flex;gap:.4rem;">
+              <select class="ress-input" id="ressType" style="flex:1;">
+                <option value="article">📰 Article</option>
+                <option value="livre">📚 Livre</option>
+                <option value="vidéo">🎬 Vidéo</option>
+                <option value="idée">💡 Idée</option>
+                <option value="outil">🔧 Outil</option>
+                <option value="concept">🧩 Concept</option>
+                <option value="autre">📎 Autre</option>
+              </select>
+              <input class="ress-input" id="ressTags" type="text" placeholder="Tags : finance, bourse…" style="flex:2;">
+            </div>
+            <textarea class="ress-input" id="ressNote" placeholder="Notes, annotation, résumé…" rows="3" style="resize:vertical;font-family:inherit;"></textarea>
+          </div>
+          <div class="btn-row" style="margin-top:.5rem;">
+            <button class="btn primary" onclick="saveRessource()" style="font-size:.74rem;">Enregistrer</button>
+            <button class="btn" onclick="cancelRessourceForm()" style="font-size:.74rem;">Annuler</button>
+          </div>
+        </div>
       </div>
 
       <!-- IDEAS BY MODULE -->
@@ -1089,7 +1141,7 @@ function showTab(id,btn){
   if(btn) btn.classList.add('active');
   if(id==='stats') renderStats();
   if(id==='export') updateBatchInfo();
-  if(id==='suggest'){ renderSuggestions(); renderModuleIdeas(); }
+  if(id==='suggest'){ renderSuggestions(); renderModuleIdeas(); renderRessources(); }
   if(id==='explore') renderSyllabusAnnots();
   if(id==='agents') initAgentsTab();
   if(id==='marketing') initMarketing();
@@ -1742,6 +1794,106 @@ function importPdfLessons(){
   document.getElementById('pdfStatus').textContent='';
   document.getElementById('pdfInput').value='';
   pdfExtractedData=null;
+}
+
+/* ══════════════════════════════════════════════
+   BASE DE RESSOURCES
+   ══════════════════════════════════════════════ */
+const RESS_KEY='apex_ressources';
+const RESS_ICONS={article:'📰',livre:'📚','vid\xe9o':'🎬','id\xe9e':'💡',outil:'🔧',concept:'🧩',autre:'📎'};
+
+function _ressLoad(){ try{ return JSON.parse(localStorage.getItem(RESS_KEY)||'[]'); }catch(e){ return []; } }
+function _ressSave(d){ localStorage.setItem(RESS_KEY,JSON.stringify(d)); }
+
+function renderRessources(){
+  const data=_ressLoad();
+  const q=(document.getElementById('ressSearch')?.value||'').toLowerCase().trim();
+  const f=document.getElementById('ressFilter')?.value||'';
+  const list=data.filter(r=>{
+    if(f&&r.type!==f) return false;
+    if(q&&!r.title.toLowerCase().includes(q)&&!(r.note||'').toLowerCase().includes(q)&&!(r.tags||[]).join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const c=document.getElementById('ressListContainer'); if(!c) return;
+  if(!list.length){
+    c.innerHTML='<div style="text-align:center;padding:.9rem 0;font-size:.73rem;color:var(--muted);">'+(q||f?'Aucun r\xe9sultat pour ce filtre.':'Aucune ressource — cliquez sur <b>+ Ajouter</b> pour commencer.')+'</div>';
+    return;
+  }
+  c.innerHTML=list.map(r=>{
+    const icon=RESS_ICONS[r.type]||'📎';
+    const tagsHtml=(r.tags||[]).filter(Boolean).map(t=>`<span class="ress-tag">${t.trim()}</span>`).join('');
+    const noteHtml=r.note?`<div style="font-size:.71rem;color:var(--soft);margin-top:.22rem;line-height:1.45;white-space:pre-wrap;">${r.note.slice(0,220)}${r.note.length>220?'…':''}</div>`:'';
+    const urlHtml=r.url?`<div style="margin-top:.18rem;"><a href="${r.url.replace(/"/g,'&quot;')}" target="_blank" rel="noopener" style="font-size:.67rem;color:var(--blue);word-break:break-all;">${r.url.slice(0,70)}${r.url.length>70?'…':''}</a></div>`:'';
+    return `<div class="ress-card">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;">
+        <span style="font-size:.95rem;flex-shrink:0;margin-top:.05rem;">${icon}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;">
+            <span style="font-size:.78rem;font-weight:700;color:var(--txt);">${r.title}</span>
+            ${tagsHtml}
+          </div>
+          ${urlHtml}${noteHtml}
+        </div>
+        <div style="display:flex;gap:.2rem;flex-shrink:0;">
+          <button class="ress-icon-btn" onclick="editRessource('${r.id}')">✏️</button>
+          <button class="ress-icon-btn" onclick="deleteRessource('${r.id}')">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleRessourceForm(){
+  const f=document.getElementById('ressForm'); if(!f) return;
+  if(f.style.display==='none'||!f.style.display){
+    f.style.display='block';
+    document.getElementById('ressFormTitle').textContent='Nouvelle ressource';
+    document.getElementById('ressEditId').value='';
+    ['ressTitle','ressUrl','ressTags','ressNote'].forEach(id=>{ document.getElementById(id).value=''; });
+    document.getElementById('ressType').value='article';
+    document.getElementById('ressTitle').focus();
+  } else { f.style.display='none'; }
+}
+
+function cancelRessourceForm(){ document.getElementById('ressForm').style.display='none'; }
+
+function saveRessource(){
+  const title=document.getElementById('ressTitle').value.trim();
+  if(!title){ toast('Titre requis','error'); return; }
+  const editId=document.getElementById('ressEditId').value;
+  const data=_ressLoad();
+  const entry={
+    id:editId||('r'+Date.now()),
+    title,
+    url:document.getElementById('ressUrl').value.trim(),
+    type:document.getElementById('ressType').value,
+    tags:document.getElementById('ressTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    note:document.getElementById('ressNote').value.trim(),
+    createdAt:editId?((data.find(r=>r.id===editId)||{}).createdAt||new Date().toISOString()):new Date().toISOString()
+  };
+  if(editId){ const i=data.findIndex(r=>r.id===editId); if(i>=0) data[i]=entry; else data.push(entry); }
+  else { data.unshift(entry); }
+  _ressSave(data); renderRessources(); cancelRessourceForm();
+  toast(editId?'Ressource mise \xe0 jour':'Ressource ajout\xe9e');
+}
+
+function editRessource(id){
+  const r=_ressLoad().find(x=>x.id===id); if(!r) return;
+  const f=document.getElementById('ressForm'); f.style.display='block';
+  document.getElementById('ressFormTitle').textContent='Modifier la ressource';
+  document.getElementById('ressEditId').value=id;
+  document.getElementById('ressTitle').value=r.title;
+  document.getElementById('ressUrl').value=r.url||'';
+  document.getElementById('ressType').value=r.type||'article';
+  document.getElementById('ressTags').value=(r.tags||[]).join(', ');
+  document.getElementById('ressNote').value=r.note||'';
+  f.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function deleteRessource(id){
+  _ressSave(_ressLoad().filter(r=>r.id!==id));
+  renderRessources();
+  toast('Ressource supprim\xe9e');
 }
 
 /* ── SYLLABUS GÉNÉRAL ── */
