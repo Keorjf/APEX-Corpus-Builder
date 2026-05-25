@@ -594,6 +594,18 @@ select option{background:var(--bg2);}
 .adef-tone-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:.2rem .55rem;font-size:.64rem;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;}
 .adef-tone-btn:hover{color:var(--txt);}
 .adef-tone-btn.active{background:rgba(255,205,13,.12);border-color:var(--gold);color:var(--gold);}
+/* ── Marketing KPI selector ── */
+.mkt-kpi-chip{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:.25rem .65rem;font-size:.68rem;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;user-select:none;display:inline-flex;align-items:center;gap:.3rem;}
+.mkt-kpi-chip:hover{border-color:var(--gold);color:var(--txt);}
+.mkt-kpi-chip.active{background:rgba(255,205,13,.1);border-color:var(--gold);color:var(--gold);}
+.mkt-custom-kpi-row{display:flex;align-items:center;gap:.5rem;background:var(--bg2);border:1px solid var(--border2);border-radius:7px;padding:.3rem .65rem;font-size:.72rem;}
+.mkt-custom-kpi-name{font-weight:600;color:var(--txt);flex:1;}
+.mkt-custom-kpi-val{color:var(--gold);font-family:var(--font-title);font-size:.85rem;min-width:60px;text-align:right;}
+.mkt-custom-kpi-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:.75rem;padding:0 .2rem;transition:.15s;}
+.mkt-custom-kpi-del:hover{color:var(--red);}
+.mkt-comment-box{background:var(--bg2);border-top:1px solid var(--border2);padding:.55rem .7rem .45rem;}
+.mkt-comment-ta{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--txt);font-size:.72rem;padding:.4rem .55rem;resize:vertical;min-height:54px;font-family:inherit;box-sizing:border-box;}
+.mkt-comment-ta:focus{outline:none;border-color:var(--gold);}
 /* ── Report pipeline ── */
 .rpo-item{display:flex;align-items:center;gap:.5rem;background:var(--bg2);border:1px solid var(--border2);border-radius:9px;padding:.45rem .7rem;transition:.15s;}
 .rpo-item.disabled{opacity:.4;}
@@ -1186,17 +1198,6 @@ select option{background:var(--bg2);}
                   <button class="adef-preset-btn" onclick="adefApplyPreset('action')">⚡ Action plan</button>
                 </div>
 
-                <!-- Tone selector -->
-                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap;">
-                  <span style="font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Tone</span>
-                  <div id="adefToneRow" style="display:flex;gap:.3rem;flex-wrap:wrap;">
-                    <button class="adef-tone-btn" data-tone="professional" onclick="adefSetTone('professional',this)">Professional</button>
-                    <button class="adef-tone-btn" data-tone="concise" onclick="adefSetTone('concise',this)">Concise</button>
-                    <button class="adef-tone-btn" data-tone="technical" onclick="adefSetTone('technical',this)">Technical</button>
-                    <button class="adef-tone-btn" data-tone="narrative" onclick="adefSetTone('narrative',this)">Narrative</button>
-                  </div>
-                </div>
-
                 <!-- Free-form description -->
                 <textarea id="adefReportFormat" class="adef-textarea" rows="5"
                   placeholder="Describe the report format in detail…&#10;e.g.:&#10;1. Executive summary (3 sentences max)&#10;2. Key findings — bullet points with severity icons&#10;3. Recommended actions — numbered, prioritised&#10;4. Metrics table&#10;5. Conclusion"></textarea>
@@ -1216,52 +1217,70 @@ select option{background:var(--bg2);}
       </div><!-- /agents-org-panel (two columns) -->
 
       <!-- ── Report Pipeline ── -->
-      <div class="agents-inner-panel active" id="agents-pipeline-panel" style="display:block;margin-top:1rem;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:1100px;margin:0 auto;">
+      <div style="max-width:1100px;margin:1rem auto 0;display:flex;flex-direction:column;gap:1rem;">
 
-          <!-- Order configurator -->
-          <div class="org-panel">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;">
-              <div class="org-panel-title" style="margin-bottom:0;">🔄 Concatenation Order</div>
-              <button class="task-add-btn" style="font-size:.7rem;padding:.3rem .8rem;" onclick="generateConsolidatedReport()">🤖 Generate with TACT</button>
-            </div>
-            <div style="font-size:.67rem;color:var(--muted);margin-bottom:.75rem;">Drag or use arrows to set the order in which robot reports are assembled. Toggle to include/exclude.</div>
-            <div id="reportOrderList" style="display:flex;flex-direction:column;gap:.35rem;"></div>
+        <!-- Concatenation order -->
+        <div class="org-panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;flex-wrap:wrap;gap:.5rem;">
+            <div class="org-panel-title" style="margin-bottom:0;">🔄 Report Generation Order</div>
+            <button class="task-add-btn" style="font-size:.7rem;padding:.3rem .8rem;" onclick="generateConsolidatedReport()">🤖 Generate with TACT</button>
           </div>
-
-          <!-- Queue -->
-          <div class="org-panel">
-            <div class="org-panel-title">📬 Report Queue</div>
-            <div style="font-size:.67rem;color:var(--muted);margin-bottom:.75rem;">Reports reviewed and validated. Ready to be sent.</div>
-            <div id="reportQueueList" style="display:flex;flex-direction:column;gap:.4rem;"></div>
-            <div id="reportQueueEmpty" style="color:var(--muted);font-size:.72rem;font-style:italic;padding:.4rem 0;">Queue is empty.</div>
-          </div>
-
+          <div style="font-size:.67rem;color:var(--muted);margin-bottom:.75rem;">Set the order and toggle which robots are included, then generate the report for review and validation.</div>
+          <div id="reportOrderList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.4rem;"></div>
         </div>
+
+        <!-- Validated reports queue -->
+        <div class="org-panel" id="reportQueuePanel">
+          <div class="org-panel-title">✅ Validated Reports</div>
+          <div style="font-size:.67rem;color:var(--muted);margin-bottom:.75rem;">Reports reviewed and validated by the user. Ready to be sent.</div>
+          <div id="reportQueueList" style="display:flex;flex-direction:column;gap:.4rem;"></div>
+          <div id="reportQueueEmpty" style="color:var(--muted);font-size:.72rem;font-style:italic;padding:.2rem 0;">No validated reports yet.</div>
+        </div>
+
       </div><!-- /pipeline -->
 
     </div>
   </div>
 
-  <!-- Report Review Modal -->
-  <div id="reportReviewModal" class="hidden" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem;box-sizing:border-box;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);overflow-y:auto;">
-    <div style="background:var(--bg1);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:820px;display:flex;flex-direction:column;gap:0;overflow:hidden;">
+  <!-- Report Review & Validation Modal -->
+  <div id="reportReviewModal" class="hidden" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem;box-sizing:border-box;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);overflow-y:auto;">
+    <div style="background:var(--bg1);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:860px;display:flex;flex-direction:column;overflow:hidden;">
+
       <!-- Header -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.2rem;border-bottom:1px solid var(--border2);background:var(--bg2);">
-        <div style="font-family:var(--font-title);font-size:.95rem;color:var(--gold);">📝 Report Review</div>
-        <div style="display:flex;gap:.5rem;align-items:center;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.3rem;border-bottom:1px solid var(--border2);background:var(--bg2);flex-wrap:wrap;gap:.5rem;">
+        <div>
+          <div style="font-family:var(--font-title);font-size:.95rem;color:var(--gold);">📝 Report Review</div>
+          <div style="font-size:.65rem;color:var(--muted);margin-top:.1rem;">Review each section, edit if needed, then validate to confirm.</div>
+        </div>
+        <div style="display:flex;gap:.45rem;align-items:center;flex-wrap:wrap;">
           <button class="adef-preset-btn" onclick="addReportSection()">＋ Add section</button>
-          <button class="task-add-btn" style="font-size:.72rem;padding:.32rem .8rem;" onclick="sendToQueue()">📤 Add to queue</button>
-          <button class="btn" style="font-size:.72rem;" onclick="document.getElementById('reportReviewModal').classList.add('hidden')">✕ Close</button>
+          <button class="btn" style="font-size:.72rem;" onclick="closeReportModal()">✕ Close</button>
         </div>
       </div>
+
+      <!-- Validation status banner -->
+      <div id="reportValidationBanner" style="display:none;padding:.55rem 1.3rem;font-size:.72rem;font-weight:700;display:flex;align-items:center;gap:.5rem;"></div>
+
       <!-- Generating indicator -->
-      <div id="reportReviewLoading" style="display:none;padding:1.5rem;text-align:center;color:var(--muted);font-size:.78rem;">
+      <div id="reportReviewLoading" style="display:none;padding:2rem;text-align:center;color:var(--muted);font-size:.78rem;">
         <span class="loader"><span></span><span></span><span></span></span>
-        <div style="margin-top:.6rem;">TACT is assembling the report…</div>
+        <div style="margin-top:.65rem;">TACT is assembling the report…</div>
       </div>
+
       <!-- Sections editor -->
-      <div id="reportSectionsWrap" style="padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.65rem;max-height:70vh;overflow-y:auto;"></div>
+      <div id="reportSectionsWrap" style="padding:1rem 1.3rem;display:flex;flex-direction:column;gap:.65rem;max-height:58vh;overflow-y:auto;"></div>
+
+      <!-- Validation footer -->
+      <div id="reportValidationFooter" style="display:none;border-top:1px solid var(--border2);padding:.85rem 1.3rem;background:var(--bg2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;">
+        <div style="font-size:.72rem;color:var(--muted);">
+          <span id="reportSecCount">0</span> section(s) · Last edited <span id="reportEditTime">—</span>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center;">
+          <button class="btn" style="font-size:.72rem;color:var(--red);border-color:rgba(255,80,80,.3);" onclick="resetReportValidation()">↩ Reset</button>
+          <button id="reportValidateBtn" class="task-add-btn" style="font-size:.75rem;padding:.4rem 1rem;background:var(--green);letter-spacing:.02em;" onclick="validateReport()">✅ Validate report</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1293,6 +1312,45 @@ select option{background:var(--bg2);}
           <button class="btn" onclick="loadSampleMarketing()">Sample data</button>
         </div>
         <div id="mktStatus" style="margin-top:.6rem;font-size:.75rem;color:var(--soft);min-height:1rem;"></div>
+      </div>
+
+      <!-- Campaign KPI selector -->
+      <div id="mktKpiConfigurator" style="display:none;margin-bottom:1.2rem;">
+        <div class="export-box" style="padding:1rem 1.2rem;">
+
+          <!-- Campaign picker -->
+          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem;">
+            <div style="font-family:var(--font-title);font-size:.88rem;color:var(--gold);">🎯 Campaign KPIs</div>
+            <select id="mktCampaignSelect" class="adef-select" style="flex:1;max-width:300px;font-size:.75rem;" onchange="mktSelectCampaign(this.value)">
+              <option value="">— Select a campaign —</option>
+            </select>
+            <span style="font-size:.65rem;color:var(--muted);">Select the KPIs to track for this campaign</span>
+          </div>
+
+          <!-- KPI configurator (hidden until campaign selected) -->
+          <div id="mktKpiConfig" style="display:none;">
+
+            <!-- Standard KPI toggles -->
+            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.45rem;">📌 Pin standard KPIs</div>
+            <div id="mktStdKpis" style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1rem;"></div>
+
+            <!-- Custom KPIs -->
+            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.45rem;">➕ Custom KPIs</div>
+            <div id="mktCustomKpiList" style="display:flex;flex-direction:column;gap:.3rem;margin-bottom:.5rem;"></div>
+            <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+              <input id="mktCustomKpiName"  class="adef-new-input" style="flex:1;min-width:120px;" placeholder="KPI name (e.g. Email opens)">
+              <input id="mktCustomKpiValue" class="adef-new-input" style="width:110px;" placeholder="Value (e.g. 2450)">
+              <button class="task-add-btn" style="font-size:.7rem;padding:.3rem .75rem;" onclick="mktAddCustomKpi()">＋ Add</button>
+            </div>
+
+            <!-- Pinned dashboard preview -->
+            <div id="mktPinnedDashboard" style="margin-top:1rem;display:none;">
+              <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.45rem;">📊 Your KPI dashboard for this campaign</div>
+              <div id="mktPinnedGrid" class="mkt-kpi-grid"></div>
+            </div>
+
+          </div>
+        </div>
       </div>
 
       <!-- KPIs -->
@@ -2647,19 +2705,132 @@ function clearMarketingData(){
   document.getElementById('mktClearBtn').style.display='none';
   document.getElementById('mktKpis').style.display='none';
   document.getElementById('mktTable').style.display='none';
+  document.getElementById('mktKpiConfigurator').style.display='none';
   toast('Marketing data cleared');
 }
 
 function initMarketing(){
-  try{
-    const raw=localStorage.getItem('tactic_mkt');
-    if(raw){ _mktData=JSON.parse(raw); }
-  }catch(e){}
+  try{ const raw=localStorage.getItem('tactic_mkt'); if(raw){ _mktData=JSON.parse(raw); } }catch(e){}
   if(_mktData.length){
     document.getElementById('mktStatus').innerHTML=`<span style="color:var(--green);">✓</span> ${_mktData.length} campaign(s) in memory`;
     document.getElementById('mktClearBtn').style.display='';
     renderMarketingDashboard();
+    mktInitConfigurator();
   }
+}
+
+/* ── Campaign KPI Configurator ── */
+let _mktKpiConfig={};   // {campaignName: {pinned:[...], custom:[{name,value}]}}
+let _mktCurrentCamp='';
+
+const MKT_STD_KPIS=[
+  {key:'budget',  label:'Budget',       fmt:d=>`${Math.round(d.budget)}€`},
+  {key:'revenue', label:'Revenue',      fmt:d=>`${Math.round(d.revenue)}€`},
+  {key:'reach',   label:'Reach',        fmt:d=>d.reach>=1000?`${(d.reach/1000).toFixed(1)}k`:String(d.reach)},
+  {key:'clicks',  label:'Clicks',       fmt:d=>String(d.clicks)},
+  {key:'conversions',label:'Conversions',fmt:d=>String(d.conversions)},
+  {key:'roi',     label:'ROI',          fmt:d=>d.budget>0?`${((d.revenue-d.budget)/d.budget*100).toFixed(0)}%`:'—'},
+  {key:'ctr',     label:'CTR',          fmt:d=>d.reach>0?`${(d.clicks/d.reach*100).toFixed(2)}%`:'—'},
+  {key:'cpc',     label:'CPC',          fmt:d=>d.clicks>0?`${(d.budget/d.clicks).toFixed(2)}€`:'—'},
+  {key:'cpl',     label:'Cost/Lead',    fmt:d=>d.conversions>0?`${(d.budget/d.conversions).toFixed(2)}€`:'—'},
+  {key:'convrate',label:'Conv. Rate',   fmt:d=>d.clicks>0?`${(d.conversions/d.clicks*100).toFixed(1)}%`:'—'},
+];
+
+function mktInitConfigurator(){
+  try{ _mktKpiConfig=JSON.parse(localStorage.getItem('mkt_kpi_config')||'{}'); }catch(e){ _mktKpiConfig={}; }
+  const conf=document.getElementById('mktKpiConfigurator');
+  if(conf) conf.style.display='';
+  const sel=document.getElementById('mktCampaignSelect');
+  if(!sel) return;
+  sel.innerHTML='<option value="">— Select a campaign —</option>'+
+    _mktData.map(d=>`<option value="${d.name.replace(/"/g,'&quot;')}">${d.name}</option>`).join('');
+}
+
+function mktSelectCampaign(name){
+  _mktCurrentCamp=name;
+  const cfg=document.getElementById('mktKpiConfig');
+  if(!cfg) return;
+  if(!name){ cfg.style.display='none'; return; }
+  cfg.style.display='block';
+  if(!_mktKpiConfig[name]) _mktKpiConfig[name]={pinned:['budget','roi','reach','conversions'],custom:[]};
+  _mktRenderStdChips(name);
+  _mktRenderCustomKpis(name);
+  _mktRenderPinnedDash(name);
+}
+
+function _mktRenderStdChips(name){
+  const el=document.getElementById('mktStdKpis');
+  if(!el) return;
+  const pinned=_mktKpiConfig[name]?.pinned||[];
+  el.innerHTML=MKT_STD_KPIS.map(k=>`
+    <span class="mkt-kpi-chip${pinned.includes(k.key)?' active':''}" onclick="mktToggleKpi('${k.key}')">${pinned.includes(k.key)?'✓ ':''} ${k.label}</span>
+  `).join('');
+}
+
+function mktToggleKpi(key){
+  if(!_mktCurrentCamp) return;
+  const cfg=_mktKpiConfig[_mktCurrentCamp];
+  if(cfg.pinned.includes(key)) cfg.pinned=cfg.pinned.filter(k=>k!==key);
+  else cfg.pinned.push(key);
+  localStorage.setItem('mkt_kpi_config',JSON.stringify(_mktKpiConfig));
+  _mktRenderStdChips(_mktCurrentCamp);
+  _mktRenderPinnedDash(_mktCurrentCamp);
+}
+
+function mktAddCustomKpi(){
+  if(!_mktCurrentCamp){ toast('Select a campaign first','error'); return; }
+  const name=document.getElementById('mktCustomKpiName').value.trim();
+  const value=document.getElementById('mktCustomKpiValue').value.trim();
+  if(!name){ toast('Enter a KPI name','error'); return; }
+  _mktKpiConfig[_mktCurrentCamp].custom.push({name,value});
+  localStorage.setItem('mkt_kpi_config',JSON.stringify(_mktKpiConfig));
+  document.getElementById('mktCustomKpiName').value='';
+  document.getElementById('mktCustomKpiValue').value='';
+  _mktRenderCustomKpis(_mktCurrentCamp);
+  _mktRenderPinnedDash(_mktCurrentCamp);
+}
+
+function mktDeleteCustomKpi(i){
+  if(!_mktCurrentCamp) return;
+  _mktKpiConfig[_mktCurrentCamp].custom.splice(i,1);
+  localStorage.setItem('mkt_kpi_config',JSON.stringify(_mktKpiConfig));
+  _mktRenderCustomKpis(_mktCurrentCamp);
+  _mktRenderPinnedDash(_mktCurrentCamp);
+}
+
+function _mktRenderCustomKpis(name){
+  const el=document.getElementById('mktCustomKpiList');
+  if(!el) return;
+  const customs=_mktKpiConfig[name]?.custom||[];
+  el.innerHTML=customs.length?customs.map((c,i)=>`
+    <div class="mkt-custom-kpi-row">
+      <span class="mkt-custom-kpi-name">${c.name}</span>
+      <span class="mkt-custom-kpi-val">${c.value}</span>
+      <button class="mkt-custom-kpi-del" onclick="mktDeleteCustomKpi(${i})" title="Delete">🗑</button>
+    </div>`).join(''):'<div style="color:var(--muted);font-size:.7rem;font-style:italic;">No custom KPIs yet.</div>';
+}
+
+function _mktRenderPinnedDash(name){
+  const dash=document.getElementById('mktPinnedDashboard');
+  const grid=document.getElementById('mktPinnedGrid');
+  if(!dash||!grid) return;
+  const cfg=_mktKpiConfig[name]||{};
+  const camp=_mktData.find(d=>d.name===name);
+  if(!camp){ dash.style.display='none'; return; }
+  const pinned=cfg.pinned||[];
+  const customs=cfg.custom||[];
+  if(!pinned.length&&!customs.length){ dash.style.display='none'; return; }
+  dash.style.display='block';
+  const stdHtml=pinned.map(key=>{
+    const def=MKT_STD_KPIS.find(k=>k.key===key);
+    if(!def) return '';
+    const val=def.fmt(camp);
+    const color=key==='roi'?(parseFloat(val)>0?'var(--green)':'var(--red)'):key==='budget'?'var(--gold)':'var(--txt)';
+    return `<div class="mkt-kpi"><div class="mkt-kpi-val" style="color:${color};">${val}</div><div class="mkt-kpi-lbl">${def.label}</div><div class="mkt-kpi-sub">${name}</div></div>`;
+  }).join('');
+  const customHtml=customs.map(c=>`
+    <div class="mkt-kpi"><div class="mkt-kpi-val" style="color:var(--blue);">${c.value}</div><div class="mkt-kpi-lbl">${c.name}</div><div class="mkt-kpi-sub">Custom</div></div>`).join('');
+  grid.innerHTML=stdHtml+customHtml;
 }
 
 function _mktROI(d){ return d.budget>0?((d.revenue-d.budget)/d.budget*100):0; }
@@ -2696,6 +2867,7 @@ function _mktChartSVG(data,valFn,fmtFn,colorFn){
 
 function renderMarketingDashboard(){
   if(!_mktData.length) return;
+  mktInitConfigurator();
   const totalBudget=_mktData.reduce((s,d)=>s+d.budget,0);
   const totalRevenue=_mktData.reduce((s,d)=>s+d.revenue,0);
   const totalReach=_mktData.reduce((s,d)=>s+d.reach,0);
@@ -2745,12 +2917,17 @@ function renderMarketingDashboard(){
     </div>`).join('')}</div>`;
 
   // Table (collapsible)
+  let _mktComments={};
+  try{ _mktComments=JSON.parse(localStorage.getItem('mkt_comments')||'{}'); }catch(e){}
+
   const sorted=[..._mktData].sort((a,b)=>_mktROI(b)-_mktROI(a));
   const tblHtml=`<div class="mkt-tbl-wrap"><table class="mkt-tbl">
-    <thead><tr><th>Campaign</th><th>Channel</th><th>Budget</th><th>Reach</th><th>Clicks</th><th>Conv.</th><th>Revenue</th><th>ROI</th><th>CTR</th><th>CVR</th><th>Health</th></tr></thead>
+    <thead><tr><th>Campaign</th><th>Channel</th><th>Budget</th><th>Reach</th><th>Clicks</th><th>Conv.</th><th>Revenue</th><th>ROI</th><th>CTR</th><th>CVR</th><th>Health</th><th style="width:28px;"></th></tr></thead>
     <tbody>${sorted.map(d=>{
       const h=_mktHealth(d); const roi=_mktROI(d);
-      return `<tr>
+      const cid='mkt-c-'+d.name.replace(/\s+/g,'_');
+      const hasComment=!!_mktComments[d.name];
+      return `<tr class="mkt-tbl-row" ondblclick="mktOpenComment('${d.name.replace(/'/g,"\\'")}')" title="Double-click to add a comment" style="cursor:pointer;">
         <td style="font-weight:600;">${d.name}</td>
         <td><span class="mkt-channel">${d.channel||'—'}</span></td>
         <td>${d.budget?fmtE(d.budget):'—'}</td>
@@ -2762,6 +2939,18 @@ function renderMarketingDashboard(){
         <td>${_mktCTR(d).toFixed(1)}%</td>
         <td>${_mktCVR(d).toFixed(1)}%</td>
         <td><span class="mkt-pill" style="background:${h.col}22;color:${h.col};">${h.lbl}</span></td>
+        <td style="text-align:center;">${hasComment?`<span title="${_mktComments[d.name].replace(/"/g,'&quot;')}" style="cursor:pointer;font-size:.8rem;" onclick="event.stopPropagation();mktOpenComment('${d.name.replace(/'/g,"\\'")}')">💬</span>`:'<span style="color:var(--border2);font-size:.75rem;">＋</span>'}</td>
+      </tr>
+      <tr class="mkt-comment-row" id="${cid}" style="display:none;">
+        <td colspan="12" style="padding:0;">
+          <div class="mkt-comment-box">
+            <textarea class="mkt-comment-ta" id="${cid}-ta" placeholder="Leave a comment on this campaign…" onkeydown="if(event.key==='Enter'&&(event.ctrlKey||event.metaKey))mktSaveComment('${d.name.replace(/'/g,"\\'")}','${cid}')">${(_mktComments[d.name]||'').replace(/</g,'&lt;')}</textarea>
+            <div style="display:flex;gap:.4rem;justify-content:flex-end;padding:.3rem .5rem .4rem;">
+              <button class="btn" style="font-size:.65rem;" onclick="mktCloseComment('${cid}')">Cancel</button>
+              <button class="task-add-btn" style="font-size:.65rem;padding:.25rem .65rem;" onclick="mktSaveComment('${d.name.replace(/'/g,"\\'")}','${cid}')">💾 Save (Ctrl+Enter)</button>
+            </div>
+          </div>
+        </td>
       </tr>`;
     }).join('')}</tbody>
   </table></div>`;
@@ -2773,6 +2962,40 @@ function renderMarketingDashboard(){
       <span>▸</span> Detailed table
     </button>
     <div style="display:none;margin-top:.5rem;">${tblHtml}</div>`;
+}
+
+function mktOpenComment(name){
+  const cid='mkt-c-'+name.replace(/\s+/g,'_');
+  const row=document.getElementById(cid);
+  if(!row) return;
+  const isOpen=row.style.display!=='none';
+  document.querySelectorAll('.mkt-comment-row').forEach(r=>{ r.style.display='none'; });
+  if(!isOpen){ row.style.display=''; const ta=document.getElementById(cid+'-ta'); if(ta) ta.focus(); }
+}
+function mktCloseComment(cid){
+  const row=document.getElementById(cid);
+  if(row) row.style.display='none';
+}
+function mktSaveComment(name,cid){
+  let c={};
+  try{ c=JSON.parse(localStorage.getItem('mkt_comments')||'{}'); }catch(e){}
+  const val=(document.getElementById(cid+'-ta')?.value||'').trim();
+  if(val) c[name]=val; else delete c[name];
+  localStorage.setItem('mkt_comments',JSON.stringify(c));
+  const commentRow=document.getElementById(cid);
+  if(commentRow){
+    const mainRow=commentRow.previousElementSibling;
+    if(mainRow){
+      const iconCell=mainRow.querySelector('td:last-child');
+      if(iconCell){
+        const escaped=(val||'').replace(/"/g,'&quot;');
+        iconCell.innerHTML=val
+          ?`<span title="${escaped}" style="cursor:pointer;font-size:.8rem;" onclick="event.stopPropagation();mktOpenComment('${name.replace(/'/g,"\\'")}')">💬</span>`
+          :'<span style="color:var(--border2);font-size:.75rem;">＋</span>';
+      }
+    }
+  }
+  toast('Comment saved','ok');
 }
 
 function deleteHistoryEntry(i){
@@ -4891,6 +5114,10 @@ INSTRUCTIONS:
   document.getElementById('reportReviewLoading').style.display='none';
 }
 
+function closeReportModal(){
+  document.getElementById('reportReviewModal').classList.add('hidden');
+}
+
 function _parseReportIntoSections(text){
   const lines=text.split('\n');
   const sections=[];
@@ -4899,9 +5126,6 @@ function _parseReportIntoSections(text){
     if(line.startsWith('## ')){
       if(current) sections.push(current);
       current={title:line.replace(/^##\s*/,'').trim(),content:''};
-    } else if(line.startsWith('### ')&&!current){
-      if(current) sections.push(current);
-      current={title:line.replace(/^###\s*/,'').trim(),content:''};
     } else {
       if(!current) current={title:'Introduction',content:''};
       current.content+=(current.content?'\n':'')+line;
@@ -4910,7 +5134,65 @@ function _parseReportIntoSections(text){
   if(current) sections.push(current);
   if(!sections.length) sections.push({title:'Full report',content:text});
   _reportSections=sections.map(s=>({...s,content:s.content.trim()}));
+  _reportValidated=false;
   _renderSections();
+  _showValidationUI();
+}
+
+let _reportValidated=false;
+
+function _showValidationUI(){
+  const footer=document.getElementById('reportValidationFooter');
+  const banner=document.getElementById('reportValidationBanner');
+  const btn=document.getElementById('reportValidateBtn');
+  if(!footer||!banner) return;
+  footer.style.display='flex';
+  const cnt=document.getElementById('reportSecCount');
+  if(cnt) cnt.textContent=_reportSections.length;
+  const t=document.getElementById('reportEditTime');
+  if(t) t.textContent=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  if(_reportValidated){
+    banner.style.display='flex';
+    banner.style.background='rgba(0,232,122,.10)';
+    banner.style.borderBottom='1px solid rgba(0,232,122,.2)';
+    banner.innerHTML='<span style="color:var(--green);font-size:1rem;">✅</span> <span style="color:var(--green);">Report validated — ready to send.</span>';
+    if(btn){ btn.textContent='📤 Send to queue'; btn.style.background='var(--blue)'; }
+  } else {
+    banner.style.display='flex';
+    banner.style.background='rgba(255,205,13,.07)';
+    banner.style.borderBottom='1px solid rgba(255,205,13,.15)';
+    banner.innerHTML='<span style="font-size:.9rem;">⚠️</span> <span style="color:var(--gold);">Review all sections carefully before validating.</span>';
+    if(btn){ btn.textContent='✅ Validate report'; btn.style.background='var(--green)'; }
+  }
+}
+
+function validateReport(){
+  if(!_reportSections.length){ toast('Report is empty','error'); return; }
+  if(!_reportValidated){
+    // First click = validate
+    _reportValidated=true;
+    _showValidationUI();
+    toast('Report validated','ok');
+  } else {
+    // Second click = send to queue
+    const title=_reportSections[0]?.title||'Report '+new Date().toLocaleDateString('en-GB');
+    _reportQueue.unshift({
+      id:Date.now(),
+      ts:new Date().toLocaleString('en-GB',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),
+      title,
+      sections:JSON.parse(JSON.stringify(_reportSections)),
+      status:'validated'
+    });
+    _pipelineSave();
+    _renderQueue();
+    closeReportModal();
+    toast('Report sent to queue','ok');
+  }
+}
+
+function resetReportValidation(){
+  _reportValidated=false;
+  _showValidationUI();
 }
 
 function _renderSections(){
@@ -4919,48 +5201,31 @@ function _renderSections(){
   wrap.innerHTML=_reportSections.map((s,i)=>`
     <div class="rsec" id="rsec-${i}">
       <div class="rsec-hdr">
-        <input class="rsec-title" value="${s.title.replace(/"/g,'&quot;')}" oninput="_reportSections[${i}].title=this.value" placeholder="Section title…">
+        <input class="rsec-title" value="${s.title.replace(/"/g,'&quot;')}" oninput="_reportSections[${i}].title=this.value;_reportValidated=false;_showValidationUI();" placeholder="Section title…">
         <div class="rsec-actions">
           <button onclick="_rsecMove(${i},-1)" title="Up" ${i===0?'disabled':''}>▲</button>
           <button onclick="_rsecMove(${i},1)" title="Down" ${i===_reportSections.length-1?'disabled':''}>▼</button>
           <button onclick="_rsecDelete(${i})" title="Delete section" style="color:var(--red);">🗑</button>
         </div>
       </div>
-      <textarea oninput="_reportSections[${i}].content=this.value">${s.content.replace(/</g,'&lt;')}</textarea>
+      <textarea oninput="_reportSections[${i}].content=this.value;_reportValidated=false;_showValidationUI();">${s.content.replace(/</g,'&lt;')}</textarea>
     </div>`).join('');
+  _showValidationUI();
 }
 
 function addReportSection(){
   _reportSections.push({title:'New section',content:''});
+  _reportValidated=false;
   _renderSections();
   const wrap=document.getElementById('reportSectionsWrap');
   if(wrap) wrap.lastElementChild?.scrollIntoView({behavior:'smooth'});
 }
-function _rsecDelete(i){
-  _reportSections.splice(i,1);
-  _renderSections();
-}
+function _rsecDelete(i){ _reportSections.splice(i,1); _reportValidated=false; _renderSections(); }
 function _rsecMove(i,dir){
   const j=i+dir;
   if(j<0||j>=_reportSections.length) return;
   [_reportSections[i],_reportSections[j]]=[_reportSections[j],_reportSections[i]];
-  _renderSections();
-}
-
-function sendToQueue(){
-  if(!_reportSections.length){ toast('Report is empty','error'); return; }
-  const title=_reportSections[0]?.title||'Report '+new Date().toLocaleDateString('en-GB');
-  _reportQueue.unshift({
-    id:Date.now(),
-    ts:new Date().toLocaleString('en-GB',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),
-    title,
-    sections:JSON.parse(JSON.stringify(_reportSections)),
-    status:'pending'
-  });
-  _pipelineSave();
-  _renderQueue();
-  document.getElementById('reportReviewModal').classList.add('hidden');
-  toast('Report added to queue','ok');
+  _reportValidated=false; _renderSections();
 }
 
 function _renderQueue(){
@@ -4979,10 +5244,10 @@ function _renderQueue(){
         <div class="rq-item-title">${q.title}</div>
         <div class="rq-item-meta">${q.ts} · ${q.sections.length} section${q.sections.length>1?'s':''}</div>
       </div>
-      <span class="rq-status ${q.status}">${q.status==='sent'?'Sent':'Pending'}</span>
+      <span class="rq-status ${q.status==='sent'?'sent':'pending'}">${q.status==='sent'?'Sent':'Validated'}</span>
       <div class="rq-actions">
-        <button onclick="_queueEdit(${q.id})" title="Review & edit">✏️</button>
-        <button onclick="_queueSend(${q.id})" title="${q.status==='sent'?'Mark pending':'Mark as sent'}">${q.status==='sent'?'↩':'📤'}</button>
+        <button onclick="_queueEdit(${q.id})" title="Re-open">✏️</button>
+        <button onclick="_queueSend(${q.id})" title="${q.status==='sent'?'Mark pending':'Mark as sent'}" style="${q.status!=='sent'?'color:var(--blue);':''}">${q.status==='sent'?'↩':'📤 Send'}</button>
         <button onclick="_queueDelete(${q.id})" title="Delete" style="color:var(--red);">🗑</button>
       </div>
     </div>`).join('');
@@ -4992,20 +5257,19 @@ function _queueEdit(id){
   const q=_reportQueue.find(q=>q.id===id);
   if(!q) return;
   _reportSections=JSON.parse(JSON.stringify(q.sections));
-  const modal=document.getElementById('reportReviewModal');
-  modal.classList.remove('hidden');
+  _reportValidated=true;
+  document.getElementById('reportReviewModal').classList.remove('hidden');
   document.getElementById('reportReviewLoading').style.display='none';
   _renderSections();
 }
 function _queueSend(id){
   const q=_reportQueue.find(q=>q.id===id);
-  if(q){ q.status=q.status==='sent'?'pending':'sent'; _pipelineSave(); _renderQueue(); }
+  if(q){ q.status=q.status==='sent'?'validated':'sent'; _pipelineSave(); _renderQueue(); }
 }
 function _queueDelete(id){
-  if(!confirm('Delete this report from the queue?')) return;
+  if(!confirm('Delete this report?')) return;
   _reportQueue=_reportQueue.filter(q=>q.id!==id);
-  _pipelineSave();
-  _renderQueue();
+  _pipelineSave(); _renderQueue();
 }
 
 /* ── Init agents tab ── */
