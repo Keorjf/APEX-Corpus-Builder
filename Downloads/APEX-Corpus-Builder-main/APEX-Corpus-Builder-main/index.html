@@ -659,6 +659,50 @@ select option{background:var(--bg2);}
 .mkt-chart-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.65rem;}
 .mkt-tbl-toggle{background:none;border:none;color:var(--muted);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:flex;align-items:center;gap:.3rem;padding:.3rem 0;transition:.15s;}
 .mkt-tbl-toggle:hover{color:var(--soft);}
+/* ── Marketing inner tabs ── */
+.mkt-inner-tabs{display:flex;gap:.35rem;margin-bottom:1.3rem;border-bottom:1px solid var(--border2);padding-bottom:.55rem;flex-wrap:wrap;}
+.mkt-inner-tab{background:transparent;border:1px solid transparent;border-radius:8px;padding:.32rem .8rem;font-size:.72rem;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;}
+.mkt-inner-tab:hover{color:var(--txt);border-color:var(--border2);}
+.mkt-inner-tab.active{background:var(--bg2);border-color:var(--border2);color:var(--gold);}
+.mkt-inner-panel{display:none;}
+.mkt-inner-panel.active{display:block;}
+/* Strategy */
+.strat-section{background:var(--bg1);border:1px solid var(--border2);border-radius:13px;padding:1.1rem 1.3rem;margin-bottom:1rem;}
+.strat-section-title{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.6rem;}
+.strat-horizons{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;}
+.strat-horizon{background:var(--bg2);border:1px solid var(--border2);border-radius:11px;padding:.85rem 1rem;}
+.strat-horizon-title{font-size:.68rem;font-weight:700;margin-bottom:.4rem;}
+.strat-ta{width:100%;background:transparent;border:none;color:var(--txt);font-size:.73rem;font-family:inherit;resize:vertical;min-height:68px;outline:none;line-height:1.55;}
+.strat-save-row{display:flex;justify-content:flex-end;margin-top:.5rem;}
+/* Inspiration */
+.inspi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.85rem;margin-top:.9rem;}
+.inspi-card{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:.85rem 1rem;display:flex;flex-direction:column;gap:.4rem;}
+.inspi-card-hdr{display:flex;align-items:center;gap:.5rem;}
+.inspi-card-title{font-weight:700;font-size:.8rem;color:var(--txt);flex:1;}
+.inspi-cat-badge{font-size:.6rem;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:.1rem .4rem;color:var(--muted);white-space:nowrap;}
+.inspi-card-desc{font-size:.72rem;color:var(--soft);line-height:1.5;}
+.inspi-card-meta{font-size:.62rem;color:var(--muted);}
+.inspi-add-form{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;display:none;}
+.inspi-add-form.open{display:block;}
+/* Planner */
+.planner-add-form{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;display:none;}
+.planner-add-form.open{display:block;}
+.planner-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.75rem;}
+.planner-field label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-bottom:.25rem;}
+.planner-field input,.planner-field select,.planner-field textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--txt);font-size:.73rem;padding:.35rem .55rem;font-family:inherit;box-sizing:border-box;}
+.planner-field input:focus,.planner-field select:focus,.planner-field textarea:focus{outline:none;border-color:var(--gold);}
+.planner-field textarea{resize:vertical;min-height:52px;}
+.planner-field.full{grid-column:1/-1;}
+.planner-tbl-wrap{overflow-x:auto;border-radius:11px;border:1px solid var(--border2);}
+.planner-tbl{width:100%;border-collapse:collapse;font-size:.72rem;}
+.planner-tbl th{background:var(--bg2);padding:.45rem .7rem;text-align:left;font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border2);white-space:nowrap;}
+.planner-tbl td{padding:.5rem .7rem;border-bottom:1px solid var(--border);color:var(--txt);vertical-align:middle;}
+.planner-tbl tr:last-child td{border-bottom:none;}
+.planner-tbl tr:hover td{background:rgba(255,255,255,.025);}
+.planner-status{font-size:.63rem;border-radius:5px;padding:.15rem .45rem;font-weight:700;white-space:nowrap;}
+.planner-status.planned{background:rgba(255,205,13,.12);color:var(--gold);}
+.planner-status.active{background:rgba(0,232,122,.12);color:#00e87a;}
+.planner-status.done{background:rgba(160,160,180,.12);color:var(--muted);}
 </style>
 </head>
 <body>
@@ -1291,7 +1335,7 @@ select option{background:var(--bg2);}
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:.8rem;">
         <div>
           <div style="font-family:var(--font-title);font-size:1.1rem;color:var(--gold);letter-spacing:.04em;">📣 Marketing</div>
-          <div style="font-size:.72rem;color:var(--muted);margin-top:.15rem;">Campaign performance analysis</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:.15rem;">Strategy · Planning · Performance</div>
         </div>
         <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
           <button class="btn" id="mktAgentBtn" onclick="showTab('agents',document.querySelector('[onclick*=showTab][onclick*=agents]'));setTimeout(()=>runAgent('marketing'),300)" style="font-size:.7rem;">🤖 Run Marketing Agent</button>
@@ -1299,65 +1343,258 @@ select option{background:var(--bg2);}
         </div>
       </div>
 
-      <!-- Import -->
-      <div class="export-box" style="margin-bottom:1.2rem;">
-        <div class="export-title">📁 Import data</div>
-        <div class="mkt-upload-hint">
-          CSV file with columns (separator <code>,</code> or <code>;</code>) :<br>
-          <code>Campaign</code> · <code>Channel</code> · <code>Budget</code> · <code>Reach</code> · <code>Clicks</code> · <code>Conversions</code> · <code>Revenue</code> · <code>Date</code>
-        </div>
-        <input type="file" id="mktInput" accept=".csv,.tsv" style="display:none;" onchange="loadMarketingCSV(this)">
-        <div class="btn-row">
-          <button class="btn primary" onclick="document.getElementById('mktInput').click()">📂 Import CSV</button>
-          <button class="btn" onclick="loadSampleMarketing()">Sample data</button>
-        </div>
-        <div id="mktStatus" style="margin-top:.6rem;font-size:.75rem;color:var(--soft);min-height:1rem;"></div>
+      <!-- Inner sub-tabs -->
+      <div class="mkt-inner-tabs">
+        <button class="mkt-inner-tab active" onclick="showMktTab('mkt-panel-dashboard',this)">📊 Dashboard</button>
+        <button class="mkt-inner-tab" onclick="showMktTab('mkt-panel-strategy',this)">🎯 Strategy</button>
+        <button class="mkt-inner-tab" onclick="showMktTab('mkt-panel-inspiration',this)">💡 Inspiration</button>
+        <button class="mkt-inner-tab" onclick="showMktTab('mkt-panel-planner',this)">📅 Campaign Planner</button>
       </div>
 
-      <!-- Campaign KPI selector -->
-      <div id="mktKpiConfigurator" style="display:none;margin-bottom:1.2rem;">
-        <div class="export-box" style="padding:1rem 1.2rem;">
+      <!-- ── PANEL: Dashboard ── -->
+      <div class="mkt-inner-panel active" id="mkt-panel-dashboard">
 
-          <!-- Campaign picker -->
-          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem;">
-            <div style="font-family:var(--font-title);font-size:.88rem;color:var(--gold);">🎯 Campaign KPIs</div>
-            <select id="mktCampaignSelect" class="adef-select" style="flex:1;max-width:300px;font-size:.75rem;" onchange="mktSelectCampaign(this.value)">
-              <option value="">— Select a campaign —</option>
-            </select>
-            <span style="font-size:.65rem;color:var(--muted);">Select the KPIs to track for this campaign</span>
+        <!-- Import -->
+        <div class="export-box" style="margin-bottom:1.2rem;">
+          <div class="export-title">📁 Import data</div>
+          <div class="mkt-upload-hint">
+            CSV file with columns (separator <code>,</code> or <code>;</code>) :<br>
+            <code>Campaign</code> · <code>Channel</code> · <code>Budget</code> · <code>Reach</code> · <code>Clicks</code> · <code>Conversions</code> · <code>Revenue</code> · <code>Date</code>
           </div>
+          <input type="file" id="mktInput" accept=".csv,.tsv" style="display:none;" onchange="loadMarketingCSV(this)">
+          <div class="btn-row">
+            <button class="btn primary" onclick="document.getElementById('mktInput').click()">📂 Import CSV</button>
+            <button class="btn" onclick="loadSampleMarketing()">Sample data</button>
+          </div>
+          <div id="mktStatus" style="margin-top:.6rem;font-size:.75rem;color:var(--soft);min-height:1rem;"></div>
+        </div>
 
-          <!-- KPI configurator (hidden until campaign selected) -->
-          <div id="mktKpiConfig" style="display:none;">
-
-            <!-- Standard KPI toggles -->
-            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.45rem;">📌 Pin standard KPIs</div>
-            <div id="mktStdKpis" style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1rem;"></div>
-
-            <!-- Custom KPIs -->
-            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.45rem;">➕ Custom KPIs</div>
-            <div id="mktCustomKpiList" style="display:flex;flex-direction:column;gap:.3rem;margin-bottom:.5rem;"></div>
-            <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
-              <input id="mktCustomKpiName"  class="adef-new-input" style="flex:1;min-width:120px;" placeholder="KPI name (e.g. Email opens)">
-              <input id="mktCustomKpiValue" class="adef-new-input" style="width:110px;" placeholder="Value (e.g. 2450)">
-              <button class="task-add-btn" style="font-size:.7rem;padding:.3rem .75rem;" onclick="mktAddCustomKpi()">＋ Add</button>
+        <!-- Campaign KPI selector -->
+        <div id="mktKpiConfigurator" style="display:none;margin-bottom:1.2rem;">
+          <div class="export-box" style="padding:1rem 1.2rem;">
+            <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem;">
+              <div style="font-family:var(--font-title);font-size:.88rem;color:var(--gold);">🎯 Campaign KPIs</div>
+              <select id="mktCampaignSelect" class="adef-select" style="flex:1;max-width:300px;font-size:.75rem;" onchange="mktSelectCampaign(this.value)">
+                <option value="">— Select a campaign —</option>
+              </select>
+              <span style="font-size:.65rem;color:var(--muted);">Select the KPIs to track for this campaign</span>
             </div>
-
-            <!-- Pinned dashboard preview -->
-            <div id="mktPinnedDashboard" style="margin-top:1rem;display:none;">
-              <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.45rem;">📊 Your KPI dashboard for this campaign</div>
-              <div id="mktPinnedGrid" class="mkt-kpi-grid"></div>
+            <div id="mktKpiConfig" style="display:none;">
+              <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.45rem;">📌 Pin standard KPIs</div>
+              <div id="mktStdKpis" style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1rem;"></div>
+              <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.45rem;">➕ Custom KPIs</div>
+              <div id="mktCustomKpiList" style="display:flex;flex-direction:column;gap:.3rem;margin-bottom:.5rem;"></div>
+              <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+                <input id="mktCustomKpiName"  class="adef-new-input" style="flex:1;min-width:120px;" placeholder="KPI name (e.g. Email opens)">
+                <input id="mktCustomKpiValue" class="adef-new-input" style="width:110px;" placeholder="Value (e.g. 2450)">
+                <button class="task-add-btn" style="font-size:.7rem;padding:.3rem .75rem;" onclick="mktAddCustomKpi()">＋ Add</button>
+              </div>
+              <div id="mktPinnedDashboard" style="margin-top:1rem;display:none;">
+                <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.45rem;">📊 Your KPI dashboard for this campaign</div>
+                <div id="mktPinnedGrid" class="mkt-kpi-grid"></div>
+              </div>
             </div>
-
           </div>
         </div>
-      </div>
 
-      <!-- KPIs -->
-      <div id="mktKpis" style="display:none;margin-bottom:1.2rem;"></div>
+        <!-- KPIs -->
+        <div id="mktKpis" style="display:none;margin-bottom:1.2rem;"></div>
+        <!-- Table -->
+        <div id="mktTable" style="display:none;"></div>
 
-      <!-- Table -->
-      <div id="mktTable" style="display:none;"></div>
+      </div><!-- /mkt-panel-dashboard -->
+
+      <!-- ── PANEL: Strategy ── -->
+      <div class="mkt-inner-panel" id="mkt-panel-strategy">
+
+        <!-- Target & Message -->
+        <div class="strat-section">
+          <div class="strat-section-title">🎯 Target audience</div>
+          <textarea class="strat-ta" id="stratTarget" placeholder="Describe your target audience: demographics, psychographics, pain points, platforms used…" rows="3"></textarea>
+        </div>
+
+        <div class="strat-section">
+          <div class="strat-section-title">💬 Key message</div>
+          <textarea class="strat-ta" id="stratMessage" placeholder="What is the core message you want to communicate? What emotion or action do you aim to trigger?" rows="3"></textarea>
+        </div>
+
+        <!-- Objectives by horizon -->
+        <div class="strat-section">
+          <div class="strat-section-title">📈 Objectives by horizon</div>
+          <div class="strat-horizons">
+            <div class="strat-horizon">
+              <div class="strat-horizon-title" style="color:var(--gold);">⚡ Short term (&lt; 6 months)</div>
+              <textarea class="strat-ta" id="stratObj6m" placeholder="Awareness, first conversions, list building…" rows="4"></textarea>
+            </div>
+            <div class="strat-horizon">
+              <div class="strat-horizon-title" style="color:#4d9eff;">📅 1 year</div>
+              <textarea class="strat-ta" id="stratObj1y" placeholder="Market share, recurring revenue, community…" rows="4"></textarea>
+            </div>
+            <div class="strat-horizon">
+              <div class="strat-horizon-title" style="color:#a855f7;">🚀 5 years</div>
+              <textarea class="strat-ta" id="stratObj5y" placeholder="Brand positioning, expansion, partnerships…" rows="4"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Things to anticipate -->
+        <div class="strat-section">
+          <div class="strat-section-title">🔭 Things to anticipate / plan for</div>
+          <textarea class="strat-ta" id="stratForecast" placeholder="Risks, trends, seasonal peaks, competitive moves, regulatory changes, budget milestones…" rows="4"></textarea>
+        </div>
+
+        <div class="strat-save-row">
+          <button class="task-add-btn" style="padding:.35rem 1rem;font-size:.73rem;" onclick="saveMktStrategy()">💾 Save strategy</button>
+          <span id="stratSaved" style="display:none;color:#00e87a;font-size:.7rem;margin-left:.6rem;">✓ Saved</span>
+        </div>
+
+      </div><!-- /mkt-panel-strategy -->
+
+      <!-- ── PANEL: Inspiration ── -->
+      <div class="mkt-inner-panel" id="mkt-panel-inspiration">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;">
+          <div>
+            <div style="font-family:var(--font-title);font-size:.9rem;color:var(--gold);">💡 Inspiration database</div>
+            <div style="font-size:.68rem;color:var(--muted);margin-top:.1rem;">What worked — campaigns, tactics, formats to draw from</div>
+          </div>
+          <button class="task-add-btn" style="font-size:.72rem;" onclick="toggleInspiAddForm()">＋ Add entry</button>
+        </div>
+
+        <!-- Add form -->
+        <div class="inspi-add-form" id="inspiAddForm">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.65rem;">
+            <div>
+              <div class="adef-label" style="margin-bottom:.25rem;">Title *</div>
+              <input id="inspiTitle" class="adef-new-input" style="width:100%;box-sizing:border-box;" placeholder="e.g. Instagram Reel series — April 2024">
+            </div>
+            <div>
+              <div class="adef-label" style="margin-bottom:.25rem;">Category</div>
+              <select id="inspiCat" class="adef-select" style="width:100%;font-size:.73rem;">
+                <option value="Content">Content</option>
+                <option value="Paid">Paid Ads</option>
+                <option value="Email">Email</option>
+                <option value="Social">Social Media</option>
+                <option value="SEO">SEO</option>
+                <option value="Event">Event</option>
+                <option value="Partnership">Partnership</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div style="grid-column:1/-1;">
+              <div class="adef-label" style="margin-bottom:.25rem;">What worked *</div>
+              <textarea id="inspiDesc" class="adef-textarea" style="min-height:62px;" placeholder="Describe what made this successful — audience reaction, format, timing, message angle…"></textarea>
+            </div>
+            <div>
+              <div class="adef-label" style="margin-bottom:.25rem;">Source / Reference</div>
+              <input id="inspiSource" class="adef-new-input" style="width:100%;box-sizing:border-box;" placeholder="Link, file name, brand name…">
+            </div>
+            <div>
+              <div class="adef-label" style="margin-bottom:.25rem;">Date (optional)</div>
+              <input id="inspiDate" type="date" class="adef-new-input" style="width:100%;box-sizing:border-box;">
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:.4rem;">
+            <button class="btn" style="font-size:.68rem;" onclick="toggleInspiAddForm()">Cancel</button>
+            <button class="task-add-btn" style="font-size:.72rem;" onclick="addInspirationItem()">💾 Save entry</button>
+          </div>
+        </div>
+
+        <!-- List -->
+        <div id="inspiList" class="inspi-grid"></div>
+        <div id="inspiEmpty" style="color:var(--muted);font-size:.75rem;font-style:italic;text-align:center;padding:2rem 0;">No entries yet. Add your first inspiration above.</div>
+
+      </div><!-- /mkt-panel-inspiration -->
+
+      <!-- ── PANEL: Campaign Planner ── -->
+      <div class="mkt-inner-panel" id="mkt-panel-planner">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;">
+          <div>
+            <div style="font-family:var(--font-title);font-size:.9rem;color:var(--gold);">📅 Campaign Planner</div>
+            <div style="font-size:.68rem;color:var(--muted);margin-top:.1rem;">Plan, budget and track upcoming campaigns</div>
+          </div>
+          <button class="task-add-btn" style="font-size:.72rem;" onclick="togglePlannerAddForm()">＋ New campaign</button>
+        </div>
+
+        <!-- Add form -->
+        <div class="planner-add-form" id="plannerAddForm">
+          <div class="planner-grid">
+            <div class="planner-field">
+              <label>Campaign name *</label>
+              <input id="plName" placeholder="e.g. Summer Launch 2025">
+            </div>
+            <div class="planner-field">
+              <label>Channel</label>
+              <select id="plChannel">
+                <option value="">— Choose —</option>
+                <option>Social Media</option>
+                <option>Email</option>
+                <option>Paid Ads</option>
+                <option>SEO / Content</option>
+                <option>Event</option>
+                <option>Partnership</option>
+                <option>PR / Media</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="planner-field">
+              <label>Goal / Objective</label>
+              <input id="plGoal" placeholder="e.g. +500 leads, brand awareness…">
+            </div>
+            <div class="planner-field">
+              <label>Budget (€)</label>
+              <input id="plBudget" type="number" placeholder="0">
+            </div>
+            <div class="planner-field full">
+              <label>Strategy</label>
+              <textarea id="plStrategy" placeholder="Describe the approach, targeting, key messages, formats…"></textarea>
+            </div>
+            <div class="planner-field">
+              <label>Expected ROI</label>
+              <input id="plRoi" placeholder="e.g. ×3, +20% revenue…">
+            </div>
+            <div class="planner-field">
+              <label>Expected Impact</label>
+              <input id="plImpact" placeholder="e.g. 10k reach, 200 sign-ups…">
+            </div>
+            <div class="planner-field">
+              <label>Launch date</label>
+              <input id="plLaunch" type="date">
+            </div>
+            <div class="planner-field">
+              <label>Check-up date</label>
+              <input id="plCheckup" type="date">
+            </div>
+            <div class="planner-field">
+              <label>Status</label>
+              <select id="plStatus">
+                <option value="planned">Planned</option>
+                <option value="active">Active</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:.4rem;margin-top:.2rem;">
+            <button class="btn" style="font-size:.68rem;" onclick="togglePlannerAddForm()">Cancel</button>
+            <button class="task-add-btn" style="font-size:.72rem;" onclick="addPlannerCampaign()">💾 Save campaign</button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div id="plannerEmpty" style="color:var(--muted);font-size:.75rem;font-style:italic;text-align:center;padding:2rem 0;">No campaigns planned yet. Click "+ New campaign" to start.</div>
+        <div class="planner-tbl-wrap" id="plannerTblWrap" style="display:none;">
+          <table class="planner-tbl">
+            <thead><tr>
+              <th>Campaign</th><th>Channel</th><th>Goal</th><th>Budget</th>
+              <th>ROI</th><th>Impact</th><th>Strategy</th>
+              <th>Launch</th><th>Check-up</th><th>Status</th><th></th>
+            </tr></thead>
+            <tbody id="plannerTbody"></tbody>
+          </table>
+        </div>
+
+      </div><!-- /mkt-panel-planner -->
 
     </div>
   </div>
@@ -3004,6 +3241,168 @@ function deleteHistoryEntry(i){
   localStorage.setItem('syllabus_history',JSON.stringify(hist));
   renderSyllabusHistory();
 }
+
+/* ── MARKETING SUB-TABS ── */
+function showMktTab(panelId,btn){
+  document.querySelectorAll('.mkt-inner-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.mkt-inner-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+  btn.classList.add('active');
+  if(panelId==='mkt-panel-strategy') renderMktStrategy();
+  if(panelId==='mkt-panel-inspiration') renderInspirationItems();
+  if(panelId==='mkt-panel-planner') renderPlannerCampaigns();
+}
+
+/* ── STRATEGY ── */
+function saveMktStrategy(){
+  const s={
+    target:document.getElementById('stratTarget').value,
+    message:document.getElementById('stratMessage').value,
+    obj6m:document.getElementById('stratObj6m').value,
+    obj1y:document.getElementById('stratObj1y').value,
+    obj5y:document.getElementById('stratObj5y').value,
+    forecast:document.getElementById('stratForecast').value
+  };
+  localStorage.setItem('mkt_strategy',JSON.stringify(s));
+  const el=document.getElementById('stratSaved');
+  el.style.display='inline';
+  setTimeout(()=>el.style.display='none',2000);
+}
+function renderMktStrategy(){
+  let s={};
+  try{ s=JSON.parse(localStorage.getItem('mkt_strategy')||'{}'); }catch(e){}
+  if(s.target) document.getElementById('stratTarget').value=s.target;
+  if(s.message) document.getElementById('stratMessage').value=s.message;
+  if(s.obj6m) document.getElementById('stratObj6m').value=s.obj6m;
+  if(s.obj1y) document.getElementById('stratObj1y').value=s.obj1y;
+  if(s.obj5y) document.getElementById('stratObj5y').value=s.obj5y;
+  if(s.forecast) document.getElementById('stratForecast').value=s.forecast;
+}
+
+/* ── INSPIRATION ── */
+function toggleInspiAddForm(){
+  const f=document.getElementById('inspiAddForm');
+  f.classList.toggle('open');
+  if(f.classList.contains('open')) document.getElementById('inspiTitle').focus();
+}
+function addInspirationItem(){
+  const title=document.getElementById('inspiTitle').value.trim();
+  const desc=document.getElementById('inspiDesc').value.trim();
+  if(!title||!desc){ toast('Title and "What worked" are required','warn'); return; }
+  let items=[];
+  try{ items=JSON.parse(localStorage.getItem('mkt_inspiration')||'[]'); }catch(e){}
+  items.unshift({
+    id:Date.now(),
+    title,
+    cat:document.getElementById('inspiCat').value,
+    desc,
+    source:document.getElementById('inspiSource').value.trim(),
+    date:document.getElementById('inspiDate').value
+  });
+  localStorage.setItem('mkt_inspiration',JSON.stringify(items));
+  ['inspiTitle','inspiDesc','inspiSource','inspiDate'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('inspiAddForm').classList.remove('open');
+  renderInspirationItems();
+  toast('Entry saved','ok');
+}
+function deleteInspirationItem(id){
+  let items=[];
+  try{ items=JSON.parse(localStorage.getItem('mkt_inspiration')||'[]'); }catch(e){}
+  items=items.filter(i=>i.id!==id);
+  localStorage.setItem('mkt_inspiration',JSON.stringify(items));
+  renderInspirationItems();
+}
+function renderInspirationItems(){
+  let items=[];
+  try{ items=JSON.parse(localStorage.getItem('mkt_inspiration')||'[]'); }catch(e){}
+  const grid=document.getElementById('inspiList');
+  const empty=document.getElementById('inspiEmpty');
+  if(!items.length){ grid.innerHTML=''; empty.style.display=''; return; }
+  empty.style.display='none';
+  grid.innerHTML=items.map(it=>`
+    <div class="inspi-card">
+      <div class="inspi-card-hdr">
+        <span class="inspi-card-title">${_esc(it.title)}</span>
+        <span class="inspi-cat-badge">${_esc(it.cat)}</span>
+        <button style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.75rem;padding:0 .2rem;" onclick="deleteInspirationItem(${it.id})" title="Delete">🗑</button>
+      </div>
+      <div class="inspi-card-desc">${_esc(it.desc)}</div>
+      ${it.source||it.date?`<div class="inspi-card-meta">${it.source?'🔗 '+_esc(it.source):''}${it.source&&it.date?' · ':''}${it.date?'📅 '+it.date:''}</div>`:''}
+    </div>`).join('');
+}
+
+/* ── CAMPAIGN PLANNER ── */
+function togglePlannerAddForm(){
+  const f=document.getElementById('plannerAddForm');
+  f.classList.toggle('open');
+  if(f.classList.contains('open')) document.getElementById('plName').focus();
+}
+function addPlannerCampaign(){
+  const name=document.getElementById('plName').value.trim();
+  if(!name){ toast('Campaign name is required','warn'); return; }
+  let items=[];
+  try{ items=JSON.parse(localStorage.getItem('mkt_planner')||'[]'); }catch(e){}
+  items.unshift({
+    id:Date.now(),
+    name,
+    channel:document.getElementById('plChannel').value,
+    goal:document.getElementById('plGoal').value.trim(),
+    budget:document.getElementById('plBudget').value.trim(),
+    strategy:document.getElementById('plStrategy').value.trim(),
+    roi:document.getElementById('plRoi').value.trim(),
+    impact:document.getElementById('plImpact').value.trim(),
+    launch:document.getElementById('plLaunch').value,
+    checkup:document.getElementById('plCheckup').value,
+    status:document.getElementById('plStatus').value
+  });
+  localStorage.setItem('mkt_planner',JSON.stringify(items));
+  ['plName','plGoal','plBudget','plStrategy','plRoi','plImpact','plLaunch','plCheckup'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('plChannel').value='';
+  document.getElementById('plStatus').value='planned';
+  document.getElementById('plannerAddForm').classList.remove('open');
+  renderPlannerCampaigns();
+  toast('Campaign saved','ok');
+}
+function deletePlannerCampaign(id){
+  let items=[];
+  try{ items=JSON.parse(localStorage.getItem('mkt_planner')||'[]'); }catch(e){}
+  items=items.filter(i=>i.id!==id);
+  localStorage.setItem('mkt_planner',JSON.stringify(items));
+  renderPlannerCampaigns();
+}
+function updatePlannerStatus(id,val){
+  let items=[];
+  try{ items=JSON.parse(localStorage.getItem('mkt_planner')||'[]'); }catch(e){}
+  const it=items.find(i=>i.id===id);
+  if(it){ it.status=val; localStorage.setItem('mkt_planner',JSON.stringify(items)); renderPlannerCampaigns(); }
+}
+function renderPlannerCampaigns(){
+  let items=[];
+  try{ items=JSON.parse(localStorage.getItem('mkt_planner')||'[]'); }catch(e){}
+  const empty=document.getElementById('plannerEmpty');
+  const wrap=document.getElementById('plannerTblWrap');
+  const tbody=document.getElementById('plannerTbody');
+  if(!items.length){ empty.style.display=''; wrap.style.display='none'; return; }
+  empty.style.display='none'; wrap.style.display='';
+  tbody.innerHTML=items.map(it=>`<tr>
+    <td style="font-weight:700;">${_esc(it.name)}</td>
+    <td>${it.channel?`<span class="mkt-channel">${_esc(it.channel)}</span>`:''}</td>
+    <td>${_esc(it.goal)}</td>
+    <td>${it.budget?it.budget+'€':''}</td>
+    <td>${_esc(it.roi)}</td>
+    <td>${_esc(it.impact)}</td>
+    <td style="max-width:180px;white-space:normal;font-size:.68rem;color:var(--soft);">${_esc(it.strategy)}</td>
+    <td style="white-space:nowrap;">${it.launch||'—'}</td>
+    <td style="white-space:nowrap;">${it.checkup||'—'}</td>
+    <td><select class="planner-status ${it.status}" style="background:transparent;border:none;font-size:.63rem;font-weight:700;cursor:pointer;color:inherit;" onchange="updatePlannerStatus(${it.id},this.value)">
+      <option value="planned" ${it.status==='planned'?'selected':''}>Planned</option>
+      <option value="active" ${it.status==='active'?'selected':''}>Active</option>
+      <option value="done" ${it.status==='done'?'selected':''}>Done</option>
+    </select></td>
+    <td><button style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.75rem;" onclick="deletePlannerCampaign(${it.id})" title="Delete">🗑</button></td>
+  </tr>`).join('');
+}
+function _esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 /* ── AGENT MARKETING ── */
 async function _runMarketingAgent(){
